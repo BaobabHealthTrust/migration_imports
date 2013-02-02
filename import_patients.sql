@@ -1,4 +1,10 @@
 # This procedure imports patients from intermediate tables to ART2 OpenMRS database
+# ASSUMPTION
+# ==========
+# The assumption here is your source database name is `bart1_intermediate_bare_bones`
+# and the destination any name you prefer.
+# This has been necessary because there seems to be no way to use dynamic database 
+# names in procedures yet
 
 # The default DELIMITER is disabled to avoid conflicting with our scripts
 DELIMITER $$
@@ -54,6 +60,11 @@ BEGIN
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
     
+    # Disable system checks and indexing to speed up processing
+    SET FOREIGN_KEY_CHECKS = 0;
+    SET UNIQUE_CHECKS = 0;
+    SET AUTOCOMMIT = 0;
+
     # Open cursor
     OPEN cur;
     
@@ -156,9 +167,100 @@ BEGIN
         SET @new_nat_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "National id");
         SET @nat_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "National id");
         SET @archived_filing_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Archived filing number");
+        SET @filing_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Filing number");
+        SET @pre_art_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Pre-ART number");
+        SET @prev_art_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Previous-ART number");
+    
+        # Location id defaulted to "Unknown" since the source database version 
+        # did not capture this field
+        SET @location_id = (SELECT location_id FROM location WHERE name = "Unknown");
+    
+        # Create patient identifiers            
+        IF NOT ISNULL(prev_art_number) AND NOT ISNULL(@pre_art_number_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, prev_art_number, @prev_art_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+                                         
+        IF NOT ISNULL(pre_art_number) AND NOT ISNULL(@pre_art_number_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, pre_art_number, @pre_art_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+                                  
+        IF NOT ISNULL(filing_number) AND NOT ISNULL(@filing_number_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, filing_number, @filing_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+                          
+        IF NOT ISNULL(archived_filing_number) AND NOT ISNULL(@archived_filing_number_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, archived_filing_number, @archived_filing_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+                  
+        IF NOT ISNULL(nat_id) AND NOT ISNULL(@nat_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, nat_id, (CASE WHEN ISNULL(new_nat_id) THEN @nat_id ELSE @legacy_id END), @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+          
+        IF NOT ISNULL(new_nat_id) AND NOT ISNULL(@new_nat_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, new_nat_id, @new_nat_id, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        IF NOT ISNULL(art_number) AND NOT ISNULL(@art_number) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, art_number, @art_number, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        IF NOT ISNULL(tb_number) AND NOT ISNULL(@tb_number) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, tb_number, @tb_number, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        IF NOT ISNULL(legacy_id) AND NOT ISNULL(@legacy_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, legacy_id, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        IF NOT ISNULL(legacy_id2) AND NOT ISNULL(@legacy_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, legacy_id2, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        IF NOT ISNULL(legacy_id3) AND NOT ISNULL(@legacy_id) THEN
+        
+            INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+            VALUES (@person_id, legacy_id3, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
     
     END LOOP;
+
+    SET UNIQUE_CHECKS = 1;
+    SET FOREIGN_KEY_CHECKS = 1;
+    COMMIT;
+    SET AUTOCOMMIT = 1;
 
 END$$
 
 DELIMITER ;
+
