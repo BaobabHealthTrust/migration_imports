@@ -36,6 +36,7 @@ BEGIN
     DECLARE home_phone_number VARCHAR(255);
     DECLARE office_phone_number VARCHAR(255);
     DECLARE occupation VARCHAR(255);
+    DECLARE guardian_id INT(11);
     DECLARE nat_id VARCHAR(255);
     DECLARE art_number VARCHAR(255);
     DECLARE pre_art_number VARCHAR(255);
@@ -72,7 +73,7 @@ BEGIN
     read_loop: LOOP
     
         # Get the fields into the variables declared earlier
-        FETCH cur INTO patient_id, given_name, middle_name, family_name, gender, dob, dob_estimated, dead, traditional_authority, current_address, landmark, cellphone_number, home_phone_number, office_phone_number, occupation, nat_id, art_number, pre_art_number, tb_number, legacy_id, legacy_id2, legacy_id3, new_nat_id, prev_art_number, filing_number, archived_filing_number, voided, void_reason, date_voided, voided_by, date_created, creator;
+        FETCH cur INTO patient_id, given_name, middle_name, family_name, gender, dob, dob_estimated, dead, traditional_authority, current_address, landmark, cellphone_number, home_phone_number, office_phone_number, occupation, guardian_id, nat_id, art_number, pre_art_number, tb_number, legacy_id, legacy_id2, legacy_id3, new_nat_id, prev_art_number, filing_number, archived_filing_number, voided, void_reason, date_voided, voided_by, date_created, creator;
     
         # Check if we are done and exit loop if done
         IF done THEN
@@ -252,6 +253,8 @@ BEGIN
             VALUES (@person_id, legacy_id3, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
+    
+        CALL proc_import_first_visit_encounters(@person_id);
     
     END LOOP;
 
