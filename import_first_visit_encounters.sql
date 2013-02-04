@@ -111,10 +111,268 @@ BEGIN
         # Map destination user to source user
         SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
     
+        # Get id of encounter type
         SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = "HIV CLINIC REGISTRATION");
     
+        # Create encounter
         INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
         VALUES (visit_encounter_id, @encounter_type, patient_id, @creator, visit_date, @creator, date_created, (SELECT UUID()));
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(agrees_to_follow_up) THEN
+        
+            # Get concept_id
+            SET @agrees_to_follow_up_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Agrees to followup" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded id
+            SET @agrees_to_follow_up_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded_name_id
+            SET @agrees_to_follow_up_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @agrees_to_follow_up_concept_id, visit_encounter_id, visit_date, @agrees_to_follow_up_value_coded, @agrees_to_follow_up_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(date_of_hiv_pos_test) THEN
+        
+            # Get concept_id
+            SET @date_of_hiv_pos_test_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Confirmatory HIV test date" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator, date_created, uuid)
+            VALUES (patient_id, @date_of_hiv_pos_test_concept_id, visit_encounter_id, visit_date, date_of_hiv_pos_test, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(location_of_hiv_pos_test) THEN
+        
+            # Get concept_id
+            SET @location_of_hiv_pos_test_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "CONFIRMATORY HIV TEST LOCATION" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
+            VALUES (patient_id, @location_of_hiv_pos_test_concept_id, visit_encounter_id, visit_date, location_of_hiv_pos_test, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(arv_number_at_that_site) THEN
+        
+            # Get concept_id
+            SET @arv_number_at_that_site_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "ART number at previous location" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
+            VALUES (patient_id, @arv_number_at_that_site_concept_id, visit_encounter_id, visit_date, arv_number_at_that_site, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(location_of_art_initiation) THEN
+        
+            # Get concept_id
+            SET @location_of_art_initiation_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Location of art initialization" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
+            VALUES (patient_id, @location_of_art_initiation_concept_id, visit_encounter_id, visit_date, location_of_art_initiation, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(taken_arvs_in_last_two_months) THEN
+        
+            # Get concept_id
+            SET @taken_arvs_in_last_two_months_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Has the patient taken ART in the last two months" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded id
+            SET @taken_arvs_in_last_two_months_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded_name_id
+            SET @taken_arvs_in_last_two_months_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @taken_arvs_in_last_two_months_concept_id, visit_encounter_id, visit_date, @taken_arvs_in_last_two_months_value_coded, @taken_arvs_in_last_two_months_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(taken_arvs_in_last_two_weeks) THEN
+        
+            # Get concept_id
+            SET @taken_arvs_in_last_two_weeks_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Has the patient taken ART in the last two weeks" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded id
+            SET @taken_arvs_in_last_two_weeks_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded_name_id
+            SET @taken_arvs_in_last_two_weeks_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @taken_arvs_in_last_two_weeks_concept_id, visit_encounter_id, visit_date, @taken_arvs_in_last_two_weeks_value_coded, @taken_arvs_in_last_two_weeks_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(has_transfer_letter) THEN
+        
+            # Get concept_id
+            SET @has_transfer_letter_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Has transfer letter" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded id
+            SET @has_transfer_letter_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded_name_id
+            SET @has_transfer_letter_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @has_transfer_letter_concept_id, visit_encounter_id, visit_date, @has_transfer_letter_value_coded, @has_transfer_letter_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(site_transferred_from) THEN
+        
+            # Get concept_id
+            SET @site_transferred_from_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Transferred from" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
+            VALUES (patient_id, @site_transferred_from_concept_id, visit_encounter_id, visit_date, site_transferred_from, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(date_of_art_initiation) THEN
+        
+            # Get concept_id
+            SET @date_of_art_initiation_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "ART initiation date" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator, date_created, uuid)
+            VALUES (patient_id, @date_of_art_initiation_concept_id, visit_encounter_id, visit_date, date_of_art_initiation, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(ever_registered_at_art) THEN
+        
+            # Get concept_id
+            SET @ever_registered_at_art_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Ever registered at ART clinic" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded id
+            SET @ever_registered_at_art_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded_name_id
+            SET @ever_registered_at_art_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @ever_registered_at_art_concept_id, visit_encounter_id, visit_date, @ever_registered_at_art_value_coded, @ever_registered_at_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(ever_received_arv) THEN
+        
+            # Get concept_id
+            SET @ever_received_arv_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Ever received ART" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded id
+            SET @ever_received_arv_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded_name_id
+            SET @ever_received_arv_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = agrees_to_follow_up AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @ever_received_arv_concept_id, visit_encounter_id, visit_date, @ever_received_arv_value_coded, @ever_received_arv_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(last_arv_regimen) THEN
+        
+            # Get concept_id
+            SET @last_arv_regimen_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Last ART drugs taken" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
+            VALUES (patient_id, @last_arv_regimen_concept_id, visit_encounter_id, visit_date, last_arv_regimen, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
+    
+        # Check if the field is not empty
+        IF NOT ISNULL(date_last_arv_taken) THEN
+        
+            # Get concept_id
+            SET @date_last_arv_taken_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "Date ART last taken" AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator, date_created, uuid)
+            VALUES (patient_id, @date_last_arv_taken_concept_id, visit_encounter_id, visit_date, date_last_arv_taken, @creator, date_created, (SELECT UUID()));
+        
+        END IF;
     
     END LOOP;
 
