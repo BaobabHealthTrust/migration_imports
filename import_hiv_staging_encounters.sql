@@ -1576,10 +1576,14 @@ BEGIN
             SET reason_for_starting_art = "WHO stage III peds";
           ELSEIF (reason_for_starting_art = "WHO stage 4 peds") THEN
             SET reason_for_starting_art = "WHO stage IV peds";
+          ELSEIF (reason_for_starting_art = "CD4 Count < 250") THEN
+            SET reason_for_starting_art = "CD4 count <= 250";
+          ELSEIF (reason_for_starting_art = "CD4 Count < 350") THEN
+            SET reason_for_starting_art = "CD4 count <= 350";
           ELSE
             SET reason_for_starting_art = reason_for_starting_art;
           END IF;
-          
+
             # Get concept_id
             SET @reason_for_starting_art_concept_id = (SELECT concept_name.concept_id FROM concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
