@@ -1557,32 +1557,71 @@ BEGIN
             VALUES (patient_id, @recto_vaginal_fitsula_concept_id, visit_encounter_id, visit_date, @recto_vaginal_fitsula_value_coded, @recto_vaginal_fitsula_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
-        
+
         # Check if the field is not empty
         IF NOT ISNULL(reason_for_starting_art) THEN
-        
+          IF (reason_for_starting_art = "WHO stage 1 adult") THEN
+            SET reason_for_starting_art = "WHO stage I adult";
+          ELSEIF (reason_for_starting_art = "WHO stage 2 adult") THEN
+            SET reason_for_starting_art = "WHO stage II adult";
+          ELSEIF (reason_for_starting_art = "WHO stage 3 adult") THEN
+            SET reason_for_starting_art = "WHO stage III adult";
+          ELSEIF (reason_for_starting_art = "WHO stage 4 adult") THEN
+            SET reason_for_starting_art = "WHO stage IV adult";
+          ELSEIF (reason_for_starting_art = "WHO stage 1 peds") THEN
+            SET reason_for_starting_art = "WHO stage I peds";
+          ELSEIF (reason_for_starting_art = "WHO stage 2 peds") THEN
+            SET reason_for_starting_art = "WHO stage II peds";
+          ELSEIF (reason_for_starting_art = "WHO stage 3 peds") THEN
+            SET reason_for_starting_art = "WHO stage III peds";
+          ELSEIF (reason_for_starting_art = "WHO stage 4 peds") THEN
+            SET reason_for_starting_art = "WHO stage IV peds";
+          ELSE
+            SET reason_for_starting_art = reason_for_starting_art;
+          END IF;
+          
             # Get concept_id
-            SET @reason_for_starting_art_concept_id = (SELECT concept_name.concept_id FROM concept_name 
+            SET @reason_for_starting_art_concept_id = (SELECT concept_name.concept_id FROM concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
                         WHERE name = "Reason for ART eligibility" AND voided = 0 AND retired = 0 LIMIT 1);
         
+            # Get value_coded id
+            SET @reason_for_starting_art_value_coded = (SELECT concept_name.concept_id FROM concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = reason_for_starting_art AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded_name_id
+            SET @reason_for_starting_art_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = reason_for_starting_art AND voided = 0 AND retired = 0 LIMIT 1);
+        
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @reason_for_starting_art_concept_id, visit_encounter_id, visit_date, reason_for_starting_art, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @reason_for_starting_art_concept_id, visit_encounter_id, visit_date, @reason_for_starting_art_value_coded, @reason_for_starting_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
-    
+
         # Check if the field is not empty
         IF NOT ISNULL(who_stage) THEN
         
             # Get concept_id
-            SET @who_stage_concept_id = (SELECT concept_name.concept_id FROM concept_name 
+            SET @who_stage_concept_id = (SELECT concept_name.concept_id FROM concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
                         WHERE name = "WHO stage" AND voided = 0 AND retired = 0 LIMIT 1);
         
+            # Get value_coded id
+            SET @who_stage_value_coded = (SELECT concept_name.concept_id FROM concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = who_stage AND voided = 0 AND retired = 0 LIMIT 1);
+        
+            # Get value_coded_name_id
+            SET @who_stage_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = who_stage AND voided = 0 AND retired = 0 LIMIT 1);
+        
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @who_stage_concept_id, visit_encounter_id, visit_date, who_stage, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @who_stage_concept_id, visit_encounter_id, visit_date, @who_stage_value_coded, @who_stage_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
