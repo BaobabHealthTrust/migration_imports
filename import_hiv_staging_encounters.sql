@@ -10,7 +10,7 @@
 DELIMITER $$
 
 # Check if a similar procedure exists and drop it so we can start from a clean slate
-DROP PROCEDURE IF EXISTS `proc_import_first_visit_encounters`$$
+DROP PROCEDURE IF EXISTS `proc_import_hiv_staging_encounters`$$
 
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
