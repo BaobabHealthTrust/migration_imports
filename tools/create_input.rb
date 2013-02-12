@@ -95,9 +95,9 @@ def list_databases(called=nil, destination=nil)
     if p.to_i > 0 and p.to_i < $databases.length
       $database = p.to_i
       if !destination.nil?
-        $dst_db = p.to_i
+        $dst_db = $databases[p.to_i]
       else
-        $src_db = p.to_i
+        $src_db = $databases[p.to_i]
       end
 
       system("clear")
@@ -448,7 +448,7 @@ def edit_row
 
   show_edit_row
 
-  puts "\tRecord Types: [ VALUE_CODED | VALUE_TEXT | VALUE_NUMERIC | VALUE_DATETIME ]"
+  puts "\tRecord Types: [ VALUE_CODED | VALUE_TEXT | VALUE_NUMERIC | VALUE_DATETIME | VALUE_MODIFIER ]"
   if $description[$row][4].nil?
     print "\tAdd record type: "
   else
@@ -530,7 +530,7 @@ def show_edit_row
     puts ""
   end
 
-  puts "\t#{("").ljust(5)}#{"FIELD".ljust(35)}#{"FIELD TYPE".ljust(20)}" +
+  puts "\t#{("").ljust(5)}#{"FIELD".ljust(35)}#{"FIELD TYPE".ljust(15)}" +
     "#{"FIELD CATEGORY".ljust(16)}#{"CONCEPT".ljust(40)}#{"RECORD TYPE".ljust(15)}" +
     "#{"GROUP FIELD".ljust(35)}"
 
@@ -564,7 +564,7 @@ def set_folder
 
 end
 
-def expand_obs(field, category, concept=nil, type=nil)
+def expand_obs(field, category, concept=nil, type=nil, group=nil)
 
   result = ""
 
@@ -594,8 +594,11 @@ def expand_obs(field, category, concept=nil, type=nil)
                         WHERE name = #{field} AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @#{field}_value_coded, @#{field}_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id #{(!group.nil? ? ", obs_group_id" : "")}, value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, @#{field}_value_coded, @#{field}_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @#{field}_id = (SELECT LAST_INSERT_ID());
 
         END IF;
         "
@@ -607,16 +610,46 @@ def expand_obs(field, category, concept=nil, type=nil)
             # Get concept_id
             SET @#{field}_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = '#{field}' AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = '#{concept}' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator, date_created, uuid)
-            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, #{field}, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id #{(!group.nil? ? ", obs_group_id" : "")}, value_datetime, creator, date_created, uuid)
+            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @#{field}_id = (SELECT LAST_INSERT_ID());
 
         END IF;
         "
       when "VALUE_NUMERIC"
-        result = ""
+        result = "
+        # Check if the field is not empty
+        IF NOT ISNULL(#{field}) THEN
+
+            # Get concept_id
+            SET @#{field}_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = '#{concept}' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id #{(!group.nil? ? ", obs_group_id" : "")}, value_numeric, creator, date_created, uuid)
+            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @#{field}_id = (SELECT LAST_INSERT_ID());
+
+        END IF;
+        "
+      when "VALUE_MODIFIER"
+        result = "
+        # Check if the field is not empty
+        IF NOT ISNULL(#{field}) THEN
+
+            # Update parent observation
+            UPDATE obs SET value_modifier = '#{field}' WHERE obs_id = @#{group}_id;
+
+        END IF;
+        "
       else
         result = "
         # Check if the field is not empty
@@ -625,11 +658,14 @@ def expand_obs(field, category, concept=nil, type=nil)
             # Get concept_id
             SET @#{field}_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = '#{field}' AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = '#{concept}' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, #{field}, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id #{(!group.nil? ? ", obs_group_id" : "")}, value_text, creator, date_created, uuid)
+            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @#{field}_id = (SELECT LAST_INSERT_ID());
 
         END IF;
         "
@@ -658,27 +694,29 @@ def generate
   encounter = $encounter_type
 
   commands = [
-    "DELIMITER $$",
-    "DROP PROCEDURE IF EXISTS `proc_import_#{src_table}`$$",
-    "CREATE PROCEDURE `proc_import_#{src_table}`(\n\tIN in_patient_id INT(11)\n)",
-    "BEGIN",
-    "DECLARE done INT DEFAULT FALSE;",
-    "DECLARE cur CURSOR FOR SELECT DISTINCT ",
-    "DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;",
-    "OPEN cur;",
-    "read_loop: LOOP",
-    "FETCH cur INTO",
-    "IF done THEN",
-    "LEAVE read_loop;",
-    "END IF;",
-    "SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);",
-    "SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = '#{encounter}');",
-    "INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, " + 
+    "DELIMITER $$",   # 0
+    "DROP PROCEDURE IF EXISTS `proc_import_#{src_table}`$$",    # 1
+    "CREATE PROCEDURE `proc_import_#{src_table}`(\n\tIN in_patient_id INT(11)\n)",    # 2
+    "BEGIN",    # 3
+    "DECLARE done INT DEFAULT FALSE;",    # 4
+    "DECLARE cur CURSOR FOR SELECT DISTINCT ",    # 5
+    "DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;",    # 6
+    "OPEN cur;",    # 7
+    "read_loop: LOOP",    # 8
+    "FETCH cur INTO",   # 9
+    "IF done THEN",   # 10
+    "LEAVE read_loop;",   # 11
+    "END IF;",    # 12
+    "SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);",   # 13
+    "SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = '#{encounter}');",    # 14
+    "INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, " +
       "encounter_datetime, creator, date_created, uuid) VALUES (visit_encounter_id, " +
-      "@encounter_type, patient_id, @creator, visit_date, @creator, date_created, (SELECT UUID()));",
-    "END LOOP;",
-    "END$$",
-    "DELIMITER ;"
+      "@encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) " +
+      "ON DUPLICATE KEY UPDATE encounter_id = visit_encounter_id;",   # 15
+    "END LOOP;",    # 16
+    "END$$",    # 17
+    "DELIMITER ;",   # 18
+    "SET @location_id = (SELECT location_id FROM location WHERE name = location);"
   ]
 
   script = "# This procedure imports data from `#{src_db}` to `#{dst_db}`\n\n# " +
@@ -702,19 +740,23 @@ def generate
   $description.each{|line|
     row = line
 
+    if row[0].downcase.strip == "field"
+      next
+    end
+
     fields << row[0]
 
     declarations << "DECLARE #{row[0]} #{row[1]};"
 
     selects << "`#{src_db}`.`#{src_table}`.`#{row[0]}`"
 
-    obs = obs + expand_obs(row[0], row[2], row[3], row[4]) if (row[2].upcase rescue "") == "OBSERVATION"
+    obs = obs + expand_obs(row[0], row[2], row[3], row[4], ((row[5].strip.length rescue 0) > 0 ? row[5] : nil)) if (row[2].upcase rescue "") == "OBSERVATION"
   }
 
   script = script + declarations.join("\n\t") + "\n\tDECLARE visit_date DATE;\n\n\t"
 
   cursor = cursor + "#{selects.join(", ")}, COALESCE(`#{src_db}`.`visit_encounters`.visit_date, " +
-    "`#{src_db}`.`first_visit_encounters`.date_created) FROM `#{src_db}`.`#{src_table}` " +
+    "`#{src_db}`.`#{src_table}`.date_created) FROM `#{src_db}`.`#{src_table}` " +
     "LEFT OUTER JOIN `#{src_db}`.`visit_encounters` ON
         visit_encounter_id = `#{src_db}`.`visit_encounters`.`id`
         WHERE `#{src_db}`.`#{src_table}`.`patient_id` = in_patient_id;\n\n\t# " +
@@ -724,6 +766,7 @@ def generate
     "#{fields.join(",\n\t\t\t")},\n\t\t\tvisit_date;\n\n\t\t# Check if we are done and exit loop if done\n\t\t#{commands[10]}\n" +
     "\n\t\t\t#{commands[11]}\n\n\t\t#{commands[12]}\n\n\t# Not done, process " +
     "the parameters\n\n\t# Map destination user to source user\n\t#{commands[13]}\n\n\t" +
+    "# Get location id\n\t#{commands[19]}\n\n\t" +
     "# Get id of encounter type\n\t#{commands[14]}\n\n\t# Create encounter\n\t" +
     "#{commands[15]}\n\n\t"
 

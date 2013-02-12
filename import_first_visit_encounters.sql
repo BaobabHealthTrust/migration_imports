@@ -116,7 +116,7 @@ BEGIN
     
         # Create encounter
         INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
-        VALUES (visit_encounter_id, @encounter_type, patient_id, @creator, visit_date, @creator, date_created, (SELECT UUID()));
+        VALUES (visit_encounter_id, @encounter_type, patient_id, @creator, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = visit_encounter_id;
     
         # Check if the field is not empty
         IF NOT ISNULL(agrees_to_follow_up) THEN
