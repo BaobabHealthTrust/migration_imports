@@ -12,7 +12,8 @@ tasks = [
   "import_hiv_reception.sql",
   "import_hiv_staging_encounters.sql",
   "import_pre_art_visit_encounters.sql",
-  "import_outcome_encounters.sql"
+  "import_outcome_encounters.sql",
+  "drug_map.sql"
 ]
 
 def colorize(text, color_code)
