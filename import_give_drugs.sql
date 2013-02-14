@@ -217,9 +217,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -279,9 +279,9 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
@@ -377,9 +377,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -439,9 +439,9 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
@@ -537,9 +537,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -599,9 +599,9 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
@@ -697,9 +697,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -759,9 +759,9 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
@@ -857,9 +857,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -919,9 +919,9 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) + 2)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) + 2)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
