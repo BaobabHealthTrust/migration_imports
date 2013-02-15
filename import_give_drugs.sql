@@ -223,8 +223,8 @@ BEGIN
                         END AS prescription_duration_in_days);
             END IF;
             
-            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-              VALUES (1, @pres_drug_name1_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @pres_drug1_obs_id, @creator,  date_created, @pres_drug_name1_uuid);
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @pres_drug_name1_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name1_uuid);
 
             SET @pres_drug1_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name1_uuid);
 
@@ -285,8 +285,8 @@ BEGIN
                         END AS prescription_duration_in_days);
                 END IF;
                 
-                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name1_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug1_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+                VALUES (1, @pres_drug_name1_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -383,8 +383,8 @@ BEGIN
                         END AS prescription_duration_in_days);
             END IF;
             
-            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-              VALUES (1, @pres_drug_name2_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @pres_drug2_obs_id, @creator,  date_created, @pres_drug_name2_uuid);
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @pres_drug_name2_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name2_uuid);
 
             SET @pres_drug2_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name2_uuid);
 
@@ -445,8 +445,8 @@ BEGIN
                         END AS prescription_duration_in_days);
                 END IF;
                 
-                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name2_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug2_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+                VALUES (1, @pres_drug_name2_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -543,8 +543,8 @@ BEGIN
                         END AS prescription_duration_in_days);
             END IF;
             
-            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-              VALUES (1, @pres_drug_name3_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @pres_drug3_obs_id, @creator,  date_created, @pres_drug_name3_uuid);
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @pres_drug_name3_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name3_uuid);
 
             SET @pres_drug3_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name3_uuid);
 
@@ -605,8 +605,8 @@ BEGIN
                         END AS prescription_duration_in_days);
                 END IF;
                 
-                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name3_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug3_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+                VALUES (1, @pres_drug_name3_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -703,8 +703,8 @@ BEGIN
                         END AS prescription_duration_in_days);
             END IF;
             
-            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-              VALUES (1, @pres_drug_name4_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @pres_drug4_obs_id, @creator,  date_created, @pres_drug_name4_uuid);
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @pres_drug_name4_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name4_uuid);
 
             SET @pres_drug4_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name4_uuid);
 
@@ -765,8 +765,8 @@ BEGIN
                         END AS prescription_duration_in_days);
                 END IF;
                 
-                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name4_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug4_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+                VALUES (1, @pres_drug_name4_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -863,8 +863,8 @@ BEGIN
                         END AS prescription_duration_in_days);
             END IF;
             
-            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-              VALUES (1, @pres_drug_name5_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @pres_drug5_obs_id, @creator,  date_created, @pres_drug_name5_uuid);
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @pres_drug_name5_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name5_uuid);
 
             SET @pres_drug5_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name5_uuid);
 
@@ -925,8 +925,8 @@ BEGIN
                         END AS prescription_duration_in_days);
                 END IF;
                 
-                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name5_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug5_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+                VALUES (1, @pres_drug_name5_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
