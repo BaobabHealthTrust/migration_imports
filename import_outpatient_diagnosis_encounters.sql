@@ -64,21 +64,8 @@ BEGIN
     
         # Get the fields into the variables declared earlier
         FETCH cur INTO  
-            id,
-            visit_encounter_id ,
-            patient_id,
-            refer_to_anotha_hosp,
-            pri_diagnosis,
-            sec_diagnosis,
-            treatment,
-            location,
-            voided,
-            void_reason,
-            date_voided,
-            voided_by,
-            date_created,
-            creator,
-            visit_date;
+            id, visit_encounter_id, patient_id, refer_to_anotha_hosp, pri_diagnosis, sec_diagnosis,
+            treatment, location, voided, void_reason, date_voided, voided_by, date_created, creator, visit_date;
             
         # Check if we are done and exit loop if done
         IF done THEN
@@ -136,7 +123,7 @@ BEGIN
         END IF;
         
         IF NOT ISNULL(pri_diagnosis) THEN
-          IF (sec_diagnosis <> "Not applicable") THEN
+          IF (pri_diagnosis <> "Not applicable") THEN
             # Get id of outpatient_diagnosis encounter type
             SET @outpatient_diagnosis_encounter_type = (SELECT encounter_type_id FROM encounter_type 
                                                         WHERE name = "OUTPATIENT DIAGNOSIS");
@@ -192,21 +179,27 @@ BEGIN
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
               VALUES (patient_id, @detailed_primary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,'non-bloody', @creator, date_created, (SELECT UUID()));
             
-            ELSE
-              IF (pri_diagnosis = "Sprains (Joint Soft Tissue Injury)") THEN
+            ELSEIF (pri_diagnosis = "Sprains (Joint Soft Tissue Injury)") THEN
+                SET @bart_two_sprains_name = (SELECT bart_two_diagnosis_name FROM diagnosis_name_map WHERE bart_one_diagnosis_name = "Sprains");
+
                 SET @detailed_diagnosis_name_concept_id = (SELECT concept_name.concept_id FROM concept_name
                             LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
-                            WHERE name = "Sprain"  AND voided = 0 AND retired = 0 LIMIT 1);
+                            WHERE name = @bart_two_sprains_name AND voided = 0 AND retired = 0 LIMIT 1);
                 
                 SET @detailed_diagnosis_name_concept_name_id = (SELECT concept_name.concept_name_id FROM concept_name
-                            LEFT OUTER JOIN concept ON concept.concept_name_id = concept_name.concept_id 
-                            WHERE concept_id = "Sprain"   AND voided = 0 AND retired = 0 LIMIT 1);
+                            LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                            WHERE name = @bart_two_sprains_name AND voided = 0 AND retired = 0 LIMIT 1);
                 
                 # Create _detailed_primary_diagnosis_observation
                 
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @detailed_primary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,@detailed_diagnosis_name_concept_id, @creator, date_created, (SELECT UUID()));
-             END IF;
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+                VALUES (patient_id, @detailed_primary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,@detailed_diagnosis_name_concept_id,@detailed_diagnosis_name_concept_name_id, @creator, date_created, (SELECT UUID()));
+             
+             ELSEIF (pri_diagnosis = "Soft Tissue Injury (Excluding Joints)") THEN
+                 # Create detailed_primary_diagnosis_observation
+                  
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,'Excluding Joints', @creator, date_created, (SELECT UUID()));
             END IF;
 
           END IF;
@@ -278,16 +271,20 @@ BEGIN
                           WHERE name = @bart_two_sprains_name  AND voided = 0 AND retired = 0 LIMIT 1);
               
               SET @detailed_diagnosis_name_concept_name_id = (SELECT concept_name.concept_name_id FROM concept_name
-                          LEFT OUTER JOIN concept ON concept.concept_name_id = concept_name.concept_id 
-                          WHERE concept_id = @bart_two_sprains_name  AND voided = 0 AND retired = 0 LIMIT 1);
+                          LEFT OUTER JOIN concept ON concept_name.concept_id = concept.concept_id 
+                          WHERE name = @bart_two_sprains_name  AND voided = 0 AND retired = 0 LIMIT 1);
               
               # Create detailed_secondary_diagnosis_observation
               
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-              VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,@detailed_diagnosis_name_concept_id, @creator, date_created, (SELECT UUID()));
+              VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,@detailed_diagnosis_name_concept_id, @detailed_diagnosis_name_concept_name_id, @creator, date_created, (SELECT UUID()));
+            ELSEIF (sec_diagnosis = "Soft Tissue Injury (Excluding Joints)") THEN
+                 # Create detailed_primary_diagnosis_observation
+                  
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,'Excluding Joints', @creator, date_created, (SELECT UUID()));
             END IF;
-          
-          
+
           END IF;
        END IF;
 
