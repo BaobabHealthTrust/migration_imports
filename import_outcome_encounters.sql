@@ -27,7 +27,9 @@ DROP PROCEDURE IF EXISTS `proc_import_outcome_encounter`$$
 
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
-CREATE PROCEDURE `proc_import_outcome_encounter`(IN in_patient_id INT(11))
+CREATE PROCEDURE `proc_import_outcome_encounter`(
+    IN in_patient_id INT(11)
+)
 BEGIN
     # Declare condition for exiting loop
     DECLARE done INT DEFAULT FALSE;

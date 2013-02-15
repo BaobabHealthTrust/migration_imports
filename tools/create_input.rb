@@ -287,6 +287,8 @@ def describe_table
       case cells[0].to_s.downcase
       when "visit_encounter_id"
         category = "ENCOUNTER"
+      when "old_enc_id"
+        category = "ENCOUNTER"
       when "patient_id"
         category = "PATIENT_ID"
       when "id"
@@ -595,7 +597,7 @@ def expand_obs(field, category, concept=nil, type=nil, group=nil)
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id #{(!group.nil? ? ", obs_group_id" : "")}, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, @#{field}_value_coded, @#{field}_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @#{field}_concept_id, old_enc_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, @#{field}_value_coded, @#{field}_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @#{field}_id = (SELECT LAST_INSERT_ID());
@@ -614,7 +616,7 @@ def expand_obs(field, category, concept=nil, type=nil, group=nil)
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id #{(!group.nil? ? ", obs_group_id" : "")}, value_datetime, creator, date_created, uuid)
-            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @#{field}_concept_id, old_enc_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @#{field}_id = (SELECT LAST_INSERT_ID());
@@ -633,7 +635,7 @@ def expand_obs(field, category, concept=nil, type=nil, group=nil)
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id #{(!group.nil? ? ", obs_group_id" : "")}, value_numeric, creator, date_created, uuid)
-            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @#{field}_concept_id, old_enc_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @#{field}_id = (SELECT LAST_INSERT_ID());
@@ -662,7 +664,7 @@ def expand_obs(field, category, concept=nil, type=nil, group=nil)
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id #{(!group.nil? ? ", obs_group_id" : "")}, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @#{field}_concept_id, visit_encounter_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @#{field}_concept_id, old_enc_id, visit_date, @location_id #{(!group.nil? ? ", @" + group + "_id" : "")}, #{field}, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @#{field}_id = (SELECT LAST_INSERT_ID());
@@ -710,9 +712,9 @@ def generate
     "SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);",   # 13
     "SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = '#{encounter}');",    # 14
     "INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, " +
-      "encounter_datetime, creator, date_created, uuid) VALUES (visit_encounter_id, " +
+      "encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, " +
       "@encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) " +
-      "ON DUPLICATE KEY UPDATE encounter_id = visit_encounter_id;",   # 15
+      "ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;",   # 15
     "END LOOP;",    # 16
     "END$$",    # 17
     "DELIMITER ;",   # 18

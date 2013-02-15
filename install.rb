@@ -13,7 +13,9 @@ tasks = [
   "import_hiv_staging_encounters.sql",
   "import_pre_art_visit_encounters.sql",
   "import_outcome_encounters.sql",
-  "drug_map.sql"
+  "import_vitals_encounters.sql",
+  "drug_map.sql" ,
+  "moh_regimens_only.sql"
 ]
 
 def colorize(text, color_code)
@@ -82,13 +84,32 @@ tasks.each do |file|
 
   dst.close
 
+  system("clear")
+
+  puts green("\n\n\tSetting up #{file}")
+
   system("mysql -u #{$username} -p#{$password} #{$dst_database} < tmp/~#{file}")
   
 end
 
 Dir.foreach("tmp").each{|f|
+
+  next if f == "." or f == ".."
+
+  system("clear")
+
+  puts red("\n\n\tDeleting 'tmp/#{f}' temporary file...")
+
   File.delete("tmp/#{f}") if f != '.' && f != '..'
 }
 
+system("clear")
+
 Dir.rmdir("tmp")
+
+print cyan("\n\n\tDone!")
+
+p = gets.chomp
+
+system("clear")
 
