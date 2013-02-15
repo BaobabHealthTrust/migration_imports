@@ -27,7 +27,9 @@ DROP PROCEDURE IF EXISTS `proc_import_outcome_encounter`$$
 
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
-CREATE PROCEDURE `proc_import_outcome_encounter`()
+CREATE PROCEDURE `proc_import_outcome_encounter`(
+    IN in_patient_id INT(11)
+)
 BEGIN
     # Declare condition for exiting loop
     DECLARE done INT DEFAULT FALSE;
@@ -48,7 +50,8 @@ BEGIN
     DECLARE creator INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`outcome_encounters`;
+    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`outcome_encounters` 
+        WHERE `bart1_intermediate_bare_bones`.`outcome_encounters`.`patient_id` = in_patient_id;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;

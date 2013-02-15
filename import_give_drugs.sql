@@ -145,8 +145,8 @@ BEGIN
         # Create encounter
         SET @encounter_uuid = (SELECT UUID());
         
-        INSERT INTO encounter (encounter_id, ssencounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
-        VALUES (visit_encounter_id, @encounter_type, patient_id, @creator, visit_date, @creator, date_created, @encounter_uuid);
+        INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+        VALUES (visit_encounter_id, @encounter_type, patient_id, @creator, visit_date, @creator, date_created, @encounter_uuid) ON DUPLICATE KEY UPDATE encounter_id = visit_encounter_id;
        
         SET @encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @encounter_uuid);
 
