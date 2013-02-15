@@ -2,11 +2,11 @@
 # I decided to use default values / hardcoded values to reduce database reads
 
 # encounter_type ====> 40
-# states :  pre-art             =>  
-#           died                => 
-#           transfered_out      => 
-#           treatment_stopped   => 
-#           on_art              =>
+# states :  pre-art             =>  1
+#           died                =>  3
+#           transfered_out      =>  2
+#           treatment_stopped   =>  6
+#           on_art              =>  7
 #
 #  mapping explained    
     -- On Art   => Add a state On_Art 
@@ -16,7 +16,7 @@
     -- treatment_stopped => Update state -- This is a terminal state
 
     # Terminal states
-    -- Create an Exit from care encounter with associated observations 
+    -- Create an Exit from care encounter (119) with associated observations 
 #  end mapping
 
 # The default DELIMITER is disabled to avoid conflicting with our scripts
@@ -50,8 +50,8 @@ BEGIN
     DECLARE creator INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`outcome_encounters` 
-        WHERE `bart1_intermediate_bare_bones`.`outcome_encounters`.`patient_id` = in_patient_id;
+    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`outcome_encounters`
+            WHERE `bart1_intermediate_bare_bones`.`outcome_encounters`.`patient_id` = in_patient_id;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;

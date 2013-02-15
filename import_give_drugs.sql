@@ -183,8 +183,10 @@ BEGIN
             ELSE
               IF NOT ISNULL(weight)THEN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                          WHERE max_weight >= weight
+                                          WHERE min_weight <= weight
+                                          AND max_weight >= weight
                                           AND concept_id = @pres_drug_name1_concept_id);
+
               END IF;
 
               SET @regimen_category_concept_id = (SELECT concept_name.concept_id FROM concept_name
@@ -215,9 +217,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -227,6 +229,18 @@ BEGIN
             SET @pres_drug1_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name1_uuid);
 
             IF NOT ISNULL(dispensed_drug_name1) THEN
+              
+              # Get id of dispense encounter type
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+
+              # Create encounter
+              SET @dispensing_encounter_uuid = (SELECT UUID());
+              
+              INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
+       
+              SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
+              
               
               #get the bart2_drug_names from drug_map table
 
@@ -251,11 +265,11 @@ BEGIN
                             
                # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @pres_drug1_order_id, visit_date, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug1_order_id, visit_date, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id,@pres_drug1_order_id, visit_date, @dispensed_drug_name1_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,@pres_drug1_order_id, visit_date, @dispensed_drug_name1_concept_id, @creator, date_created, (SELECT UUID()));
               
               ELSEIF (@dispensed_drug_name1_bart2_name <> @pres_drug_name1_bart2_name) THEN
                 
@@ -265,14 +279,14 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
                 INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name1_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug1_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                VALUES (1, @pres_drug_name1_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug1_obs_id, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -283,11 +297,11 @@ BEGIN
                 
                 # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name1_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name1_concept_id, @creator, date_created, (SELECT UUID()));
               END IF;
              ELSE
               #create drug_order without quantity
@@ -295,7 +309,7 @@ BEGIN
                 VALUES (@pres_drug1_order_id, @pres_drug_name1_concept_id, pres_dosage1, pres_dosage1, pres_frequency1);
              END IF;
         END IF;
-        
+
         # Check if the field is not empty========================================================================================
         IF NOT ISNULL(pres_drug_name2) THEN
             SET @pres_drug_name2_bart2_name = (SELECT bart2_two_name FROM drug_map WHERE bart_one_name = pres_drug_name2 LIMIT 1);
@@ -329,8 +343,10 @@ BEGIN
             ELSE
               IF NOT ISNULL(weight)THEN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                          WHERE max_weight >= weight
+                                          WHERE min_weight <= weight
+                                          AND max_weight >= weight
                                           AND concept_id = @pres_drug_name2_concept_id);
+
               END IF;
 
               SET @regimen_category_concept_id = (SELECT concept_name.concept_id FROM concept_name
@@ -361,9 +377,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -373,6 +389,18 @@ BEGIN
             SET @pres_drug2_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name2_uuid);
 
             IF NOT ISNULL(dispensed_drug_name2) THEN
+              
+              # Get id of dispense encounter type
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+
+              # Create encounter
+              SET @dispensing_encounter_uuid = (SELECT UUID());
+              
+              INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
+       
+              SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
+              
               
               #get the bart2_drug_names from drug_map table
 
@@ -397,11 +425,11 @@ BEGIN
                             
                # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @pres_drug2_order_id, visit_date, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug2_order_id, visit_date, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id,@pres_drug2_order_id, visit_date, @dispensed_drug_name2_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,@pres_drug2_order_id, visit_date, @dispensed_drug_name2_concept_id, @creator, date_created, (SELECT UUID()));
               
               ELSEIF (@dispensed_drug_name2_bart2_name <> @pres_drug_name2_bart2_name) THEN
                 
@@ -411,14 +439,14 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
                 INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name2_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug2_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                VALUES (1, @pres_drug_name2_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug2_obs_id, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -429,18 +457,18 @@ BEGIN
                 
                 # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name2_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name2_concept_id, @creator, date_created, (SELECT UUID()));
               END IF;
              ELSE
               #create drug_order without quantity
                 INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
                 VALUES (@pres_drug2_order_id, @pres_drug_name2_concept_id, pres_dosage2, pres_dosage2, pres_frequency2);
              END IF;
-        END IF;        
+        END IF;
 
         # Check if the field is not empty========================================================================================
         IF NOT ISNULL(pres_drug_name3) THEN
@@ -475,8 +503,10 @@ BEGIN
             ELSE
               IF NOT ISNULL(weight)THEN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                          WHERE max_weight >= weight
+                                          WHERE min_weight <= weight
+                                          AND max_weight >= weight
                                           AND concept_id = @pres_drug_name3_concept_id);
+
               END IF;
 
               SET @regimen_category_concept_id = (SELECT concept_name.concept_id FROM concept_name
@@ -507,9 +537,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -519,6 +549,18 @@ BEGIN
             SET @pres_drug3_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name3_uuid);
 
             IF NOT ISNULL(dispensed_drug_name3) THEN
+              
+              # Get id of dispense encounter type
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+
+              # Create encounter
+              SET @dispensing_encounter_uuid = (SELECT UUID());
+              
+              INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
+       
+              SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
+              
               
               #get the bart2_drug_names from drug_map table
 
@@ -543,11 +585,11 @@ BEGIN
                             
                # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @pres_drug3_order_id, visit_date, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug3_order_id, visit_date, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id,@pres_drug3_order_id, visit_date, @dispensed_drug_name3_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,@pres_drug3_order_id, visit_date, @dispensed_drug_name3_concept_id, @creator, date_created, (SELECT UUID()));
               
               ELSEIF (@dispensed_drug_name3_bart2_name <> @pres_drug_name3_bart2_name) THEN
                 
@@ -557,14 +599,14 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
                 INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name3_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug3_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                VALUES (1, @pres_drug_name3_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug3_obs_id, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -575,20 +617,20 @@ BEGIN
                 
                 # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name3_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name3_concept_id, @creator, date_created, (SELECT UUID()));
               END IF;
              ELSE
               #create drug_order without quantity
                 INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
                 VALUES (@pres_drug3_order_id, @pres_drug_name3_concept_id, pres_dosage3, pres_dosage3, pres_frequency3);
              END IF;
-        END IF;       
+        END IF;
 
-       # Check if the field is not empty========================================================================================
+        # Check if the field is not empty========================================================================================
         IF NOT ISNULL(pres_drug_name4) THEN
             SET @pres_drug_name4_bart2_name = (SELECT bart2_two_name FROM drug_map WHERE bart_one_name = pres_drug_name4 LIMIT 1);
             SET @pres_drug_name4_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name4_bart2_name);
@@ -621,8 +663,10 @@ BEGIN
             ELSE
               IF NOT ISNULL(weight)THEN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                          WHERE max_weight >= weight
+                                          WHERE min_weight <= weight
+                                          AND max_weight >= weight
                                           AND concept_id = @pres_drug_name4_concept_id);
+
               END IF;
 
               SET @regimen_category_concept_id = (SELECT concept_name.concept_id FROM concept_name
@@ -653,9 +697,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -665,6 +709,18 @@ BEGIN
             SET @pres_drug4_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name4_uuid);
 
             IF NOT ISNULL(dispensed_drug_name4) THEN
+              
+              # Get id of dispense encounter type
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+
+              # Create encounter
+              SET @dispensing_encounter_uuid = (SELECT UUID());
+              
+              INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
+       
+              SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
+              
               
               #get the bart2_drug_names from drug_map table
 
@@ -689,11 +745,11 @@ BEGIN
                             
                # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @pres_drug4_order_id, visit_date, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug4_order_id, visit_date, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id,@pres_drug4_order_id, visit_date, @dispensed_drug_name4_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,@pres_drug4_order_id, visit_date, @dispensed_drug_name4_concept_id, @creator, date_created, (SELECT UUID()));
               
               ELSEIF (@dispensed_drug_name4_bart2_name <> @pres_drug_name4_bart2_name) THEN
                 
@@ -703,14 +759,14 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
                 INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name4_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug4_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                VALUES (1, @pres_drug_name4_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug4_obs_id, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -721,11 +777,11 @@ BEGIN
                 
                 # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name4_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name4_concept_id, @creator, date_created, (SELECT UUID()));
               END IF;
              ELSE
               #create drug_order without quantity
@@ -767,8 +823,10 @@ BEGIN
             ELSE
               IF NOT ISNULL(weight)THEN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                          WHERE max_weight >= weight
+                                          WHERE min_weight <= weight
+                                          AND max_weight >= weight
                                           AND concept_id = @pres_drug_name5_concept_id);
+
               END IF;
 
               SET @regimen_category_concept_id = (SELECT concept_name.concept_id FROM concept_name
@@ -799,9 +857,9 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
             END IF;
             
@@ -811,6 +869,18 @@ BEGIN
             SET @pres_drug5_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name5_uuid);
 
             IF NOT ISNULL(dispensed_drug_name5) THEN
+              
+              # Get id of dispense encounter type
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+
+              # Create encounter
+              SET @dispensing_encounter_uuid = (SELECT UUID());
+              
+              INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
+       
+              SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
+              
               
               #get the bart2_drug_names from drug_map table
 
@@ -835,11 +905,11 @@ BEGIN
                             
                # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @pres_drug5_order_id, visit_date, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug5_order_id, visit_date, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id,@pres_drug5_order_id, visit_date, @dispensed_drug_name5_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,@pres_drug5_order_id, visit_date, @dispensed_drug_name5_concept_id, @creator, date_created, (SELECT UUID()));
               
               ELSEIF (@dispensed_drug_name5_bart2_name <> @pres_drug_name5_bart2_name) THEN
                 
@@ -849,14 +919,14 @@ BEGIN
                 IF NOT ISNULL(prescription_duration) THEN
                   SET @auto_expire_date = (SELECT 
                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                        ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30)) 
+                        ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                         ELSE 
-                          ADDDATE(visit_date,(LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7)) 
+                          ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                         END AS prescription_duration_in_days);
                 END IF;
                 
                 INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, obs_id, creator, date_created, uuid)
-                VALUES (1, @pres_drug_name5_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug5_obs_id, @creator,  date_created, @dispensed_order_uuid);
+                VALUES (1, @pres_drug_name5_concept_id, 1, @dispensing_encounter_id, patient_id, visit_date, @auto_expire_date,@pres_drug5_obs_id, @creator,  date_created, @dispensed_order_uuid);
                 
                 # get the dispensed_drug_order_id
                 SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
@@ -867,11 +937,11 @@ BEGIN
                 
                 # create amount_dispensed observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @amount_dispensed_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
                
                # create arv_regimens_received_abstracted_construct observation         
                 INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
-                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name5_concept_id, @creator, date_created, (SELECT UUID()));
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id, visit_date, @dispensed_drug_name5_concept_id, @creator, date_created, (SELECT UUID()));
               END IF;
              ELSE
               #create drug_order without quantity
@@ -879,11 +949,6 @@ BEGIN
                 VALUES (@pres_drug5_order_id, @pres_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5);
              END IF;
         END IF;
-
-
-
-
-
 
     END LOOP;
 
