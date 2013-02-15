@@ -142,7 +142,7 @@ BEGIN
                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
                           WHERE name = "Primary diagnosis" AND voided = 0 AND retired = 0 LIMIT 1);
             
-            SET @pri_diagnosis_name = (SELECT bart_two_diagnosis_name FROM diagnosis_name_map WHERE bart_one_diagnosis_name = pri_diagnosis);
+            SET @pri_diagnosis_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = pri_diagnosis);
 
             IF ISNULL(@pri_diagnosis_name) THEN
               SET @bart2_primary_diagnosis_name = (pri_diagnosis);
@@ -180,7 +180,7 @@ BEGIN
               VALUES (patient_id, @detailed_primary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,'non-bloody', @creator, date_created, (SELECT UUID()));
             
             ELSEIF (pri_diagnosis = "Sprains (Joint Soft Tissue Injury)") THEN
-                SET @bart_two_sprains_name = (SELECT bart_two_diagnosis_name FROM diagnosis_name_map WHERE bart_one_diagnosis_name = "Sprains");
+                SET @bart_two_sprains_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = "Sprains");
 
                 SET @detailed_diagnosis_name_concept_id = (SELECT concept_name.concept_id FROM concept_name
                             LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
@@ -226,7 +226,7 @@ BEGIN
                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
                           WHERE name = "secondary diagnosis" AND voided = 0 AND retired = 0 LIMIT 1);
             
-            SET @sec_diagnosis_name = (SELECT bart_two_diagnosis_name FROM diagnosis_name_map WHERE bart_one_diagnosis_name = sec_diagnosis);
+            SET @sec_diagnosis_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = sec_diagnosis);
 
           IF ISNULL(@sec_diagnosis_name) THEN
             SET @bart2_secondary_diagnosis_name = (sec_diagnosis);
@@ -264,7 +264,7 @@ BEGIN
               VALUES (patient_id, @detailed_primary_diagnosis_concept_id, @outpatient_diagnosis_encounter_id,  visit_date,'non-bloody', @creator, date_created, (SELECT UUID()));
             
             ELSEIF (sec_diagnosis = "Sprains (Joint Soft Tissue Injury)") THEN
-              SET @bart_two_sprains_name = (SELECT bart_two_diagnosis_name FROM diagnosis_name_map WHERE bart_one_diagnosis_name = "Sprains");
+              SET @bart_two_sprains_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = "Sprains");
               
               SET @detailed_diagnosis_name_concept_id = (SELECT concept_name.concept_id FROM concept_name
                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
@@ -288,6 +288,57 @@ BEGIN
           END IF;
        END IF;
 
+       #check if treatment is empty========================================================================================
+       IF NOT ISNULL(treatment) THEN
+         
+         # Get id of outpatient_reception encounter type
+         SET @outpatient_treatment_encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = "TREATMENT");
+
+         # Create outpatient_reception encounter
+         SET @outpatient_treatment_encounter_uuid = (SELECT UUID());
+          
+         INSERT INTO encounter ( encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+         VALUES ( @outpatient_treatment_encounter_type, patient_id, @creator, visit_date, @creator, date_created, @outpatient_treatment_encounter_uuid);
+         
+         # get the created outpatient_reception encounter_id
+         SET @outpatient_treatment_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @outpatient_treatment_encounter_uuid);
+         
+         # get the drug_dispensed_concept_id
+         SET @drug_dispensed_concept_id =  (SELECT concept_name.concept_id FROM concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                          WHERE name = "Drugs dispensed"  AND voided = 0 AND retired = 0 LIMIT 1);
+        
+        # get the correct drug_name spelling 
+        SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment);
+
+        IF ISNULL(@bart2_drug_name) THEN
+          SET @bart2_drug_concept_name = (treatment);
+        ELSE
+          SET @bart2_drug_concept_name = (@bart2_drug_name);
+        END IF;
+        
+        # get the drug_concept_id     
+        SET @drug_concept_id =  (SELECT concept_name.concept_id FROM concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                          WHERE name = @bart2_drug_concept_name  AND voided = 0 AND retired = 0 LIMIT 1);
+
+         SET @drug_concept_name_id =  (SELECT concept_name.concept_name_id FROM concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                          WHERE name = @bart2_drug_concept_name  AND voided = 0 AND retired = 0 LIMIT 1);        
+                         
+        # create the drug_dispensed observation
+        IF ISNULL(@drug_concept_id) THEN
+          INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
+          VALUES (patient_id, @drug_dispensed_concept_id, @outpatient_treatment_encounter_id, visit_date, @bart2_drug_concept_name, @creator, date_created, (SELECT UUID()));
+        ELSE
+              
+          INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
+          VALUES (patient_id, @drug_dispensed_concept_id, @outpatient_treatment_encounter_id, visit_date, @drug_concept_id, @drug_concept_name_id, @creator, date_created, (SELECT UUID()));
+         
+        END IF;
+         
+       END IF;
+
     END LOOP;
 
     # SET UNIQUE_CHECKS = 1;
@@ -298,4 +349,4 @@ BEGIN
 END$$
 
 DELIMITER ;
-        
+
