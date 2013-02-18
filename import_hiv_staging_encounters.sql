@@ -24,6 +24,7 @@ BEGIN
 
     DECLARE id INT(11);
     DECLARE visit_encounter_id INT(11);
+    DECLARE old_enc_id INT(11);
     DECLARE patient_id INT(11);
     DECLARE patient_pregnant VARCHAR(40);
     DECLARE patient_breast_feeding VARCHAR(40);
@@ -96,7 +97,9 @@ BEGIN
     DECLARE visit_patient_id INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.visit_encounter_id, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.patient_id,
+    DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.visit_encounter_id,
+`bart1_intermediate_bare_bones`.`hiv_staging_encounters`.old_enc_id, 
+`bart1_intermediate_bare_bones`.`hiv_staging_encounters`.patient_id,
 `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.patient_pregnant, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.patient_breast_feeding, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.cd4_count_available, 
 `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.cd4_count, 
 `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.cd4_count_modifier, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.cd4_count_percentage, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.date_of_cd4_count, 
@@ -133,6 +136,7 @@ BEGIN
         # Get the fields into the variables declared earlier
         FETCH cur INTO  
              visit_encounter_id, 
+             old_enc_id,
              patient_id, 
              patient_pregnant, 
              patient_breast_feeding,
@@ -219,7 +223,7 @@ BEGIN
     
         # Create encounter
         INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
-        VALUES (visit_encounter_id, @encounter_type, patient_id, @creator, visit_date, @creator, date_created, (SELECT UUID()));
+        VALUES (old_enc_id, @encounter_type, patient_id, @creator, visit_date, @creator, date_created, (SELECT UUID()));
     
 
       # Check if the field is not empty
@@ -242,7 +246,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @patient_pregnant_concept_id, visit_encounter_id, visit_date, @patient_pregnant_value_coded, @patient_pregnant_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @patient_pregnant_concept_id, old_enc_id, visit_date, @patient_pregnant_value_coded, @patient_pregnant_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
@@ -266,7 +270,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @patient_breast_feeding_concept_id, visit_encounter_id, visit_date, @patient_breast_feeding_value_coded, @patient_breast_feeding_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @patient_breast_feeding_concept_id, old_enc_id, visit_date, @patient_breast_feeding_value_coded, @patient_breast_feeding_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -280,7 +284,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @cd4_count_percentage_concept_id, visit_encounter_id, visit_date, cd4_count, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cd4_count_percentage_concept_id, old_enc_id, visit_date, cd4_count, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -294,7 +298,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @cd4_count_modifier_concept_id, visit_encounter_id, visit_date, cd4_count, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cd4_count_modifier_concept_id, old_enc_id, visit_date, cd4_count, @creator, date_created, (SELECT UUID()));
         END IF;
 
         # Check if the field is not empty
@@ -307,7 +311,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @date_of_cd4_count_concept_id, visit_encounter_id, visit_date, date_of_cd4_count, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @date_of_cd4_count_concept_id, old_enc_id, visit_date, date_of_cd4_count, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -321,7 +325,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @cd4_count_concept_id, visit_encounter_id, visit_date, cd4_count, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cd4_count_concept_id, old_enc_id, visit_date, cd4_count, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -335,7 +339,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @cd4_count_percentage_concept_id, visit_encounter_id, visit_date, cd4_count, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cd4_count_percentage_concept_id, old_enc_id, visit_date, cd4_count, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -349,7 +353,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-            VALUES (patient_id, @date_of_cd4_count_concept_id, visit_encounter_id, visit_date, date_of_cd4_count, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @date_of_cd4_count_concept_id, old_enc_id, visit_date, date_of_cd4_count, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -373,7 +377,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @asymptomatic_concept_id, visit_encounter_id, visit_date, @asymptomatic_value_coded, @asymptomatic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @asymptomatic_concept_id, old_enc_id, visit_date, @asymptomatic_value_coded, @asymptomatic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -397,7 +401,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @persistent_generalized_lymphadenopathy_concept_id, visit_encounter_id, visit_date, @persistent_generalized_lymphadenopathy_value_coded, @persistent_generalized_lymphadenopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @persistent_generalized_lymphadenopathy_concept_id, old_enc_id, visit_date, @persistent_generalized_lymphadenopathy_value_coded, @persistent_generalized_lymphadenopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
      
@@ -421,7 +425,7 @@ BEGIN
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @unspecified_stage_1_cond_concept_id, visit_encounter_id, visit_date, @unspecified_stage_1_cond_value_coded, @unspecified_stage_1_cond_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @unspecified_stage_1_cond_concept_id, old_enc_id, visit_date, @unspecified_stage_1_cond_value_coded, @unspecified_stage_1_cond_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -445,7 +449,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @molluscumm_contagiosum_cond_concept_id, visit_encounter_id, visit_date, @molluscumm_contagiosum_value_coded, @molluscumm_contagiosum_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @molluscumm_contagiosum_cond_concept_id, old_enc_id, visit_date, @molluscumm_contagiosum_value_coded, @molluscumm_contagiosum_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -469,7 +473,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @wart_virus_infection_extensive_concept_id, visit_encounter_id, visit_date, @wart_virus_infection_extensive_value_coded, @wart_virus_infection_extensive_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @wart_virus_infection_extensive_concept_id, old_enc_id, visit_date, @wart_virus_infection_extensive_value_coded, @wart_virus_infection_extensive_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -493,7 +497,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @oral_ulcerations_recurrent_concept_id, visit_encounter_id, visit_date, @oral_ulcerations_recurrent_value_coded, @oral_ulcerations_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @oral_ulcerations_recurrent_concept_id, old_enc_id, visit_date, @oral_ulcerations_recurrent_value_coded, @oral_ulcerations_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -517,7 +521,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @parotid_enlargement_persistent_unexplained_concept_id, visit_encounter_id, visit_date, @parotid_enlargement_persistent_unexplained_value_coded, @parotid_enlargement_persistent_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @parotid_enlargement_persistent_unexplained_concept_id, old_enc_id, visit_date, @parotid_enlargement_persistent_unexplained_value_coded, @parotid_enlargement_persistent_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
        
@@ -541,7 +545,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @lineal_gingival_erythema_concept_id, visit_encounter_id, visit_date, @lineal_gingival_erythema_value_coded, @lineal_gingival_erythema_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @lineal_gingival_erythema_concept_id, old_enc_id, visit_date, @lineal_gingival_erythema_value_coded, @lineal_gingival_erythema_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -565,7 +569,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @herpes_zoster_concept_id, visit_encounter_id, visit_date, @herpes_zoster_value_coded, @herpes_zoster_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @herpes_zoster_concept_id, old_enc_id, visit_date, @herpes_zoster_value_coded, @herpes_zoster_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -589,7 +593,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @respiratory_tract_infections_recurrent_concept_id, visit_encounter_id, visit_date, @respiratory_tract_infections_recurrent_value_coded, @respiratory_tract_infections_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @respiratory_tract_infections_recurrent_concept_id, old_enc_id, visit_date, @respiratory_tract_infections_recurrent_value_coded, @respiratory_tract_infections_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
            
@@ -613,7 +617,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @unspecified_stage2_condition_concept_id, visit_encounter_id, visit_date, @unspecified_stage2_condition_value_coded, @unspecified_stage2_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @unspecified_stage2_condition_concept_id, old_enc_id, visit_date, @unspecified_stage2_condition_value_coded, @unspecified_stage2_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
                           
@@ -637,7 +641,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @angular_chelitis_concept_id, visit_encounter_id, visit_date, @angular_chelitis_value_coded, @angular_chelitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @angular_chelitis_concept_id, old_enc_id, visit_date, @angular_chelitis_value_coded, @angular_chelitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
                                   
@@ -661,7 +665,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @papular_prurtic_eruptions_concept_id, visit_encounter_id, visit_date, @papular_prurtic_eruptions_value_coded, @papular_prurtic_eruptions_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @papular_prurtic_eruptions_concept_id, old_enc_id, visit_date, @papular_prurtic_eruptions_value_coded, @papular_prurtic_eruptions_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -686,7 +690,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @hepatosplenomegaly_unexplained_concept_id, visit_encounter_id, visit_date, @hepatosplenomegaly_unexplained_value_coded, @hepatosplenomegaly_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @hepatosplenomegaly_unexplained_concept_id, old_enc_id, visit_date, @hepatosplenomegaly_unexplained_value_coded, @hepatosplenomegaly_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -711,7 +715,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @oral_hairy_leukoplakia_concept_id, visit_encounter_id, visit_date, @oral_hairy_leukoplakia_value_coded, @oral_hairy_leukoplakia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @oral_hairy_leukoplakia_concept_id, old_enc_id, visit_date, @oral_hairy_leukoplakia_value_coded, @oral_hairy_leukoplakia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -736,7 +740,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @severe_weight_loss_concept_id, visit_encounter_id, visit_date, @severe_weight_loss_value_coded, @severe_weight_loss_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @severe_weight_loss_concept_id, old_enc_id, visit_date, @severe_weight_loss_value_coded, @severe_weight_loss_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -760,7 +764,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @fever_persistent_unexplained_concept_id, visit_encounter_id, visit_date, @fever_persistent_unexplained_value_coded, @fever_persistent_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @fever_persistent_unexplained_concept_id, old_enc_id, visit_date, @fever_persistent_unexplained_value_coded, @fever_persistent_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -784,7 +788,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @pulmonary_tuberculosis_concept_id, visit_encounter_id, visit_date, @pulmonary_tuberculosis_value_coded, @pulmonary_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @pulmonary_tuberculosis_concept_id, old_enc_id, visit_date, @pulmonary_tuberculosis_value_coded, @pulmonary_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -808,7 +812,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @pulmonary_tuberculosis_last_2_years_concept_id, visit_encounter_id, visit_date, @pulmonary_tuberculosis_last_2_years_value_coded, @pulmonary_tuberculosis_last_2_years_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @pulmonary_tuberculosis_last_2_years_concept_id, old_enc_id, visit_date, @pulmonary_tuberculosis_last_2_years_value_coded, @pulmonary_tuberculosis_last_2_years_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -832,7 +836,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @severe_bacterial_infection_concept_id, visit_encounter_id, visit_date, @severe_bacterial_infection_value_coded, @severe_bacterial_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @severe_bacterial_infection_concept_id, old_enc_id, visit_date, @severe_bacterial_infection_value_coded, @severe_bacterial_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -856,7 +860,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @bacterial_pnuemonia_concept_id, visit_encounter_id, visit_date, @bacterial_pnuemonia_value_coded, @bacterial_pnuemonia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @bacterial_pnuemonia_concept_id, old_enc_id, visit_date, @bacterial_pnuemonia_value_coded, @bacterial_pnuemonia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -880,7 +884,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @symptomatic_lymphoid_interstitial_pnuemonitis_concept_id, visit_encounter_id, visit_date, @symptomatic_lymphoid_interstitial_pnuemonitis_value_coded, @symptomatic_lymphoid_interstitial_pnuemonitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @symptomatic_lymphoid_interstitial_pnuemonitis_concept_id, old_enc_id, visit_date, @symptomatic_lymphoid_interstitial_pnuemonitis_value_coded, @symptomatic_lymphoid_interstitial_pnuemonitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -904,7 +908,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @chronic_hiv_assoc_lung_disease_concept_id, visit_encounter_id, visit_date, @chronic_hiv_assoc_lung_disease_value_coded, @chronic_hiv_assoc_lung_disease_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @chronic_hiv_assoc_lung_disease_concept_id, old_enc_id, visit_date, @chronic_hiv_assoc_lung_disease_value_coded, @chronic_hiv_assoc_lung_disease_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -928,7 +932,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @unspecified_stage3_condition_concept_id, visit_encounter_id, visit_date, @unspecified_stage3_condition_value_coded, @unspecified_stage3_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @unspecified_stage3_condition_concept_id, old_enc_id, visit_date, @unspecified_stage3_condition_value_coded, @unspecified_stage3_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -952,7 +956,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @aneamia_concept_id, visit_encounter_id, visit_date, @aneamia_value_coded, @aneamia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @aneamia_concept_id, old_enc_id, visit_date, @aneamia_value_coded, @aneamia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -976,7 +980,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @neutropaenia_concept_id, visit_encounter_id, visit_date, @neutropaenia_value_coded, @neutropaenia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @neutropaenia_concept_id, old_enc_id, visit_date, @neutropaenia_value_coded, @neutropaenia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -1000,7 +1004,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @thrombocytopaenia_chronic_concept_id, visit_encounter_id, visit_date, @thrombocytopaenia_chronic_value_coded, @thrombocytopaenia_chronic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @thrombocytopaenia_chronic_concept_id, old_enc_id, visit_date, @thrombocytopaenia_chronic_value_coded, @thrombocytopaenia_chronic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -1024,7 +1028,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @diarhoea_concept_id, visit_encounter_id, visit_date, @diarhoea_value_coded, @diarhoea_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @diarhoea_concept_id, old_enc_id, visit_date, @diarhoea_value_coded, @diarhoea_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1048,7 +1052,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @oral_candidiasis_concept_id, visit_encounter_id, visit_date, @oral_candidiasis_value_coded, @oral_candidiasis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @oral_candidiasis_concept_id, old_enc_id, visit_date, @oral_candidiasis_value_coded, @oral_candidiasis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1073,7 +1077,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @acute_necrotizing_ulcerative_gingivitis_concept_id, visit_encounter_id, visit_date, @acute_necrotizing_ulcerative_gingivitis_value_coded, @acute_necrotizing_ulcerative_gingivitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @acute_necrotizing_ulcerative_gingivitis_concept_id, old_enc_id, visit_date, @acute_necrotizing_ulcerative_gingivitis_value_coded, @acute_necrotizing_ulcerative_gingivitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1097,7 +1101,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @lymph_node_tuberculosis_concept_id, visit_encounter_id, visit_date, @lymph_node_tuberculosis_value_coded, @lymph_node_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @lymph_node_tuberculosis_concept_id, old_enc_id, visit_date, @lymph_node_tuberculosis_value_coded, @lymph_node_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1121,7 +1125,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @toxoplasmosis_of_brain_concept_id, visit_encounter_id, visit_date, @toxoplasmosis_of_brain_value_coded, @toxoplasmosis_of_brain_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @toxoplasmosis_of_brain_concept_id, old_enc_id, visit_date, @toxoplasmosis_of_brain_value_coded, @toxoplasmosis_of_brain_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1145,7 +1149,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @cryptococcal_meningitis_concept_id, visit_encounter_id, visit_date, @cryptococcal_meningitis_value_coded, @cryptococcal_meningitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cryptococcal_meningitis_concept_id, old_enc_id, visit_date, @cryptococcal_meningitis_value_coded, @cryptococcal_meningitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1169,7 +1173,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @progressive_multifocal_leukoencephalopathy_concept_id, visit_encounter_id, visit_date, @progressive_multifocal_leukoencephalopathy_value_coded, @progressive_multifocal_leukoencephalopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @progressive_multifocal_leukoencephalopathy_concept_id, old_enc_id, visit_date, @progressive_multifocal_leukoencephalopathy_value_coded, @progressive_multifocal_leukoencephalopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -1193,7 +1197,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @disseminated_mycosis_concept_id, visit_encounter_id, visit_date, @disseminated_mycosis_value_coded, @disseminated_mycosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @disseminated_mycosis_concept_id, old_enc_id, visit_date, @disseminated_mycosis_value_coded, @disseminated_mycosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -1217,7 +1221,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @candidiasis_of_oesophagus_concept_id, visit_encounter_id, visit_date, @candidiasis_of_oesophagus_value_coded, @candidiasis_of_oesophagus_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @candidiasis_of_oesophagus_concept_id, old_enc_id, visit_date, @candidiasis_of_oesophagus_value_coded, @candidiasis_of_oesophagus_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1241,7 +1245,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @extrapulmonary_tuberculosis_concept_id, visit_encounter_id, visit_date, @extrapulmonary_tuberculosis_value_coded, @extrapulmonary_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @extrapulmonary_tuberculosis_concept_id, old_enc_id, visit_date, @extrapulmonary_tuberculosis_value_coded, @extrapulmonary_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1265,7 +1269,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @cerebral_non_hodgkin_lymphoma_concept_id, visit_encounter_id, visit_date, @cerebral_non_hodgkin_lymphoma_value_coded, @cerebral_non_hodgkin_lymphoma_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cerebral_non_hodgkin_lymphoma_concept_id, old_enc_id, visit_date, @cerebral_non_hodgkin_lymphoma_value_coded, @cerebral_non_hodgkin_lymphoma_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1289,7 +1293,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @kaposis_concept_id, visit_encounter_id, visit_date, @kaposis_value_coded, @kaposis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @kaposis_concept_id, old_enc_id, visit_date, @kaposis_value_coded, @kaposis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1313,7 +1317,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @hiv_encephalopathy_concept_id, visit_encounter_id, visit_date, @hiv_encephalopathy_value_coded, @hiv_encephalopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @hiv_encephalopathy_concept_id, old_enc_id, visit_date, @hiv_encephalopathy_value_coded, @hiv_encephalopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1337,7 +1341,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @bacterial_infections_severe_recurrent_concept_id, visit_encounter_id, visit_date, @bacterial_infections_severe_recurrent_value_coded, @bacterial_infections_severe_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @bacterial_infections_severe_recurrent_concept_id, old_enc_id, visit_date, @bacterial_infections_severe_recurrent_value_coded, @bacterial_infections_severe_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1361,7 +1365,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @unspecified_stage_4_condition_concept_id, visit_encounter_id, visit_date, @unspecified_stage_4_condition_value_coded, @unspecified_stage_4_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @unspecified_stage_4_condition_concept_id, old_enc_id, visit_date, @unspecified_stage_4_condition_value_coded, @unspecified_stage_4_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1385,7 +1389,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @pnuemocystis_pnuemonia_concept_id, visit_encounter_id, visit_date, @pnuemocystis_pnuemonia_value_coded, @pnuemocystis_pnuemonia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @pnuemocystis_pnuemonia_concept_id, old_enc_id, visit_date, @pnuemocystis_pnuemonia_value_coded, @pnuemocystis_pnuemonia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1410,7 +1414,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @disseminated_non_tuberculosis_mycobactierial_infection_concept_id, visit_encounter_id, visit_date, @disseminated_non_tuberculosis_mycobactierial_infection_value_coded, @disseminated_non_tuberculosis_mycobactierial_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @disseminated_non_tuberculosis_mycobactierial_infection_concept_id, old_enc_id, visit_date, @disseminated_non_tuberculosis_mycobactierial_infection_value_coded, @disseminated_non_tuberculosis_mycobactierial_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -1434,7 +1438,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @isosporiasis_concept_id, visit_encounter_id, visit_date, @isosporiasis_value_coded, @isosporiasis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @isosporiasis_concept_id, old_enc_id, visit_date, @isosporiasis_value_coded, @isosporiasis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1458,7 +1462,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @symptomatic_hiv_asscoiated_nephropathy_concept_id, visit_encounter_id, visit_date, @symptomatic_hiv_asscoiated_nephropathy_value_coded, @symptomatic_hiv_asscoiated_nephropathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @symptomatic_hiv_asscoiated_nephropathy_concept_id, old_enc_id, visit_date, @symptomatic_hiv_asscoiated_nephropathy_value_coded, @symptomatic_hiv_asscoiated_nephropathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1482,7 +1486,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @chronic_herpes_simplex_infection_concept_id, visit_encounter_id, visit_date, @chronic_herpes_simplex_infection_value_coded, @chronic_herpes_simplex_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @chronic_herpes_simplex_infection_concept_id, old_enc_id, visit_date, @chronic_herpes_simplex_infection_value_coded, @chronic_herpes_simplex_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1506,7 +1510,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @cytomegalovirus_infection_concept_id, visit_encounter_id, visit_date, @cytomegalovirus_infection_value_coded, @cytomegalovirus_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cytomegalovirus_infection_concept_id, old_enc_id, visit_date, @cytomegalovirus_infection_value_coded, @cytomegalovirus_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1530,7 +1534,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @toxoplasomis_of_the_brain_1month_concept_id, visit_encounter_id, visit_date, @toxoplasomis_of_the_brain_1month_value_coded, @toxoplasomis_of_the_brain_1month_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @toxoplasomis_of_the_brain_1month_concept_id, old_enc_id, visit_date, @toxoplasomis_of_the_brain_1month_value_coded, @toxoplasomis_of_the_brain_1month_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
         
@@ -1554,7 +1558,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @recto_vaginal_fitsula_concept_id, visit_encounter_id, visit_date, @recto_vaginal_fitsula_value_coded, @recto_vaginal_fitsula_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @recto_vaginal_fitsula_concept_id, old_enc_id, visit_date, @recto_vaginal_fitsula_value_coded, @recto_vaginal_fitsula_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -1601,7 +1605,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @reason_for_starting_art_concept_id, visit_encounter_id, visit_date, @reason_for_starting_art_value_coded, @reason_for_starting_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @reason_for_starting_art_concept_id, old_enc_id, visit_date, @reason_for_starting_art_value_coded, @reason_for_starting_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 
@@ -1625,7 +1629,7 @@ BEGIN
         
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @who_stage_concept_id, visit_encounter_id, visit_date, @who_stage_value_coded, @who_stage_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @who_stage_concept_id, old_enc_id, visit_date, @who_stage_value_coded, @who_stage_value_coded_name_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
 

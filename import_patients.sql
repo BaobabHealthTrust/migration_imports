@@ -257,11 +257,11 @@ BEGIN
         
         END IF;
     
-        CALL proc_import_first_visit_encounters(@person_id);        # good
-        CALL proc_import_art_visit_encounters(@person_id);          # good
-        CALL proc_import_pre_art_visit_encounters(@person_id);      # good
-        CALL proc_import_vitals_encounters(@person_id);             # good
-        # CALL proc_import_give_drugs(@person_id);
+        # CALL proc_import_first_visit_encounters(@person_id);        # good
+        # CALL proc_import_art_visit_encounters(@person_id);          # good
+        # CALL proc_import_pre_art_visit_encounters(@person_id);      # good
+        # CALL proc_import_vitals_encounters(@person_id);             # good
+        CALL proc_import_give_drugs(@person_id);
         # CALL proc_import_hiv_staging_encounters(@person_id);
         # CALL proc_import_hiv_reception(@person_id);
     
