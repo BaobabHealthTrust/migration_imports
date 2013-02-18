@@ -9,7 +9,7 @@ tasks = [
   "import_art_visit_encounters.sql",
   "import_first_visit_encounters.sql",
   "import_give_drugs.sql",
-  "import_hiv_reception.sql",
+  "import_hiv_reception_encounters.sql",
   "import_hiv_staging_encounters.sql",
   "import_pre_art_visit_encounters.sql",
   "import_outcome_encounters.sql",

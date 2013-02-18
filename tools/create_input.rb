@@ -831,7 +831,7 @@ def select_task
   puts green(" Set destination database")
   print yellow("\t\t8.")
   puts green(" Set destination folder")
-  print yellow("\t\t9./q")
+  print yellow("\t\t9.")
   puts green(" Quit")
 
   print "\n\n\t\tTask number: "
