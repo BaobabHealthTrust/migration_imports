@@ -86,7 +86,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'outpatient diagnosis');
 
 	# Create outpatient_reception_encounter
-	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = id;
+	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
             
         # Check if the field is not empty
         IF ISNULL(refer_to_anotha_hosp) THEN
