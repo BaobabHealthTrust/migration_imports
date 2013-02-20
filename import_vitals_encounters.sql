@@ -1,4 +1,4 @@
-# This procedure imports data from `bart1_intermediate_bare_bones` to `bart2`
+# This procedure imports data from `bart1_intermediate_bare_bones` to `migration_database`
 
 # The default DELIMITER is disabled to avoid conflicting with our scripts
 DELIMITER $$
@@ -87,7 +87,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	SET @location_id = (SELECT location_id FROM location WHERE name = location);
 
 	# Get id of encounter type
-	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'VITALS');
+	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'vitals');
 
 	# Create encounter
 	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
@@ -99,10 +99,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get concept_id
             SET @weight_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'weight' AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Weight (kg)' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
             VALUES (patient_id, @weight_concept_id, old_enc_id, visit_date, @location_id , weight, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
@@ -119,7 +119,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Height (cm)' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
             VALUES (patient_id, @height_concept_id, old_enc_id, visit_date, @location_id , height, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
@@ -133,10 +133,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get concept_id
             SET @bmi_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'bmi' AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Body mass index, measured' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
             VALUES (patient_id, @bmi_concept_id, old_enc_id, visit_date, @location_id , bmi, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
@@ -153,7 +153,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Weight for age percent of median' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
             VALUES (patient_id, @weight_for_age_concept_id, old_enc_id, visit_date, @location_id , weight_for_age, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
@@ -170,7 +170,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Height for age percent of median' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
             VALUES (patient_id, @height_for_age_concept_id, old_enc_id, visit_date, @location_id , height_for_age, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
@@ -187,7 +187,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Weight for height percent of median' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
             VALUES (patient_id, @weight_for_height_concept_id, old_enc_id, visit_date, @location_id , weight_for_height, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
