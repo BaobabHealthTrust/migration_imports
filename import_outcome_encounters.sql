@@ -35,9 +35,10 @@ BEGIN
     DECLARE done INT DEFAULT FALSE;
     
     # Declare fields to hold our values for our patients
-    DECLARE other_id INT(11);
-    DECLARE encounter_id INT(11);
-    DECLARE patient_id INT(11);
+    DECLARE id int(11);
+    DECLARE visit_encounter_id int(11);
+    DECLARE old_enc_id int(11);
+    DECLARE patient_id int(11);
     DECLARE state VARCHAR(255);
     DECLARE outcome_date DATE; 
     DECLARE transfer_out_location VARCHAR(255);
@@ -62,7 +63,7 @@ BEGIN
     # Declare loop for traversing through the records
     read_loop: LOOP
         # Get the fields into the variables declared earlier
-        FETCH cur INTO other_id, encounter_id, patient_id, state, outcome_date, transfer_out_location, 
+        FETCH cur INTO id, visit_encounter_id, old_enc_id, patient_id, state, outcome_date, transfer_out_location, 
                         location, voided, void_reason, date_voided, voided_by, date_created, creator;
     
         # Check if we are done and exit loop if done
@@ -75,24 +76,24 @@ BEGIN
         # Map destination user to source user
         SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
         # Map destination user to source voided_by
-        SET @voided_by = (SELECT user_id FROM users WHERE user_id = voided_by);
+        SET @voided_by = (SELECT user_id FROM users WHERE user_id = voided_by LIMIT 1);
         # Map location to source location
-        SET @location_id = COALESCE((SELECT location_id FROM location WHERE name = location), 1);
+        SET @location_id = COALESCE((SELECT location_id FROM location WHERE name = location LIMIT 1), 1);
         # Map encounter_id to source
         SET @encounter_type_id = COALESCE((SELECT encounter_type_id 
                                             FROM encounter_type 
-                                            WHERE name = 'UPDATE OUTCOME'), 40);
+                                            WHERE name = 'UPDATE OUTCOME' LIMIT 1), 40);
         # Get hiv program for the patient
         SET @patient_hiv_program = COALESCE((SELECT patient_program_id 
                                                 FROM patient_program 
-                                                WHERE patient_id = patient_id), 0);
+                                                WHERE patient_id = patient_program.patient_id), 0);
         
         # Create outcome encounter object in destination
         
-        INSERT INTO encounter (patient_id, provider_id, encounter_type,location_id, encounter_datetime, 
+        INSERT INTO encounter (encounter_id, patient_id, provider_id, encounter_type,location_id, encounter_datetime, 
                                 creator, voided, voided_by, date_voided, void_reason, uuid)
-        VALUES (patient_id,1, @encounter_type_id, @location_id, date_created, creator, voided, 
-                                @voided_by, date_voided, void_reason,(SELECT UUID()));
+        VALUES (old_enc_id, patient_id,1, @encounter_type_id, @location_id, date_created, creator, voided, 
+                                @voided_by, date_voided, void_reason,(SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
         # Get the latest encounter created
     	SET @encounter_id = (SELECT LAST_INSERT_ID());
@@ -105,7 +106,7 @@ BEGIN
 
                 SET @patient_hiv_program = (SELECT patient_program_id 
                                             FROM patient_program 
-                                            WHERE patient_id = patient_id AND program_id = @hiv_program);
+                                            WHERE patient_id = patient_program.patient_id AND program_id = @hiv_program);
         END IF;
          # get the previous state if there is one 
         SET @previous_state = COALESCE((SELECT max(patient_state_id) 
