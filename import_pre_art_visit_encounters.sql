@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS `proc_import_pre_art_visit_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_pre_art_visit_encounters`(
-	IN in_patient_id INT(11)
+
 )
 BEGIN
 
@@ -65,8 +65,8 @@ BEGIN
 
 	# Declare and initialise cursor for looping through the table
 DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`id`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`patient_pregnant`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`patient_breast_feeding`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`abdominal_pains`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`using_family_planning_method`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`family_planning_method_in_use`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`anorexia`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`cough`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`diarrhoea`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`fever`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`jaundice`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`leg_pain_numbness`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`vomit`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`weight_loss`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`peripheral_neuropathy`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`hepatitis`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`anaemia`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`lactic_acidosis`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`lipodystrophy`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`skin_rash`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_abdominal_pains`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_anorexia`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_diarrhoea`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_jaundice`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_leg_pain_numbness`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_vomit`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_peripheral_neuropathy`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_hepatitis`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_anaemia`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_lactic_acidosis`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_lipodystrophy`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_skin_rash`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`drug_induced_other_symptom`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`tb_status`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`refer_to_clinician`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`prescribe_cpt`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`number_of_condoms_given`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`prescribe_ipt`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`location`, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`pre_art_visit_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
-        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
-        WHERE `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`patient_id` = in_patient_id;
+        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`;
+       #-- WHERE `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -281,24 +281,97 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @family_planning_method_in_use_id = (SELECT LAST_INSERT_ID());
 
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
+        # Check if the field is not empty
+        IF NOT ISNULL(abdominal_pains) THEN
+          IF (abdominal_pains = 'Yes') THEN
+            # Get concept_id
+            SET @abdominal_pains_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @abdominal_pains_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Abdominal pain' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @abdominal_pains_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Abdominal pain' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @abdominal_pains_concept_id, old_enc_id, visit_date, @location_id , @abdominal_pains_value_coded, @abdominal_pains_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @abdominal_pains_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (abdominal_pains = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+          
+          ELSEIF (abdominal_pains = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Abdominal pain' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Abdominal pain' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;
+        END IF;
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(anorexia) THEN
-
+          IF (anorexia = 'Yes') THEN
             # Get concept_id
-            SET @anorexia_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @anorexia_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @anorexia_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = anorexia AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Anorexia' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @anorexia_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = anorexia AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Anorexia' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -306,26 +379,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @anorexia_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (anorexia = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+
+          ELSEIF (anorexia = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Anorexia' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Anorexia' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(cough) THEN
-
+          IF (cough = 'Yes') THEN
             # Get concept_id
-            SET @cough_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @cough_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @cough_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = cough AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Cough' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @cough_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = cough AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Cough' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -333,26 +452,71 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @cough_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (cough = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
-        END IF;
-        
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+          
+          ELSEIF (cough = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Cough' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Cough' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;        
+        END IF; #-----------------------------------------------------------------------------------------------------------------------------           
         # Check if the field is not empty
         IF NOT ISNULL(diarrhoea) THEN
-
+          IF (diarrhoea = 'Yes') THEN
             # Get concept_id
-            SET @diarrhoea_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @diarrhoea_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @diarrhoea_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = diarrhoea AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Diarrhoea' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @diarrhoea_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = diarrhoea AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Diarrhoea' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -360,26 +524,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @diarrhoea_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (diarrhoea = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
-        END IF;
-        
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+
+          ELSEIF (diarrhoea = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Diarrhoea' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Diarrhoea' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;
+        END IF;        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(fever) THEN
-
+          IF (fever = 'Yes') THEN
             # Get concept_id
-            SET @fever_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @fever_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @fever_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = fever AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Fever' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @fever_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = fever AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Fever' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -387,26 +597,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @fever_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (fever = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+         
+          ELSEIF (fever = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Fever' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Fever' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;        
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(jaundice) THEN
-
+          IF (jaundice = 'Yes') THEN
             # Get concept_id
-            SET @jaundice_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @jaundice_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @jaundice_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = jaundice AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Jaundice' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @jaundice_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = jaundice AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Jaundice' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -414,26 +670,73 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @jaundice_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (jaundice = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+          END IF; 
+          
+          ELSEIF (jaundice = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Jaundice' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Jaundice' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF; 
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(leg_pain_numbness) THEN
-
+          IF (leg_pain_numbness = 'Yes') THEN
             # Get concept_id
-            SET @leg_pain_numbness_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @leg_pain_numbness_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @leg_pain_numbness_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = leg_pain_numbness AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Leg pain / numbness' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @leg_pain_numbness_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = leg_pain_numbness AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Leg pain / numbness' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -441,26 +744,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @leg_pain_numbness_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (leg_pain_numbness = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+
+          ELSEIF (leg_pain_numbness = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Leg pain / numbness' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Leg pain / numbness' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(vomit) THEN
-
+          IF (vomit = 'Yes') THEN
             # Get concept_id
-            SET @vomit_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @vomit_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @vomit_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = vomit AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Vomiting' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @vomit_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = vomit AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Vomiting' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -468,26 +817,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @vomit_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (vomit = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+          
+          ELSEIF (vomit = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Vomiting' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Vomiting' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(weight_loss) THEN
-
+          IF (weight_loss = 'Yes') THEN
             # Get concept_id
-            SET @weight_loss_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @weight_loss_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @weight_loss_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = weight_loss AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Weight loss' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @weight_loss_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = weight_loss AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Weight loss' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -495,26 +890,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @weight_loss_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (weight_loss = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+
+          ELSEIF (weight_loss = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Weight loss' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Weight loss' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(peripheral_neuropathy) THEN
-
+          IF (peripheral_neuropathy = 'Yes') THEN
             # Get concept_id
-            SET @peripheral_neuropathy_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @peripheral_neuropathy_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @peripheral_neuropathy_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = peripheral_neuropathy AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Peripheral neuropathy' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @peripheral_neuropathy_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = peripheral_neuropathy AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Peripheral neuropathy' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -522,26 +963,73 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @peripheral_neuropathy_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (peripheral_neuropathy = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+
+          ELSEIF (peripheral_neuropathy = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Peripheral neuropathy' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Peripheral neuropathy' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;
         END IF;
+#-----------------------------------------------------------------------------------------------------------------------------        
         
         # Check if the field is not empty
         IF NOT ISNULL(hepatitis) THEN
-
+          IF (hepatitis = 'Yes') THEN
             # Get concept_id
-            SET @hepatitis_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @hepatitis_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @hepatitis_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = hepatitis AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Hepatitis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @hepatitis_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = hepatitis AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Hepatitis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -549,26 +1037,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @hepatitis_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (hepatitis = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+          
+          ELSEIF (hepatitis = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Hepatitis' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Hepatitis' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;      
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(anaemia) THEN
-
+          IF (anaemia = 'Yes') THEN
             # Get concept_id
-            SET @anaemia_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @anaemia_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @anaemia_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = anaemia AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Anaemia' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @anaemia_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = anaemia AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Anaemia' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -576,26 +1110,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @anaemia_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (anaemia = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+          
+          ELSEIF (anaemia = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Anaemia' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Anaemia' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(lactic_acidosis) THEN
-
+          IF (lactic_acidosis = 'Yes') THEN
             # Get concept_id
-            SET @lactic_acidosis_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @lactic_acidosis_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @lactic_acidosis_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = lactic_acidosis AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Lactic acidosis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @lactic_acidosis_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = lactic_acidosis AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Lactic acidosis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -603,26 +1183,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @lactic_acidosis_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (lactic_acidosis = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+          
+          ELSEIF (lactic_acidosis = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Lactic acidosis' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Lactic acidosis' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF; 
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(lipodystrophy) THEN
-
+          IF (lipodystrophy = 'Yes') THEN
             # Get concept_id
-            SET @lipodystrophy_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @lipodystrophy_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @lipodystrophy_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = lipodystrophy AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Lipodystrophy' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @lipodystrophy_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = lipodystrophy AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Lipodystrophy' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -630,26 +1256,72 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @lipodystrophy_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (lipodystrophy = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+
+          ELSEIF (lipodystrophy = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Lipodystrophy' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Lipodystrophy' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;             
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
         # Check if the field is not empty
         IF NOT ISNULL(skin_rash) THEN
-
+          IF (skin_rash = 'Yes') THEN
             # Get concept_id
-            SET @skin_rash_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @skin_rash_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @skin_rash_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = skin_rash AND voided = 0 AND retired = 0 LIMIT 1);
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Skin rash' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @skin_rash_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = skin_rash AND voided = 0 AND retired = 0 LIMIT 1);
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Skin rash' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -657,39 +1329,158 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @skin_rash_id = (SELECT LAST_INSERT_ID());
-
-        END IF;
-        
-        # Check if the field is not empty
-        IF NOT ISNULL(drug_induced_abdominal_pains) THEN
-
+                 
+          ELSEIF (skin_rash = 'Yes unknown cause') THEN
             # Get concept_id
-            SET @drug_induced_abdominal_pains_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @skin_rash_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
-            SET @drug_induced_abdominal_pains_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_abdominal_pains AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @skin_rash_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Skin rash' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
-            SET @drug_induced_abdominal_pains_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_abdominal_pains AND voided = 0 AND retired = 0 LIMIT 1);
+            SET @skin_rash_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Skin rash' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @drug_induced_abdominal_pains_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_abdominal_pains_value_coded, @drug_induced_abdominal_pains_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @skin_rash_concept_id, old_enc_id, visit_date, @location_id , @skin_rash_value_coded, @skin_rash_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
-            SET @drug_induced_abdominal_pains_id = (SELECT LAST_INSERT_ID());
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
+          
+          ELSEIF (skin_rash = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
 
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;             
         END IF;
-        
+#-----------------------------------------------------------------------------------------------------------------------------        
+      # Check if the field is not empty
+        IF NOT ISNULL(other_symptoms) THEN
+          IF (other_symptoms = 'Yes') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());
+                 
+          ELSEIF (other_symptoms = 'Yes unknown cause') THEN
+            # Get concept_id
+            SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @other_symptoms_concept_id, old_enc_id, visit_date, @location_id , @other_symptoms_value_coded, @other_symptoms_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @other_symptoms_id = (SELECT LAST_INSERT_ID());
+            
+            ELSEIF (other_symptoms = 'Yes drug induced') THEN
+            # Get concept_id
+            SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                                                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                                                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_value_coded, @drug_induced_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_id = (SELECT LAST_INSERT_ID());                    
+          END IF;       
+        END IF;
+#-----------------------------------------------------------------------------------------------------------------------------        
+        # Check if the field is not empty
+        IF NOT ISNULL(drug_induced_Abdominal_pains) THEN
+          IF (drug_induced_Abdominal_pains = 'Yes') THEN
+            # Get concept_id
+            SET @drug_induced_Abdominal_pains_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @drug_induced_Abdominal_pains_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = Abdominal pain AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @drug_induced_Abdominal_pains_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = Abdominal pain AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @drug_induced_Abdominal_pains_concept_id, old_enc_id, visit_date, @location_id , @drug_induced_Abdominal_pains_value_coded, @drug_induced_Abdominal_pains_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @drug_induced_Abdominal_pains_id = (SELECT LAST_INSERT_ID());
+          END IF;
+        END IF;  
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_anorexia) THEN
-
+          IF (drug_induced_anorexia = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_anorexia_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -698,12 +1489,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_anorexia_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_anorexia AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Anorexia' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_anorexia_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_anorexia AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Anorexia' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -711,12 +1502,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_anorexia_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_diarrhoea) THEN
-
+          IF (drug_induced_diarrhoea = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_diarrhoea_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -725,12 +1516,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_diarrhoea_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_diarrhoea AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Diarrhoea' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_diarrhoea_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_diarrhoea AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Diarrhoea' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -738,12 +1529,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_diarrhoea_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_jaundice) THEN
-
+          IF (drug_induced_jaundice = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_jaundice_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -752,12 +1543,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_jaundice_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_jaundice AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Jaundice' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_jaundice_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_jaundice AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Jaundice' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -765,12 +1556,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_jaundice_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_leg_pain_numbness) THEN
-
+          IF (drug_induced_leg_pain_numbness = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_leg_pain_numbness_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -779,12 +1570,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_leg_pain_numbness_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_leg_pain_numbness AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Leg pain / numbness' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_leg_pain_numbness_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_leg_pain_numbness AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Leg pain / numbness' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -792,12 +1583,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_leg_pain_numbness_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_vomit) THEN
-
+          IF (drug_induced_vomit = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_vomit_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -806,12 +1597,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_vomit_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_vomit AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Vomiting' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_vomit_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_vomit AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Vomiting' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -819,12 +1610,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_vomit_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_peripheral_neuropathy) THEN
-
+          IF (drug_induced_peripheral_neuropathy = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_peripheral_neuropathy_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -833,12 +1624,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_peripheral_neuropathy_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_peripheral_neuropathy AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Peripheral neuropathy' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_peripheral_neuropathy_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_peripheral_neuropathy AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Peripheral neuropathy' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -846,12 +1637,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_peripheral_neuropathy_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_hepatitis) THEN
-
+          IF (drug_induced_hepatitis = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_hepatitis_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -860,12 +1651,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_hepatitis_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_hepatitis AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Hepatitis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_hepatitis_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_hepatitis AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Hepatitis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -873,12 +1664,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_hepatitis_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_anaemia) THEN
-
+          IF (drug_induced_anaemia = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_anaemia_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -887,12 +1678,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_anaemia_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_anaemia AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Anaemia' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_anaemia_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_anaemia AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Anaemia' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -900,12 +1691,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_anaemia_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_lactic_acidosis) THEN
-
+          IF (drug_induced_lactic_acidosis = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_lactic_acidosis_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -914,12 +1705,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_lactic_acidosis_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_lactic_acidosis AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Lactic acidosis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_lactic_acidosis_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_lactic_acidosis AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Lactic acidosis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -927,12 +1718,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_lactic_acidosis_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_lipodystrophy) THEN
-
+          IF (drug_induced_lipodystrophy = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_lipodystrophy_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -941,12 +1732,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_lipodystrophy_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_lipodystrophy AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Lipodystrophy' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_lipodystrophy_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_lipodystrophy AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Lipodystrophy' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -954,12 +1745,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_lipodystrophy_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_skin_rash) THEN
-
+          IF (drug_induced_skin_rash = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_skin_rash_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -968,12 +1759,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_skin_rash_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_skin_rash AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Skin rash' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_skin_rash_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_skin_rash AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Skin rash' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -981,12 +1772,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_skin_rash_id = (SELECT LAST_INSERT_ID());
-
+          END IF;
         END IF;
-        
+#----------------------------------------------------------------------------------------------------------------------- 
         # Check if the field is not empty
         IF NOT ISNULL(drug_induced_other_symptom) THEN
-
+          IF (drug_induced_other_symptom = 'Yes') THEN
             # Get concept_id
             SET @drug_induced_other_symptom_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -995,12 +1786,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_other_symptom_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_other_symptom AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_other_symptom_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = drug_induced_other_symptom AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -1008,8 +1799,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @drug_induced_other_symptom_id = (SELECT LAST_INSERT_ID());
-
-        END IF;
+          END IF;
+        END IF;  
+#--------------------------------------------------------------------------------------------------------------------- 
         
         # Check if the field is not empty
         IF NOT ISNULL(tb_status) THEN
