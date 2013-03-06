@@ -15,8 +15,8 @@ DROP PROCEDURE IF EXISTS `proc_import_patients`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_patients`(
-	IN start_pos INT(11),
-	IN end_pos INT(11)
+       IN start_pos INT(11),
+       IN end_pos INT(11)
 	)
 BEGIN
     
@@ -89,17 +89,28 @@ BEGIN
         
         # Map destination user to source user
         SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
-    
+        IF ISNULL(dob_estimated) THEN
+          SET @date_of_birth_estimated = (false);
+        ELSE
+          SET @date_of_birth_estimated = (dob_estimated);
+        END IF;
+
+        IF ISNULL(dead) THEN
+          SET @patient_dead = (0);
+        ELSE
+          SET @patient_dead = (dead);
+        END IF;
+
         # Create person object in destination
-        INSERT INTO person (gender, birthdate, birthdate_estimated, dead, creator, date_created, uuid)
-        VALUES (SUBSTRING(gender, 1, 1), dob, dob_estimated, dead, @creator, date_created, (SELECT UUID()));
+        INSERT INTO person (person_id, gender, birthdate, birthdate_estimated, dead, creator, date_created, uuid)
+        VALUES (patient_id,SUBSTRING(gender, 1, 1), dob, @date_of_birth_estimated, @patient_dead, @creator, date_created, (SELECT UUID()))  ON DUPLICATE KEY UPDATE person_id = patient_id;
     
         # Get last person id for association later to other records
-        SET @person_id = (SELECT LAST_INSERT_ID());
+        SET @person_id = (patient_id);
     
         # Create person name details
         INSERT INTO person_name (person_id, given_name, middle_name, family_name, creator, date_created, uuid)
-        VALUES (@person_id, given_name, middle_name, family_name, @creator, date_created, (SELECT UUID()));
+        VALUES (patient_id, given_name, middle_name, family_name, @creator, date_created, (SELECT UUID()));
     
         # Check variables for several person attribute type ids
         SET @cellphone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Cell Phone Number");
@@ -114,55 +125,55 @@ BEGIN
         IF COALESCE(traditional_authority, "") != "" THEN
         
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
-            VALUES (@person_id, traditional_authority, @traditional_authority_type_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, traditional_authority, @traditional_authority_type_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF COALESCE(current_address, "") != "" THEN
         
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
-            VALUES (@person_id, current_address, @current_address_type_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, current_address, @current_address_type_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF COALESCE(landmark, "") != "" THEN
         
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
-            VALUES (@person_id, landmark, @landmark_type_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, landmark, @landmark_type_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF COALESCE(occupation, "") != "" THEN
         
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
-            VALUES (@person_id, occupation, @occupation_type_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, occupation, @occupation_type_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF COALESCE(office_phone_number, "") != "" THEN
         
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
-            VALUES (@person_id, office_phone_number, @office_phone_number_type_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, office_phone_number, @office_phone_number_type_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF COALESCE(cellphone_number, "") != "" THEN
         
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
-            VALUES (@person_id, cellphone_number, @cellphone_number_type_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, cellphone_number, @cellphone_number_type_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF COALESCE(home_phone_number, "") != "" THEN
         
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
-            VALUES (@person_id, home_phone_number, @home_phone_number_type_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, home_phone_number, @home_phone_number_type_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         # Create a patient
         INSERT INTO patient (patient_id, creator, date_created)
-        VALUES (@person_id, @creator, date_created);
+        VALUES (patient_id, @creator, date_created)  ON DUPLICATE KEY UPDATE patient_id = patient_id;
     
         # Set patient identifier types
         SET @art_number = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "ARV Number");
@@ -173,7 +184,7 @@ BEGIN
         SET @archived_filing_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Archived filing number");
         SET @filing_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Filing number");
         SET @pre_art_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Pre-ART number");
-        SET @prev_art_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Previous-ART number");
+        SET @prev_art_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "z_deprecated Pre ART Number (Old format)");
     
         # Location id defaulted to "Unknown" since the source database version 
         # did not capture this field
@@ -183,88 +194,91 @@ BEGIN
         IF NOT ISNULL(prev_art_number) AND NOT ISNULL(@pre_art_number_id) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, prev_art_number, @prev_art_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, prev_art_number, @prev_art_number_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
                                          
         IF NOT ISNULL(pre_art_number) AND NOT ISNULL(@pre_art_number_id) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, pre_art_number, @pre_art_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, pre_art_number, @pre_art_number_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
                                   
         IF NOT ISNULL(filing_number) AND NOT ISNULL(@filing_number_id) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, filing_number, @filing_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, filing_number, @filing_number_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
                           
         IF NOT ISNULL(archived_filing_number) AND NOT ISNULL(@archived_filing_number_id) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, archived_filing_number, @archived_filing_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, archived_filing_number, @archived_filing_number_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
                   
         IF NOT ISNULL(nat_id) AND NOT ISNULL(@nat_id) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, nat_id, (CASE WHEN ISNULL(new_nat_id) THEN @nat_id ELSE @legacy_id END), @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, nat_id, (CASE WHEN ISNULL(new_nat_id) THEN @nat_id ELSE @legacy_id END), @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
           
         IF NOT ISNULL(new_nat_id) AND NOT ISNULL(@new_nat_id) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, new_nat_id, @new_nat_id, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, new_nat_id, @new_nat_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF NOT ISNULL(art_number) AND NOT ISNULL(@art_number) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, art_number, @art_number, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, art_number, @art_number, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF NOT ISNULL(tb_number) AND NOT ISNULL(@tb_number) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, tb_number, @tb_number, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, tb_number, @tb_number, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF NOT ISNULL(legacy_id) AND NOT ISNULL(@legacy_id) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, legacy_id, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, legacy_id, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF NOT ISNULL(legacy_id2) AND NOT ISNULL(@legacy_id) THEN
-        
+
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, legacy_id2, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, legacy_id2, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
         IF NOT ISNULL(legacy_id3) AND NOT ISNULL(@legacy_id) THEN
         
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (@person_id, legacy_id3, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, legacy_id3, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
-        CALL proc_import_first_visit_encounters(@person_id);        # good
-        CALL proc_import_art_visit_encounters(@person_id);          # good
-        CALL proc_import_pre_art_visit_encounters(@person_id);      # good
-        CALL proc_import_vitals_encounters(@person_id);             # good
-        # CALL proc_import_give_drugs(@person_id);
-        CALL proc_import_hiv_staging_encounters(@person_id);
-        CALL proc_import_hiv_reception_encounters(@person_id);
-    
+        #--CALL proc_import_first_visit_encounters(@person_id);        # good
+        #--CALL proc_import_art_visit_encounters(@person_id);          # good
+        #--CALL proc_import_pre_art_visit_encounters(@person_id);      # good
+        #--CALL proc_import_vitals_encounters(@person_id);             # good
+        #--CALL proc_import_hiv_staging_encounters(@person_id);
+        #--CALL proc_import_hiv_reception_encounters(@person_id);
+        #--CALL proc_import_give_drugs(@person_id);
+        #--CALL proc_import_general_reception_encounters(@person_id);
+        #--CALL proc_import_outpatient_diagnosis_encounters(@person_id);
+        #--CALL proc_import_outcome_encounter(@person_id);
+
     END LOOP;
 
     SET UNIQUE_CHECKS = 1;
