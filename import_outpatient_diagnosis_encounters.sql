@@ -37,7 +37,7 @@ BEGIN
 	# Declare and initialise cursor for looping through the table
 DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`refer_to_anotha_hosp`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`pri_diagnosis`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`sec_diagnosis`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`treatment`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`location`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`voided`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
         visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
-        WHERE `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`patient_id` = in_patient_id;
+       WHERE `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -80,10 +80,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
 
 	# Get location id
-	SET @location_id = (SELECT location_id FROM location WHERE name = location);
+	SET @location_id = (SELECT location_id FROM location WHERE name = location LIMIT 1);
   
   # Get id of encounter type
-	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'outpatient diagnosis');
+	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'outpatient diagnosis' LIMIT 1);
 
 	# Create outpatient_reception_encounter
 	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
@@ -146,7 +146,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Primary diagnosis' AND voided = 0 AND retired = 0 LIMIT 1);
             
             # Get the correct diagnosis
-            SET @pri_diagnosis_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = pri_diagnosis);
+            SET @pri_diagnosis_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = pri_diagnosis LIMIT 1);
 
             IF ISNULL(@pri_diagnosis_name) THEN
               SET @bart2_primary_diagnosis_name = (pri_diagnosis);
@@ -186,7 +186,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                 VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, visit_date, @location_id , 'non-bloody', @creator, date_created, (SELECT UUID()));
             
             ELSEIF (pri_diagnosis = "Sprains (Joint Soft Tissue Injury)") THEN
-                SET @bart_two_sprains_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = "Sprains");
+                SET @bart_two_sprains_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = "Sprains" LIMIT 1);
 
                 SET @detailed_diagnosis_name_concept_id = (SELECT concept_name.concept_id FROM concept_name
                             LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
@@ -222,7 +222,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Secondary diagnosis' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get the correct secondary diagnosis name
-            SET @sec_diagnosis_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = sec_diagnosis);
+            SET @sec_diagnosis_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = sec_diagnosis LIMIT 1);
 
             IF ISNULL(@sec_diagnosis_name) THEN
               SET @bart2_secondary_diagnosis_name = (sec_diagnosis);
@@ -262,7 +262,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, visit_date, @location_id , 'non-bloody', @creator, date_created, (SELECT UUID()));
            
             ELSEIF (sec_diagnosis = "Sprains (Joint Soft Tissue Injury)") THEN
-              SET @bart_two_sprains_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = "Sprains");
+              SET @bart_two_sprains_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = "Sprains" LIMIT 1);
               
               SET @detailed_diagnosis_name_concept_id = (SELECT concept_name.concept_id FROM concept_name
                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
@@ -299,7 +299,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Drugs dispensed' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # get the correct drug_name spelling 
-            SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment);
+            SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment LIMIT 1);
 
             IF ISNULL(@bart2_drug_name) THEN
               SET @bart2_drug_concept_name = (treatment);
