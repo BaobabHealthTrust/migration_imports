@@ -172,16 +172,14 @@ BEGIN
         IF (state = 'Died' OR state = 'ART Stop' OR state = 'Transfer Out(With Transfer Note)' 
             OR state = 'Transfer Out(Without Transfer Note)') THEN
     
-            INSERT INTO encounter (encounter_id,patient_id, provider_id, encounter_type,location_id, encounter_datetime, creator, 
-                            voided, voided_by, date_voided, void_reason, uuid)
-            VALUES (old_enc_id, patient_id,1, @terminal_state_encounter_type_id, @location_id, date_created, @creator, 
+            INSERT INTO encounter (patient_id, provider_id, encounter_type,location_id, encounter_datetime, creator, voided, voided_by, date_voided, void_reason, uuid)
+            VALUES (patient_id,1, @terminal_state_encounter_type_id, @location_id, date_created, @creator, 
                             voided, @voided_by, date_voided, void_reason,(SELECT UUID()))  ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
             SET @new_encounter_id = (SELECT LAST_INSERT_ID());
             SET @date_of_exiting_care_concept = (SELECT concept_id FROM concept_name WHERE name = 'Date of exiting care');
             #insert Date of exiting from care observation
-            INSERT INTO obs (person_id,concept_id,encounter_id, obs_datetime,location_id, 
-                            value_datetime, creator, voided, voided_by, date_voided, void_reason, uuid)
+            INSERT INTO obs (person_id,concept_id, encounter_id, obs_datetime,location_id, value_datetime, creator, voided, voided_by, date_voided, void_reason, uuid)
             VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, @location_id, 
                             outcome_date, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
             
