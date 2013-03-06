@@ -15,7 +15,7 @@ DROP PROCEDURE IF EXISTS `proc_import_give_drugs`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_give_drugs`(
-    IN in_patient_id INT(11)
+  IN in_patient_id INT(11)
 )
 BEGIN
     
@@ -72,7 +72,7 @@ BEGIN
         visit_encounter_id = bart1_intermediate_bare_bones.visit_encounters.id
         LEFT OUTER JOIN bart1_intermediate_bare_bones.vitals_encounters
           ON bart1_intermediate_bare_bones.give_drugs_encounters.visit_encounter_id = bart1_intermediate_bare_bones.vitals_encounters.visit_encounter_id
-        WHERE `bart1_intermediate_bare_bones`.`give_drugs_encounters`.`patient_id` = in_patient_id;
+          WHERE `bart1_intermediate_bare_bones`.`give_drugs_encounters`.`patient_id` = in_patient_id;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -143,7 +143,7 @@ BEGIN
         SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
 
         # Get id of encounter type
-        SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = "TREATMENT");
+        SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = "TREATMENT"  LIMIT 1);
 
         # Create encounter
         SET @encounter_uuid = (SELECT UUID());
@@ -153,11 +153,13 @@ BEGIN
        
         SET @encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @encounter_uuid);
 
-        # Check if the field is not empty========================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------
+
+        # Check if the field is not empty
         IF NOT ISNULL(pres_drug_name1) THEN
             SET @pres_drug_name1_bart2_name = (SELECT bart2_two_name FROM drug_map WHERE bart_one_name = pres_drug_name1 LIMIT 1);
-            SET @pres_drug_name1_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name1_bart2_name);
-            SET @pres_drug_name1_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name1_new_drug_id AND name = @pres_drug_name1_bart2_name);     
+            SET @pres_drug_name1_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name1_bart2_name LIMIT 1);
+            SET @pres_drug_name1_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name1_new_drug_id AND name = @pres_drug_name1_bart2_name LIMIT 1);     
             
             IF (@pres_drug_name1_bart2_name = "Cotrimoxazole (480mg tablet)") THEN
               # Get concept_id
@@ -188,7 +190,7 @@ BEGIN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
                                           WHERE min_weight <= weight
                                           AND max_weight >= weight
-                                          AND concept_id = @pres_drug_name1_concept_id);
+                                          AND concept_id = @pres_drug_name1_concept_id  LIMIT 1);
 
               END IF;
 
@@ -234,7 +236,7 @@ BEGIN
             IF NOT ISNULL(dispensed_drug_name1) THEN
               
               # Get id of dispense encounter type
-              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING"  LIMIT 1);
 
               # Create encounter
               SET @dispensing_encounter_uuid = (SELECT UUID());
@@ -313,11 +315,13 @@ BEGIN
              END IF;
         END IF;
 
-        # Check if the field is not empty========================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------
+
+        # Check if the field is not empty
         IF NOT ISNULL(pres_drug_name2) THEN
             SET @pres_drug_name2_bart2_name = (SELECT bart2_two_name FROM drug_map WHERE bart_one_name = pres_drug_name2 LIMIT 1);
-            SET @pres_drug_name2_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name2_bart2_name);
-            SET @pres_drug_name2_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name2_new_drug_id AND name = @pres_drug_name2_bart2_name);     
+            SET @pres_drug_name2_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name2_bart2_name  LIMIT 1);
+            SET @pres_drug_name2_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name2_new_drug_id AND name = @pres_drug_name2_bart2_name  LIMIT 1);     
             
             IF (@pres_drug_name2_bart2_name = "Cotrimoxazole (480mg tablet)") THEN
               # Get concept_id
@@ -348,7 +352,7 @@ BEGIN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
                                           WHERE min_weight <= weight
                                           AND max_weight >= weight
-                                          AND concept_id = @pres_drug_name2_concept_id);
+                                          AND concept_id = @pres_drug_name2_concept_id  LIMIT 1);
 
               END IF;
 
@@ -394,7 +398,7 @@ BEGIN
             IF NOT ISNULL(dispensed_drug_name2) THEN
               
               # Get id of dispense encounter type
-              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING"  LIMIT 1);
 
               # Create encounter
               SET @dispensing_encounter_uuid = (SELECT UUID());
@@ -473,11 +477,13 @@ BEGIN
              END IF;
         END IF;
 
-        # Check if the field is not empty========================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------
+
+        # Check if the field is not empty
         IF NOT ISNULL(pres_drug_name3) THEN
             SET @pres_drug_name3_bart2_name = (SELECT bart2_two_name FROM drug_map WHERE bart_one_name = pres_drug_name3 LIMIT 1);
-            SET @pres_drug_name3_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name3_bart2_name);
-            SET @pres_drug_name3_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name3_new_drug_id AND name = @pres_drug_name3_bart2_name);     
+            SET @pres_drug_name3_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name3_bart2_name  LIMIT 1);
+            SET @pres_drug_name3_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name3_new_drug_id AND name = @pres_drug_name3_bart2_name  LIMIT 1);     
             
             IF (@pres_drug_name3_bart2_name = "Cotrimoxazole (480mg tablet)") THEN
               # Get concept_id
@@ -508,7 +514,7 @@ BEGIN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
                                           WHERE min_weight <= weight
                                           AND max_weight >= weight
-                                          AND concept_id = @pres_drug_name3_concept_id);
+                                          AND concept_id = @pres_drug_name3_concept_id  LIMIT 1);
 
               END IF;
 
@@ -633,11 +639,13 @@ BEGIN
              END IF;
         END IF;
 
-        # Check if the field is not empty========================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------
+
+       # Check if the field is not empty
         IF NOT ISNULL(pres_drug_name4) THEN
             SET @pres_drug_name4_bart2_name = (SELECT bart2_two_name FROM drug_map WHERE bart_one_name = pres_drug_name4 LIMIT 1);
-            SET @pres_drug_name4_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name4_bart2_name);
-            SET @pres_drug_name4_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name4_new_drug_id AND name = @pres_drug_name4_bart2_name);     
+            SET @pres_drug_name4_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name4_bart2_name  LIMIT 1);
+            SET @pres_drug_name4_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name4_new_drug_id AND name = @pres_drug_name4_bart2_name  LIMIT 1);     
             
             IF (@pres_drug_name4_bart2_name = "Cotrimoxazole (480mg tablet)") THEN
               # Get concept_id
@@ -668,7 +676,7 @@ BEGIN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
                                           WHERE min_weight <= weight
                                           AND max_weight >= weight
-                                          AND concept_id = @pres_drug_name4_concept_id);
+                                          AND concept_id = @pres_drug_name4_concept_id  LIMIT 1);
 
               END IF;
 
@@ -714,7 +722,7 @@ BEGIN
             IF NOT ISNULL(dispensed_drug_name4) THEN
               
               # Get id of dispense encounter type
-              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING"  LIMIT 1);
 
               # Create encounter
               SET @dispensing_encounter_uuid = (SELECT UUID());
@@ -793,11 +801,13 @@ BEGIN
              END IF;
         END IF;
 
-        # Check if the field is not empty========================================================================================
+#-------------------------------------------------------------------------------------------------------------------------------
+
+        # Check if the field is not empty
         IF NOT ISNULL(pres_drug_name5) THEN
             SET @pres_drug_name5_bart2_name = (SELECT bart2_two_name FROM drug_map WHERE bart_one_name = pres_drug_name5 LIMIT 1);
-            SET @pres_drug_name5_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name5_bart2_name);
-            SET @pres_drug_name5_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name5_new_drug_id AND name = @pres_drug_name5_bart2_name);     
+            SET @pres_drug_name5_new_drug_id = (SELECT new_drug_id FROM drug_map WHERE bart2_two_name = @pres_drug_name5_bart2_name  LIMIT 1);
+            SET @pres_drug_name5_concept_id = (SELECT concept_id  FROM drug WHERE drug_id = @pres_drug_name5_new_drug_id AND name = @pres_drug_name5_bart2_name  LIMIT 1);     
             
             IF (@pres_drug_name5_bart2_name = "Cotrimoxazole (480mg tablet)") THEN
               # Get concept_id
@@ -828,8 +838,7 @@ BEGIN
                 SET @regimen_category = ( SELECT regimen_index FROM regimen
                                           WHERE min_weight <= weight
                                           AND max_weight >= weight
-                                          AND concept_id = @pres_drug_name5_concept_id);
-
+                                          AND concept_id = @pres_drug_name5_concept_id  LIMIT 1);
               END IF;
 
               SET @regimen_category_concept_id = (SELECT concept_name.concept_id FROM concept_name
@@ -874,7 +883,7 @@ BEGIN
             IF NOT ISNULL(dispensed_drug_name5) THEN
               
               # Get id of dispense encounter type
-              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING");
+              SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = "DISPENSING" LIMIT 1);
 
               # Create encounter
               SET @dispensing_encounter_uuid = (SELECT UUID());
