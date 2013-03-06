@@ -28,7 +28,7 @@ DROP PROCEDURE IF EXISTS `proc_import_outcome_encounter`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_outcome_encounter`(
-    IN in_patient_id INT(11)
+ IN in_patient_id INT(11)
 )
 BEGIN
     # Declare condition for exiting loop
@@ -52,7 +52,7 @@ BEGIN
     
     # Declare and initialise cursor for looping through the table
     DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`outcome_encounters`
-            WHERE `bart1_intermediate_bare_bones`.`outcome_encounters`.`patient_id` = in_patient_id;
+                           WHERE `bart1_intermediate_bare_bones`.`outcome_encounters`.`patient_id` = in_patient_id;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -80,20 +80,18 @@ BEGIN
         # Map location to source location
         SET @location_id = COALESCE((SELECT location_id FROM location WHERE name = location LIMIT 1), 1);
         # Map encounter_id to source
-        SET @encounter_type_id = COALESCE((SELECT encounter_type_id 
+        SET @encounter_type_id =(SELECT encounter_type_id 
                                             FROM encounter_type 
-                                            WHERE name = 'UPDATE OUTCOME' LIMIT 1), 40);
+                                            WHERE name = 'UPDATE OUTCOME' LIMIT 1);
         # Get hiv program for the patient
         SET @patient_hiv_program = COALESCE((SELECT patient_program_id 
                                                 FROM patient_program 
                                                 WHERE patient_id = patient_program.patient_id), 0);
         
         # Create outcome encounter object in destination
-        
-        INSERT INTO encounter (encounter_id, patient_id, provider_id, encounter_type,location_id, encounter_datetime, 
-                                creator, voided, voided_by, date_voided, void_reason, uuid)
-        VALUES (old_enc_id, patient_id,1, @encounter_type_id, @location_id, date_created, creator, voided, 
-                                @voided_by, date_voided, void_reason,(SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+
+        INSERT INTO encounter (encounter_id, patient_id, provider_id, encounter_type,location_id, encounter_datetime, creator, voided, voided_by, date_voided, void_reason, uuid)
+        VALUES (old_enc_id, patient_id, 1, @encounter_type_id, @location_id, date_created, @creator, voided, @voided_by, date_voided, void_reason,(SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
         # Get the latest encounter created
     	SET @encounter_id = (SELECT LAST_INSERT_ID());
@@ -114,41 +112,42 @@ BEGIN
                                         WHERE patient_program_id = @patient_hiv_program AND voided = 0), 0);
 
         # Create States for the patient
-        IF COALESCE(state, "") != "" THEN
-            IF state = 'On ART' THEN                           
-                INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
-                                    date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 7, 
-                                    date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
-            ELSEIF state = 'PRE ART' THEN
-                INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
-                                    date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 1, 
-                                    date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
-            ELSEIF state = 'Transfer Out(With Transfer Note)' THEN
-                SET @terminal_state_encounter_type_id = (SELECT encounter_type_id 
-                                                            FROM encounter_type WHERE name = 'EXIT FROM HIV CARE');
-                INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
-                                    date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 2, 
-                                    date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
-            ELSEIF state = 'Died' THEN
-                SET @terminal_state_encounter_type_id = (SELECT encounter_type_id 
-                                                            FROM encounter_type WHERE name = 'EXIT FROM HIV CARE');
-                INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
-                                    date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 3, 
-                                    date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
-            ELSEIF state = 'ART Stop' THEN
-                SET @terminal_state_encounter_type_id = (SELECT encounter_type_id 
-                                                            FROM encounter_type WHERE name = 'EXIT FROM HIV CARE');
-                INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
-                                    date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 6, 
-                                    date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
-            ELSEIF state = 'Transfer Out(Without Transfer Note)' THEN
-                SET @terminal_state_encounter_type_id = (SELECT encounter_type_id 
-                                                            FROM encounter_type WHERE name = 'EXIT FROM HIV CARE');
-                INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
-                                    date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 2, 
-                                    date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
-            END IF;      
-        END IF; # end of state
+        IF NOT ISNULL(state) THEN
+          IF COALESCE(state, "") != "" THEN
+              IF state = 'On ART' THEN                           
+                  INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
+                                      date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 7, 
+                                      date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
+              ELSEIF state = 'PRE ART' THEN
+                  INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
+                                      date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 1, 
+                                      date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
+              ELSEIF state = 'Transfer Out(With Transfer Note)' THEN
+                  SET @terminal_state_encounter_type_id = (SELECT encounter_type_id 
+                                                              FROM encounter_type WHERE name = 'EXIT FROM HIV CARE');
+                  INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
+                                      date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 2, 
+                                      date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
+              ELSEIF state = 'Died' THEN
+                  SET @terminal_state_encounter_type_id = (SELECT encounter_type_id 
+                                                              FROM encounter_type WHERE name = 'EXIT FROM HIV CARE');
+                  INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
+                                      date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 3, 
+                                      date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
+              ELSEIF state = 'ART Stop' THEN
+                  SET @terminal_state_encounter_type_id = (SELECT encounter_type_id 
+                                                              FROM encounter_type WHERE name = 'EXIT FROM HIV CARE');
+                  INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
+                                      date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 6, 
+                                      date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
+              ELSEIF state = 'Transfer Out(Without Transfer Note)' THEN
+                  SET @terminal_state_encounter_type_id = (SELECT encounter_type_id 
+                                                              FROM encounter_type WHERE name = 'EXIT FROM HIV CARE');
+                  INSERT INTO patient_state (patient_program_id, state, start_date, creator, voided, voided_by, 
+                                      date_voided, void_reason, uuid) VALUES (@patient_hiv_program, 2, 
+                                      date_created, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
+              END IF;
+          END IF;  # end of state    
         
         #close the previous state       
         IF @previous_state != 0 THEN # previous state exists, therefore update the end date
@@ -173,10 +172,10 @@ BEGIN
         IF (state = 'Died' OR state = 'ART Stop' OR state = 'Transfer Out(With Transfer Note)' 
             OR state = 'Transfer Out(Without Transfer Note)') THEN
     
-            INSERT INTO encounter (patient_id, provider_id, encounter_type,location_id, encounter_datetime, creator, 
+            INSERT INTO encounter (encounter_id,patient_id, provider_id, encounter_type,location_id, encounter_datetime, creator, 
                             voided, voided_by, date_voided, void_reason, uuid)
-            VALUES (patient_id,1, @terminal_state_encounter_type_id, @location_id, date_created, creator, 
-                            voided, @voided_by, date_voided, void_reason,(SELECT UUID()));
+            VALUES (old_enc_id, patient_id,1, @terminal_state_encounter_type_id, @location_id, date_created, @creator, 
+                            voided, @voided_by, date_voided, void_reason,(SELECT UUID()))  ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
             SET @new_encounter_id = (SELECT LAST_INSERT_ID());
             SET @date_of_exiting_care_concept = (SELECT concept_id FROM concept_name WHERE name = 'Date of exiting care');
@@ -227,6 +226,7 @@ BEGIN
             VALUES (patient_id, @transfer_out_concept, @new_encounter_id, date_created, @location_id, 
                 @transfer_out_location_id, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
         END IF;
+     END IF; 
     END LOOP;
 
 END$$
