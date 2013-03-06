@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS `proc_import_art_visit_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_art_visit_encounters`(
-	
+		IN in_patient_id INT(11)
 )
 BEGIN
 
@@ -85,8 +85,8 @@ BEGIN
 
 	# Declare and initialise cursor for looping through the table
 DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`art_visit_encounters`.`id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_pregnant`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_breast_feeding`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`using_family_planning_method`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`family_planning_method_used`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`abdominal_pains`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`anorexia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`cough`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`diarrhoea`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`fever`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`jaundice`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`leg_pain_numbness`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`vomit`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`weight_loss`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`peripheral_neuropathy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`hepatitis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`anaemia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`lactic_acidosis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`lipodystrophy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`skin_rash`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`other_symptoms`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_Abdominal_pains`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_anorexia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_diarrhoea`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_jaundice`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_leg_pain_numbness`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_vomit`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_peripheral_neuropathy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_hepatitis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_anaemia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_lactic_acidosis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_lipodystrophy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_skin_rash`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_other_symptom`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`tb_status`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`refer_to_clinician`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`prescribe_arv`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic4`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic4`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home4`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`arv_regimen`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`prescribe_cpt`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`number_of_condoms_given`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`depo_provera_given`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`continue_treatment_at_clinic`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`location`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`voided`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`art_visit_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`art_visit_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
-        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`;
-        #--WHERE `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_id` = in_patient_id;
+        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
+        WHERE `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -706,7 +706,6 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Get last obs id for association later to other records
             SET @other_symptoms_id = (SELECT LAST_INSERT_ID());            
-          END IF; 
           
           ELSEIF (jaundice = 'Yes drug induced') THEN
             # Get concept_id
@@ -1475,12 +1474,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get value_coded id
             SET @drug_induced_Abdominal_pains_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = Abdominal pain AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Abdominal pain' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
             SET @drug_induced_Abdominal_pains_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = Abdominal pain AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Abdominal pain' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
