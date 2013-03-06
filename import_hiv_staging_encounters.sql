@@ -339,7 +339,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get concept_id
             SET @date_of_cd4_count_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'Cd4 count datetime' AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'cd4 count datetime' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
@@ -349,6 +349,88 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @date_of_cd4_count_id = (SELECT LAST_INSERT_ID());
 
         END IF;
+        
+        # Check if the field is not empty
+        IF NOT ISNULL(asymptomatic) THEN
+
+            # Get concept_id
+            SET @asymptomatic_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = 'asymptomatic' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @asymptomatic_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = asymptomatic AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @asymptomatic_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = asymptomatic AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @asymptomatic_concept_id, old_enc_id, visit_date, @location_id , @asymptomatic_value_coded, @asymptomatic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @asymptomatic_id = (SELECT LAST_INSERT_ID());
+
+        END IF;
+        
+        # Check if the field is not empty
+        IF NOT ISNULL(persistent_generalized_lymphadenopathy) THEN
+
+            # Get concept_id
+            SET @persistent_generalized_lymphadenopathy_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = 'persistent generalized lymphadenopathy' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @persistent_generalized_lymphadenopathy_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = persistent_generalized_lymphadenopathy AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @persistent_generalized_lymphadenopathy_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = persistent_generalized_lymphadenopathy AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @persistent_generalized_lymphadenopathy_concept_id, old_enc_id, visit_date, @location_id , @persistent_generalized_lymphadenopathy_value_coded, @persistent_generalized_lymphadenopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @persistent_generalized_lymphadenopathy_id = (SELECT LAST_INSERT_ID());
+
+        END IF;
+        
+        # Check if the field is not empty
+        IF NOT ISNULL(unspecified_stage_1_cond) THEN
+
+            # Get concept_id
+            SET @unspecified_stage_1_cond_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = 'unspecified stage I condition' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @unspecified_stage_1_cond_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = unspecified_stage_1_cond AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @unspecified_stage_1_cond_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = unspecified_stage_1_cond AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @unspecified_stage_1_cond_concept_id, old_enc_id, visit_date, @location_id , @unspecified_stage_1_cond_value_coded, @unspecified_stage_1_cond_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @unspecified_stage_1_cond_id = (SELECT LAST_INSERT_ID());
+
+        END IF;
+        
         
         # Check if the field is not empty
         IF NOT ISNULL(molluscumm_contagiosum) THEN
@@ -599,7 +681,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get concept_id
             SET @papular_prurtic_eruptions_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'papular prurtic eruptions' AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'papular itchy skin eruptions' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @papular_prurtic_eruptions_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
