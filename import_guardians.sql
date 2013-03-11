@@ -15,7 +15,7 @@ DROP PROCEDURE IF EXISTS `proc_import_guardians`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_guardians`(
-
+  IN in_patient_id INT(11)
 	)
 BEGIN
     
@@ -41,7 +41,8 @@ BEGIN
     DECLARE cur CURSOR FOR SELECT `final_bart1_intermediate_bare_bones`.`guardians`.`id`,        `final_bart1_intermediate_bare_bones`.`guardians`.`patient_id`,                              `final_bart1_intermediate_bare_bones`.`guardians`.`name`,                              `final_bart1_intermediate_bare_bones`.`guardians`.`relationship`,                             `final_bart1_intermediate_bare_bones`.`guardians`.`family_name`,                             `final_bart1_intermediate_bare_bones`.`guardians`.`gender`,                 `final_bart1_intermediate_bare_bones`.`guardians`.`voided`,                  `final_bart1_intermediate_bare_bones`.`guardians`.`void_reason`,  `final_bart1_intermediate_bare_bones`.`guardians`.`date_voided`,    `final_bart1_intermediate_bare_bones`.`guardians`.`voided_by`,  `final_bart1_intermediate_bare_bones`.`guardians`.`date_created`,      `final_bart1_intermediate_bare_bones`.`guardians`.`creator`,           `final_bart1_intermediate_bare_bones`.`patients`.guardian_id
                            FROM `final_bart1_intermediate_bare_bones`.`guardians`
                            LEFT OUTER JOIN `final_bart1_intermediate_bare_bones`.`patients`
-                           ON `final_bart1_intermediate_bare_bones`.`guardians`.`patient_id` = `final_bart1_intermediate_bare_bones`.`patients`.`patient_id`;
+                           ON `final_bart1_intermediate_bare_bones`.`guardians`.`patient_id` = `final_bart1_intermediate_bare_bones`.`patients`.`patient_id`
+                           WHERE `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
