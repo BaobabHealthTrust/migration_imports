@@ -15,7 +15,7 @@ DROP PROCEDURE IF EXISTS `proc_import_give_drugs`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_give_drugs`(
-  IN in_patient_id INT(11)
+  
 )
 BEGIN
     
@@ -71,8 +71,8 @@ BEGIN
         LEFT OUTER JOIN bart1_intermediate_bare_bones.visit_encounters ON 
         visit_encounter_id = bart1_intermediate_bare_bones.visit_encounters.id
         LEFT OUTER JOIN bart1_intermediate_bare_bones.vitals_encounters
-          ON bart1_intermediate_bare_bones.give_drugs_encounters.visit_encounter_id = bart1_intermediate_bare_bones.vitals_encounters.visit_encounter_id
-          WHERE `bart1_intermediate_bare_bones`.`give_drugs_encounters`.`patient_id` = in_patient_id;
+          ON bart1_intermediate_bare_bones.give_drugs_encounters.visit_encounter_id = bart1_intermediate_bare_bones.vitals_encounters.visit_encounter_id;
+          #--WHERE `bart1_intermediate_bare_bones`.`give_drugs_encounters`.`patient_id` = in_patient_id;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
