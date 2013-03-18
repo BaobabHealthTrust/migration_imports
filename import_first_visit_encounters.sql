@@ -13,7 +13,6 @@ CREATE PROCEDURE `proc_import_first_visit_encounters`(
 )
 BEGIN
 
-
 	# Declare condition for exiting loop
 	DECLARE done INT DEFAULT FALSE;
 
@@ -146,21 +145,11 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get concept_id
             SET @date_of_hiv_pos_test_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'First positive HIV test date' AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded id
-            SET @date_of_hiv_pos_test_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = date_of_hiv_pos_test AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded_name_id
-            SET @date_of_hiv_pos_test_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = date_of_hiv_pos_test AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'CONFIRMATORY HIV TEST DATE' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @date_of_hiv_pos_test_concept_id, old_enc_id, visit_date, @location_id , @date_of_hiv_pos_test_value_coded, @date_of_hiv_pos_test_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
+            VALUES (patient_id, @date_of_hiv_pos_test_concept_id, old_enc_id, visit_date, @location_id , date_of_hiv_pos_test, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_of_hiv_pos_test_id = (SELECT LAST_INSERT_ID());
@@ -175,19 +164,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Estimated date' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Get value_coded id
-            SET @date_of_hiv_pos_test_estimated_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = date_of_hiv_pos_test_estimated AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded_name_id
-            SET @date_of_hiv_pos_test_estimated_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = date_of_hiv_pos_test_estimated AND voided = 0 AND retired = 0 LIMIT 1);
-
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @date_of_hiv_pos_test_estimated_concept_id, old_enc_id, visit_date, @location_id , @date_of_hiv_pos_test_estimated_value_coded, @date_of_hiv_pos_test_estimated_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
+            VALUES (patient_id, @date_of_hiv_pos_test_estimated_concept_id, old_enc_id, visit_date, @location_id , date_of_hiv_pos_test_estimated, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_of_hiv_pos_test_estimated_id = (SELECT LAST_INSERT_ID());
@@ -200,21 +179,11 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get concept_id
             SET @location_of_hiv_pos_test_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'First positive HIV test location' AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded id
-            SET @location_of_hiv_pos_test_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = location_of_hiv_pos_test AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded_name_id
-            SET @location_of_hiv_pos_test_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = location_of_hiv_pos_test AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'CONFIRMATORY HIV TEST LOCATION' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @location_of_hiv_pos_test_concept_id, old_enc_id, visit_date, @location_id , @location_of_hiv_pos_test_value_coded, @location_of_hiv_pos_test_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+            VALUES (patient_id, @location_of_hiv_pos_test_concept_id, old_enc_id, visit_date, @location_id , location_of_hiv_pos_test, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @location_of_hiv_pos_test_id = (SELECT LAST_INSERT_ID());
@@ -229,19 +198,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'ART number at previous location' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Get value_coded id
-            SET @arv_number_at_that_site_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = arv_number_at_that_site AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded_name_id
-            SET @arv_number_at_that_site_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = arv_number_at_that_site AND voided = 0 AND retired = 0 LIMIT 1);
-
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @arv_number_at_that_site_concept_id, old_enc_id, visit_date, @location_id , @arv_number_at_that_site_value_coded, @arv_number_at_that_site_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+            VALUES (patient_id, @arv_number_at_that_site_concept_id, old_enc_id, visit_date, @location_id , arv_number_at_that_site, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @arv_number_at_that_site_id = (SELECT LAST_INSERT_ID());
@@ -256,19 +215,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Location of ART initiation' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Get value_coded id
-            SET @location_of_art_initiation_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = location_of_art_initiation AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded_name_id
-            SET @location_of_art_initiation_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = location_of_art_initiation AND voided = 0 AND retired = 0 LIMIT 1);
-
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @location_of_art_initiation_concept_id, old_enc_id, visit_date, @location_id , @location_of_art_initiation_value_coded, @location_of_art_initiation_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+            VALUES (patient_id, @location_of_art_initiation_concept_id, old_enc_id, visit_date, @location_id , location_of_art_initiation, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @location_of_art_initiation_id = (SELECT LAST_INSERT_ID());
@@ -364,19 +313,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Transfer in from' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Get value_coded id
-            SET @site_transferred_from_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = site_transferred_from AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded_name_id
-            SET @site_transferred_from_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = site_transferred_from AND voided = 0 AND retired = 0 LIMIT 1);
-
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @site_transferred_from_concept_id, old_enc_id, visit_date, @location_id , @site_transferred_from_value_coded, @site_transferred_from_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+            VALUES (patient_id, @site_transferred_from_concept_id, old_enc_id, visit_date, @location_id , site_transferred_from, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @site_transferred_from_id = (SELECT LAST_INSERT_ID());
@@ -506,19 +445,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Estimated date' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Get value_coded id
-            SET @date_last_arv_taken_estimated_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = date_last_arv_taken_estimated AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Get value_coded_name_id
-            SET @date_last_arv_taken_estimated_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = date_last_arv_taken_estimated AND voided = 0 AND retired = 0 LIMIT 1);
-
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @date_last_arv_taken_estimated_concept_id, old_enc_id, visit_date, @location_id , @date_last_arv_taken_estimated_value_coded, @date_last_arv_taken_estimated_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+            VALUES (patient_id, @date_last_arv_taken_estimated_concept_id, old_enc_id, visit_date, @location_id , date_last_arv_taken_estimated, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_last_arv_taken_estimated_id = (SELECT LAST_INSERT_ID());
