@@ -209,7 +209,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'patient pregnant' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Get value_coded id
+            # Get value_coded idWHO stage
             SET @patient_pregnant_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = patient_pregnant AND voided = 0 AND retired = 0 LIMIT 1);
@@ -242,7 +242,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = patient_breast_feeding AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded_name_id
-            SET @patient_breast_feeding_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+            SET @patient_breast_fWHO stageeeding_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = patient_breast_feeding AND voided = 0 AND retired = 0 LIMIT 1);
 
@@ -1747,10 +1747,13 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             ELSEIF (reason_for_starting_art = "WHO stage 4 peds") THEN
               SET reason_for_starting_art = "WHO stage IV peds";
             ELSEIF (reason_for_starting_art = "CD4 Count < 250") THEN
-              SET reason_for_starting_art = "CD4 count <= 250";
+              SET reason_for_starting_art = "CD4 count less than or equal to 250";
             ELSEIF (reason_for_starting_art = "CD4 Count < 350") THEN
-              SET reason_for_starting_art = "CD4 count <= 350";
+              SET reason_for_starting_art = "CD4 count less than or equal to 350";
+            ELSEIF (reason_for_starting_art = "CD4 Count < 750") THEN
+              SET reason_for_starting_art = "CD4 count less than or equal to 750";
             ELSE
+            
               SET reason_for_starting_art = reason_for_starting_art;
             END IF;
 
