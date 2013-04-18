@@ -9,8 +9,9 @@ DROP PROCEDURE IF EXISTS `proc_import_first_visit_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_first_visit_encounters`(
-	IN in_patient_id INT(11)
+IN in_patient_id INT(11)
 )
+
 BEGIN
 
 	# Declare condition for exiting loop
@@ -46,7 +47,14 @@ BEGIN
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
-DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`first_visit_encounters`.`id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`agrees_to_follow_up`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test_estimated`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`arv_number_at_that_site`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_months`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_weeks`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`has_transfer_letter`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`site_transferred_from`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_registered_at_art`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_received_arv`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`last_arv_regimen`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken_estimated`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`voided`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`first_visit_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`first_visit_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
+DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`first_visit_encounters`.`id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`old_enc_id`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`agrees_to_follow_up`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test_estimated`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`arv_number_at_that_site`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_months`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_weeks`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`has_transfer_letter`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`site_transferred_from`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_registered_at_art`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_received_arv`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`last_arv_regimen`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken_estimated`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`voided`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`void_reason`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_voided`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`voided_by`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_created`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`first_visit_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`first_visit_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
         visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
         WHERE `bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id` = in_patient_id;
 
@@ -97,6 +105,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
+  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_st_gabriel_migration_database.encounter
+                                WHERE encounter_id = old_enc_id), 0);
+  IF @migrated_encounter_id = 0 THEN
 	# Not done, process the parameters
 
 	# Map destination user to source user
@@ -453,7 +464,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @date_last_arv_taken_estimated_id = (SELECT LAST_INSERT_ID());
 
         END IF;
-        
+        select patient_id, old_enc_id;
+     ELSE
+      select patient_id; 
+     END IF;
 	END LOOP;
 
 END$$

@@ -80,6 +80,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 	# Not done, process the parameters
 
+  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_st_gabriel_migration_database.encounter
+                                WHERE voided = 0 AND encounter_id = 455435), 0);
+  IF @migrated_encounter_id = 455435 THEN
+
 	# Map destination user to source user
 	SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
 
@@ -194,6 +198,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @weight_for_height_id = (SELECT LAST_INSERT_ID());
 
         END IF;
+        select patient_id, old_enc_id;
+      ELSE
+        select patient_id;
+      END IF;
         
 	END LOOP;
 

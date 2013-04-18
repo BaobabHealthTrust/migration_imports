@@ -17,7 +17,7 @@ DROP PROCEDURE IF EXISTS `proc_import_give_drugs`$$
 CREATE PROCEDURE `proc_import_give_drugs`(
 IN in_patient_id INT(11)
 )
-#--	IN in_patient_id INT(11)
+
 BEGIN
     
     # Declare condition for exiting loop
@@ -134,7 +134,7 @@ BEGIN
         
         END IF;
         
-        SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM zomba_final_migration_database.encounter enc
+        SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_st_gabriel_migration_database.encounter enc
                                     WHERE enc.patient_id = patient_id AND enc.encounter_id = old_enc_id AND voided = 0), 0);
         IF @migrated_encounter_id != 0 THEN
         

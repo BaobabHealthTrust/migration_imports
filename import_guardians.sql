@@ -1,7 +1,7 @@
 # This procedure imports patients from intermediate tables to ART2 OpenMRS database
 # ASSUMPTION
 # ==========
-# The assumption here is your source database name is `final_bart1_intermediate_bare_bones`
+# The assumption here is your source database name is `bart1_intermediate_bare_bones`
 # and the destination any name you prefer.
 # This has been necessary because there seems to be no way to use dynamic database 
 # names in procedures yet
@@ -15,8 +15,9 @@ DROP PROCEDURE IF EXISTS `proc_import_guardians`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_guardians`(
-  IN in_patient_id INT(11)
+    IN in_patient_id INT(11)
 	)
+
 BEGIN
     
     # Declare condition for exiting loop
@@ -38,11 +39,16 @@ BEGIN
     DECLARE guardian_id INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT `final_bart1_intermediate_bare_bones`.`guardians`.`id`,        `final_bart1_intermediate_bare_bones`.`guardians`.`patient_id`,                              `final_bart1_intermediate_bare_bones`.`guardians`.`name`,                              `final_bart1_intermediate_bare_bones`.`guardians`.`relationship`,                             `final_bart1_intermediate_bare_bones`.`guardians`.`family_name`,                             `final_bart1_intermediate_bare_bones`.`guardians`.`gender`,                 `final_bart1_intermediate_bare_bones`.`guardians`.`voided`,                  `final_bart1_intermediate_bare_bones`.`guardians`.`void_reason`,  `final_bart1_intermediate_bare_bones`.`guardians`.`date_voided`,    `final_bart1_intermediate_bare_bones`.`guardians`.`voided_by`,  `final_bart1_intermediate_bare_bones`.`guardians`.`date_created`,      `final_bart1_intermediate_bare_bones`.`guardians`.`creator`,           `final_bart1_intermediate_bare_bones`.`patients`.guardian_id
-                           FROM `final_bart1_intermediate_bare_bones`.`guardians`
-                           LEFT OUTER JOIN `final_bart1_intermediate_bare_bones`.`patients`
-                           ON `final_bart1_intermediate_bare_bones`.`guardians`.`patient_id` = `final_bart1_intermediate_bare_bones`.`patients`.`patient_id`
-                           WHERE `bart1_intermediate_bare_bones`.`pre_art_visit_encounters`.`patient_id` = in_patient_id;
+    DECLARE cur CURSOR FOR SELECT `bart1_intermediate_bare_bones`.`guardians`.`id`,        `bart1_intermediate_bare_bones`.`guardians`.`patient_id`,                              `bart1_intermediate_bare_bones`.`guardians`.`name`,                              `bart1_intermediate_bare_bones`.`guardians`.`relationship`,                             `bart1_intermediate_bare_bones`.`guardians`.`family_name`,                             `bart1_intermediate_bare_bones`.`guardians`.`gender`,                 `bart1_intermediate_bare_bones`.`guardians`.`voided`,                  `bart1_intermediate_bare_bones`.`guardians`.`void_reason`,  
+`bart1_intermediate_bare_bones`.`guardians`.`date_voided`,    
+`bart1_intermediate_bare_bones`.`guardians`.`voided_by`,  
+`bart1_intermediate_bare_bones`.`guardians`.`date_created`, 
+`bart1_intermediate_bare_bones`.`guardians`.`creator`,          
+`bart1_intermediate_bare_bones`.`patients`.`guardian_id`
+                           FROM `bart1_intermediate_bare_bones`.`guardians`
+                           LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`patients`
+                           ON `bart1_intermediate_bare_bones`.`guardians`.`patient_id` = `bart1_intermediate_bare_bones`.`patients`.`patient_id`
+                           WHERE `bart1_intermediate_bare_bones`.`guardians`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -69,24 +75,35 @@ BEGIN
 	# Map destination user to source user
 	SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
 
+  IF ISNULL(name) THEN
+    SET @guardian_id = COALESCE((SELECT guardian_id
+                                 FROM bart1_intermediate_bare_bones.patients p
+                                 WHERE p.patient_id = in_patient_id),0);
+   select @guardian_id;
 
-  IF (relationship = 'Sister/brother') THEN
-    SET @relationship = 'Sibling';
-  ELSE
-    SET @relationship = relationship;
+    SET @merged_patient_id = COALESCE((SELECT REPLACE(o.void_reason, 'merged with patient ', '') 
+                                       FROM openmrs_st_gabriel_database.patient o
+                                       WHERE o.patient_id = @guardian_id),0);
+     select @merged_patient_id;
+     
+    IF (@merged_patient_id != 0) THEN
+      IF (relationship = 'Sister/brother') THEN
+        SET @relationship = 'Sibling';
+      ELSE
+        SET @relationship = relationship;
+      END IF;
+
+      SET @relationship_type = (SELECT relationship_type_id FROM relationship_type WHERE a_is_to_b = @relationship);
+        
+      INSERT INTO relationship (person_a, relationship, person_b, creator, date_created, uuid)
+      VALUES (patient_id, @relationship_type, @merged_patient_id, @creator, date_created, (SELECT UUID()));
+      
+      select patient_id, guardian_id;
+    ELSE
+      select patient_id;
+    END IF;
   END IF;
-
-  SET @relationship_type = (SELECT relationship_type_id FROM relationship_type WHERE a_is_to_b = @relationship);
-    
-  INSERT INTO relationship (person_a, relationship, person_b, creator, date_created, uuid)
-  VALUES (patient_id, @relationship_type, guardian_id, @creator, date_created, (SELECT UUID()));
-
-    END LOOP;
-
-    SET UNIQUE_CHECKS = 1;
-    SET FOREIGN_KEY_CHECKS = 1;
-    COMMIT;
-    SET AUTOCOMMIT = 1;
+ END LOOP;
 
 END$$
 
