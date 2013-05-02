@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS `proc_import_first_visit_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_first_visit_encounters`(
-IN in_patient_id INT(11)
+#--IN in_patient_id INT(11)
 )
 
 BEGIN
@@ -55,8 +55,8 @@ DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`first_vi
 `bart1_intermediate_bare_bones`.`first_visit_encounters`.`voided_by`, 
 `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_created`, 
 `bart1_intermediate_bare_bones`.`first_visit_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`first_visit_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`first_visit_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
-        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
-        WHERE `bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id` = in_patient_id;
+        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`;
+        #--WHERE `bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -105,7 +105,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
-  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_st_gabriel_migration_database.encounter
+  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_database.encounter
                                 WHERE encounter_id = old_enc_id), 0);
   IF @migrated_encounter_id = 0 THEN
 	# Not done, process the parameters
@@ -176,7 +176,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Estimated date' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_boolean, creator, date_created, uuid)
             VALUES (patient_id, @date_of_hiv_pos_test_estimated_concept_id, old_enc_id, visit_date, @location_id , date_of_hiv_pos_test_estimated, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
@@ -421,10 +421,17 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @last_arv_regimen_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = last_arv_regimen AND voided = 0 AND retired = 0 LIMIT 1);
-
-            # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @last_arv_regimen_concept_id, old_enc_id, visit_date, @location_id , @last_arv_regimen_value_coded, @last_arv_regimen_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            
+            #save as value_text if value_coded is null
+            IF ISNULL(@last_arv_regimen_value_coded) THEN
+              # Create observation
+              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+              VALUES (patient_id, @last_arv_regimen_concept_id, old_enc_id, visit_date, @location_id , last_arv_regimen, @creator, date_created, (SELECT UUID()));
+            ELSE
+              # Create observation
+              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+              VALUES (patient_id, @last_arv_regimen_concept_id, old_enc_id, visit_date, @location_id , @last_arv_regimen_value_coded, @last_arv_regimen_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            END IF;
 
             # Get last obs id for association later to other records
             SET @last_arv_regimen_id = (SELECT LAST_INSERT_ID());
@@ -457,7 +464,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         WHERE name = 'Estimated date' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_boolean, creator, date_created, uuid)
             VALUES (patient_id, @date_last_arv_taken_estimated_concept_id, old_enc_id, visit_date, @location_id , date_last_arv_taken_estimated, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
