@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS `proc_import_general_reception_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_general_reception_encounters`(
-	IN in_patient_id INT(11)
+#--	IN in_patient_id INT(11)
 )
 BEGIN
 
@@ -33,8 +33,8 @@ BEGIN
 
 	# Declare and initialise cursor for looping through the table
 DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`general_reception_encounters`.`id`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`patient_present`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`location`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`voided`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`general_reception_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`general_reception_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`general_reception_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
-        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
-        WHERE `bart1_intermediate_bare_bones`.`general_reception_encounters`.`patient_id` = in_patient_id;
+        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`;
+        #--WHERE `bart1_intermediate_bare_bones`.`general_reception_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -68,48 +68,55 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
-	# Not done, process the parameters
+  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM zomba_final_migration_database.encounter
+                                WHERE encounter_id = old_enc_id), 0);
+  IF @migrated_encounter_id = 0 THEN
+	
+	  # Not done, process the parameters
 
-	# Map destination user to source user
-	SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
+	  # Map destination user to source user
+	  SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
 
-	# Get location id
-	SET @location_id = (SELECT location_id FROM location WHERE name = location);
+	  # Get location id
+	  SET @location_id = (SELECT location_id FROM location WHERE name = location);
 
-	# Get id of encounter type
-	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'outpatient reception');
+	  # Get id of encounter type
+	  SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'outpatient reception');
 
-	# Create encounter
-	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+	  # Create encounter
+	  INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
 	
-        # Check if the field is not empty
-        IF NOT ISNULL(patient_present) THEN
+          # Check if the field is not empty
+          IF NOT ISNULL(patient_present) THEN
 
-            # Get concept_id
-            SET @patient_present_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'patient present' AND voided = 0 AND retired = 0 LIMIT 1);
+              # Get concept_id
+              SET @patient_present_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = 'patient present' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Get value_coded id
-            SET @patient_present_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = patient_present AND voided = 0 AND retired = 0 LIMIT 1);
+              # Get value_coded id
+              SET @patient_present_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = patient_present AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Get value_coded_name_id
-            SET @patient_present_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
-                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = patient_present AND voided = 0 AND retired = 0 LIMIT 1);
+              # Get value_coded_name_id
+              SET @patient_present_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = patient_present AND voided = 0 AND retired = 0 LIMIT 1);
 
-            # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @patient_present_concept_id, old_enc_id, visit_date, @location_id , @patient_present_value_coded, @patient_present_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+              # Create observation
+              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+              VALUES (patient_id, @patient_present_concept_id, old_enc_id, visit_date, @location_id , @patient_present_value_coded, @patient_present_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
-            # Get last obs id for association later to other records
-            SET @patient_present_id = (SELECT LAST_INSERT_ID());
+              # Get last obs id for association later to other records
+              SET @patient_present_id = (SELECT LAST_INSERT_ID());
 
-        END IF;
-        
+          END IF;
+     select patient_id, old_enc_id;
+   ELSE
+    select patient_id;
+   END IF;
 	END LOOP;
 
 END$$
