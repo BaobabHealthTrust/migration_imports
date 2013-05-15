@@ -37,6 +37,9 @@ BEGIN
 	DECLARE last_arv_regimen varchar(255);
 	DECLARE date_last_arv_taken date;
 	DECLARE date_last_arv_taken_estimated date;
+	DECLARE weight float;
+	DECLARE height float;
+	DECLARE bmi float;
 	DECLARE location varchar(255);
 	DECLARE voided tinyint(1);
 	DECLARE void_reason varchar(255);
@@ -48,7 +51,10 @@ BEGIN
 
 	# Declare and initialise cursor for looping through the table
 DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`first_visit_encounters`.`id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`old_enc_id`, 
-`bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`agrees_to_follow_up`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test_estimated`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`arv_number_at_that_site`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_months`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_weeks`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`has_transfer_letter`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`site_transferred_from`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_registered_at_art`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_received_arv`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`last_arv_regimen`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken_estimated`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`agrees_to_follow_up`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test_estimated`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`arv_number_at_that_site`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_months`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_weeks`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`has_transfer_letter`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`site_transferred_from`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_registered_at_art`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_received_arv`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`last_arv_regimen`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken_estimated`,
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`weight`,
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`height`,
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`bmi`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location`, 
 `bart1_intermediate_bare_bones`.`first_visit_encounters`.`voided`, 
 `bart1_intermediate_bare_bones`.`first_visit_encounters`.`void_reason`, 
 `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_voided`, 
@@ -89,6 +95,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 			last_arv_regimen,
 			date_last_arv_taken,
 			date_last_arv_taken_estimated,
+			weight,
+			height,
+			bmi,
 			location,
 			voided,
 			void_reason,
@@ -105,7 +114,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
-  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_database.encounter
+  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_final_database.encounter
                                 WHERE encounter_id = old_enc_id), 0);
   IF @migrated_encounter_id = 0 THEN
 	# Not done, process the parameters
@@ -471,6 +480,75 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @date_last_arv_taken_estimated_id = (SELECT LAST_INSERT_ID());
 
         END IF;
+        
+        # Check if the field is not empty
+        IF NOT ISNULL(weight) THEN
+
+          # Get concept_id
+          SET @weight_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = 'Weight (kg)' AND voided = 0 AND retired = 0 LIMIT 1);
+          IF (weight = 'Unknown') THEN
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+            VALUES (patient_id, @weight_concept_id, old_enc_id, visit_date, @location_id , weight, @creator, date_created, (SELECT UUID()));
+          ELSE
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            VALUES (patient_id, @weight_concept_id, old_enc_id, visit_date, @location_id , weight, @creator, date_created, (SELECT UUID()));
+          END IF;
+
+          # Get last obs id for association later to other records
+          SET @weight_id = (SELECT LAST_INSERT_ID());
+
+        END IF;
+        
+        # Check if the field is not empty
+        IF NOT ISNULL(height) THEN
+
+          # Get concept_id
+          SET @height_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = 'Height (cm)' AND voided = 0 AND retired = 0 LIMIT 1);
+          
+          IF (height = 'Unknown') THEN
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+            VALUES (patient_id, @height_concept_id, old_enc_id, visit_date, @location_id , height, @creator, date_created, (SELECT UUID()));
+          ELSE
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            VALUES (patient_id, @height_concept_id, old_enc_id, visit_date, @location_id , height, @creator, date_created, (SELECT UUID()));
+          END IF;
+
+          # Get last obs id for association later to other records
+          SET @height_id = (SELECT LAST_INSERT_ID());
+
+        END IF;
+        
+        # Check if the field is not empty
+        IF NOT ISNULL(bmi) THEN
+
+            # Get concept_id
+            SET @bmi_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = 'Body mass index, measured' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            IF (bmi = 'Unknown') THEN
+              # Create observation
+              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+              VALUES (patient_id, @bmi_concept_id, old_enc_id, visit_date, @location_id , bmi, @creator, date_created, (SELECT UUID()));
+            ELSE
+               # Create observation
+              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+              VALUES (patient_id, @bmi_concept_id, old_enc_id, visit_date, @location_id , bmi, @creator, date_created, (SELECT UUID()));
+            END IF;
+
+            # Get last obs id for association later to other records
+            SET @bmi_id = (SELECT LAST_INSERT_ID());
+
+        END IF;
+
         select patient_id, old_enc_id;
      ELSE
       select patient_id; 

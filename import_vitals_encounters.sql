@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS `proc_import_vitals_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_vitals_encounters`(
-	#--IN in_patient_id INT(11)
+#--	IN in_patient_id INT(11)
 )
 BEGIN
 
@@ -80,7 +80,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 	# Not done, process the parameters
 
-  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_database.encounter
+  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_final_database.encounter
                                 WHERE encounter_id = old_enc_id AND voided = 0), 0);
   IF @migrated_encounter_id = 0 THEN
 
@@ -104,7 +104,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @weight_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Weight (kg)' AND voided = 0 AND retired = 0 LIMIT 1);
-          IF (weight == 'Unknown') THEN
+          IF (weight = 'Unknown') THEN
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
             VALUES (patient_id, @weight_concept_id, old_enc_id, visit_date, @location_id , weight, @creator, date_created, (SELECT UUID()));
@@ -126,7 +126,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @height_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Height (cm)' AND voided = 0 AND retired = 0 LIMIT 1);
-          IF (height == 'Unknown') THEN
+          IF (height = 'Unknown') THEN
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
             VALUES (patient_id, @height_concept_id, old_enc_id, visit_date, @location_id , height, @creator, date_created, (SELECT UUID()));
@@ -150,7 +150,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Body mass index, measured' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            IF (bmi == 'Unknown') THEN
+            IF (bmi = 'Unknown') THEN
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
               VALUES (patient_id, @bmi_concept_id, old_enc_id, visit_date, @location_id , bmi, @creator, date_created, (SELECT UUID()));
@@ -174,7 +174,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Weight for age percent of median' AND voided = 0 AND retired = 0 LIMIT 1);
     
-            IF (weight_for_age == 'Unknown') THEN
+            IF (weight_for_age = 'Unknown') THEN
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
               VALUES (patient_id, @weight_for_age_concept_id, old_enc_id, visit_date, @location_id , weight_for_age, @creator, date_created, (SELECT UUID()));
@@ -197,7 +197,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Height for age percent of median' AND voided = 0 AND retired = 0 LIMIT 1);
 
-            IF (height_for_age == 'Unknown') THEN
+            IF (height_for_age = 'Unknown') THEN
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
               VALUES (patient_id, @height_for_age_concept_id, old_enc_id, visit_date, @location_id , height_for_age, @creator, date_created, (SELECT UUID()));
@@ -220,7 +220,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @weight_for_height_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = 'Weight for height percent of median' AND voided = 0 AND retired = 0 LIMIT 1);
-            IF (weight_for_height == 'Unknown') THEN
+            IF (weight_for_height = 'Unknown') THEN
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
               VALUES (patient_id, @weight_for_height_concept_id, old_enc_id, visit_date, @location_id , weight_for_height, @creator, date_created, (SELECT UUID()));

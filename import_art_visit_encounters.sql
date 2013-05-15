@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS `proc_import_art_visit_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_art_visit_encounters`(
-IN in_patient_id INT(11)
+#--IN in_patient_id INT(11)
 )
 
 BEGIN
@@ -75,6 +75,7 @@ BEGIN
 	DECLARE number_of_condoms_given int(11);
 	DECLARE depo_provera_given varchar(25);
 	DECLARE continue_treatment_at_clinic varchar(25);
+	DECLARE continue_art varchar(25);
 	DECLARE location varchar(255);
 	DECLARE voided tinyint(1);
 	DECLARE void_reason varchar(255);
@@ -85,35 +86,9 @@ BEGIN
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
-DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`art_visit_encounters`.`id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`visit_encounter_id`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`old_enc_id`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_id`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_pregnant`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_breast_feeding`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`using_family_planning_method`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`family_planning_method_used`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`abdominal_pains`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`anorexia`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`cough`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`diarrhoea`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`fever`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`jaundice`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`leg_pain_numbness`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`vomit`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`weight_loss`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`peripheral_neuropathy`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`hepatitis`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`anaemia`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`lactic_acidosis`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`lipodystrophy`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`skin_rash`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`other_symptoms`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_Abdominal_pains`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_anorexia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_diarrhoea`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_jaundice`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_leg_pain_numbness`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_vomit`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_peripheral_neuropathy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_hepatitis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_anaemia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_lactic_acidosis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_lipodystrophy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_skin_rash`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_other_symptom`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`tb_status`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`refer_to_clinician`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`prescribe_arv`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic4`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic4`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home4`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`arv_regimen`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`prescribe_cpt`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`number_of_condoms_given`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`depo_provera_given`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`continue_treatment_at_clinic`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`location`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`voided`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`void_reason`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`date_voided`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`voided_by`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`date_created`, 
-`bart1_intermediate_bare_bones`.`art_visit_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`art_visit_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`art_visit_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
-        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
-        WHERE `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_id` = in_patient_id;
+DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`art_visit_encounters`.`id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_pregnant`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_breast_feeding`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`using_family_planning_method`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`family_planning_method_used`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`abdominal_pains`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`anorexia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`cough`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`diarrhoea`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`fever`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`jaundice`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`leg_pain_numbness`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`vomit`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`weight_loss`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`peripheral_neuropathy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`hepatitis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`anaemia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`lactic_acidosis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`lipodystrophy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`skin_rash`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`other_symptoms`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_Abdominal_pains`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_anorexia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_diarrhoea`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_jaundice`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_leg_pain_numbness`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_vomit`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_peripheral_neuropathy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_hepatitis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_anaemia`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_lactic_acidosis`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_lipodystrophy`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_skin_rash`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_induced_other_symptom`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`tb_status`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`refer_to_clinician`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`prescribe_arv`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home1`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home2`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home3`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_name_brought_to_clinic4`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_quantity_brought_to_clinic4`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`drug_left_at_home4`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`arv_regimen`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`prescribe_cpt`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`number_of_condoms_given`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`depo_provera_given`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`continue_treatment_at_clinic`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`continue_art`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`location`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`voided`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`art_visit_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`art_visit_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`art_visit_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
+        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`;
+        #--WHERE `bart1_intermediate_bare_bones`.`art_visit_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -183,6 +158,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 			number_of_condoms_given,
 			depo_provera_given,
 			continue_treatment_at_clinic,
+			continue_art,
 			location,
 			voided,
 			void_reason,
@@ -199,9 +175,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
-  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_st_gabriel_migration_database.encounter
-                                WHERE voided = 0 AND encounter_id = 455436), 0);
-  IF @migrated_encounter_id = 455436 THEN
+  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_final_database.encounter
+                                WHERE voided = 0 AND encounter_id = old_enc_id), 0);
+  IF @migrated_encounter_id = 0 THEN
 
 	  # Not done, process the parameters
 
@@ -271,7 +247,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               SET @patient_breast_feeding_id = (SELECT LAST_INSERT_ID());
 
           END IF;
-          
+
           # Check if the field is not empty
           IF NOT ISNULL(using_family_planning_method) THEN
 
@@ -1398,7 +1374,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             
             ELSEIF (skin_rash = 'Yes drug induced') THEN
               # Get concept_id
-              SET @drug_induced_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+              SET @drug_induced_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                                                   WHERE name = 'Drug induced' AND voided = 0 AND retired = 0 LIMIT 1);
 
@@ -1425,7 +1401,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
           IF NOT ISNULL(other_symptoms) THEN
             IF (other_symptoms = 'Yes') THEN
               # Get concept_id
-              SET @other_symptoms_concept_id = ( SELECT concept_name.concept_id FROM concept_name concept_name
+              SET @other_symptoms_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                                                   WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
@@ -2252,6 +2228,33 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
               # Get last obs id for association later to other records
               SET @continue_treatment_at_clinic_id = (SELECT LAST_INSERT_ID());
+  
+          END IF;
+          
+          # Check if the field is not empty
+          IF NOT ISNULL(continue_art) THEN
+
+              # Get concept_id
+              SET @continue_art_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = 'Continue art' AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # Get value_coded id
+              SET @continue_art_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = continue_art AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # Get value_coded_name_id
+              SET @continue_art_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = continue_art AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # Create observation
+              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+              VALUES (patient_id, @continue_art_concept_id, old_enc_id, visit_date, @location_id , @continue_art_value_coded, @continue_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+              # Get last obs id for association later to other records
+              SET @continue_art_id = (SELECT LAST_INSERT_ID());
   
           END IF;
           select patient_id,old_enc_id;

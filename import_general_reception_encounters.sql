@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS `proc_import_general_reception_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_general_reception_encounters`(
-#--	IN in_patient_id INT(11)
+#--IN in_patient_id INT(11)
 )
 BEGIN
 
@@ -68,7 +68,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
-  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM zomba_final_migration_database.encounter
+  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_final_database.encounter
                                 WHERE encounter_id = old_enc_id), 0);
   IF @migrated_encounter_id = 0 THEN
 	

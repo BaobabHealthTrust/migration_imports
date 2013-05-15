@@ -1,7 +1,7 @@
 # This procedure imports patients from intermediate tables to ART2 OpenMRS database
 # ASSUMPTION
 # ==========
-# The assumption here is your source database name is `bart1_intermediate_bare_bones`
+# The assumption here is your source database name is `bart1_area_25_intermediary_tables`
 # and the destination any name you prefer.
 # This has been necessary because there seems to be no way to use dynamic database 
 # names in procedures yet
@@ -17,6 +17,7 @@ DROP PROCEDURE IF EXISTS `proc_import_patients`$$
 CREATE PROCEDURE `proc_import_patients`(
        #--IN start_pos INT(11),
        #--IN end_pos INT(11)
+  #--IN in_patient_id INT(11)
 	)
 BEGIN
     
@@ -59,7 +60,9 @@ BEGIN
     DECLARE creator INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`; #--LIMIT start_pos, end_pos;
+    DECLARE cur CURSOR FOR SELECT * FROM `bart1_area_25_intermediary_tables`.`patients`;
+           #--WHERE `bart1_area_25_intermediary_tables`.`patients`.`patient_id` = in_patient_id;
+           #--LIMIT start_pos, end_pos;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -268,6 +271,7 @@ BEGIN
         
         END IF;
     
+        select patient_id;
         #--CALL proc_import_first_visit_encounters(@person_id);        # good
         #--CALL proc_import_art_visit_encounters(@person_id);          # good
         #--CALL proc_import_pre_art_visit_encounters(@person_id);      # good
@@ -278,6 +282,7 @@ BEGIN
         #--CALL proc_import_general_reception_encounters(@person_id);
         #--CALL proc_import_outpatient_diagnosis_encounters(@person_id);
         #--CALL proc_import_outcome_encounter(@person_id);
+        #--CALL proc_import_guardian(@person_id);
 
     END LOOP;
 
