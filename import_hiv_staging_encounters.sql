@@ -1750,15 +1750,22 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             ELSEIF (reason_for_starting_art = "WHO stage 4 peds") THEN
               SET reason_for_starting_art = "WHO stage IV peds";
             ELSEIF (reason_for_starting_art = "CD4 Count < 250") THEN
-              SET reason_for_starting_art = "CD4 count less than or equal to 250";
+              SET reason_for_starting_art = "CD4 count <= 250";
             ELSEIF (reason_for_starting_art = "CD4 Count < 350") THEN
-              SET reason_for_starting_art = "CD4 count less than or equal to 350";
+              SET reason_for_starting_art = "CD4 count <= 350";
             ELSEIF (reason_for_starting_art = "CD4 Count < 750") THEN
-              SET reason_for_starting_art = "CD4 count less than or equal to 750";
-            ELSE
-            
-              SET reason_for_starting_art = reason_for_starting_art;
-            END IF;
+              SET reason_for_starting_art = "CD4 count <= 750";
+           ELSEIF (reason_for_starting_art = "Presumed HIV Disease") THEN
+              SET reason_for_starting_art = "Presumed severe HIV criteria in infants";
+           ELSEIF (reason_for_starting_art = "Child HIV positive") THEN
+              SET reason_for_starting_art = "HIV infected";
+           ELSEIF (reason_for_starting_art = "PCR Test") THEN
+              SET reason_for_starting_art = "HIV DNA polymerase chain reaction";
+           ELSEIF (reason_for_starting_art = "Pregnant") THEN
+              SET reason_for_starting_art = "Patient pregnant";
+           ELSE            
+            SET reason_for_starting_art = reason_for_starting_art;
+          END IF;
 
             # Get concept_id
             SET @reason_for_starting_art_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
