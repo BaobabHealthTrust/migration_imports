@@ -17,7 +17,7 @@ DROP PROCEDURE IF EXISTS `proc_import_patients`$$
 CREATE PROCEDURE `proc_import_patients`(
        #--IN start_pos INT(11),
        #--IN end_pos INT(11)
-  #--IN in_patient_id INT(11)
+  IN in_patient_id INT(11)
 	)
 BEGIN
     
@@ -60,8 +60,8 @@ BEGIN
     DECLARE creator INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_area_25_intermediary_tables`.`patients`;
-           #--WHERE `bart1_area_25_intermediary_tables`.`patients`.`patient_id` = in_patient_id;
+    DECLARE cur CURSOR FOR SELECT * FROM `bart1_area_25_intermediary_tables`.`patients`
+           WHERE `bart1_area_25_intermediary_tables`.`patients`.`patient_id` = in_patient_id;
            #--LIMIT start_pos, end_pos;
 
     # Declare loop position check
@@ -114,7 +114,12 @@ BEGIN
         # Create person name details
         INSERT INTO person_name (person_id, given_name, middle_name, family_name, creator, date_created, uuid)
         VALUES (patient_id, given_name, middle_name, family_name, @creator, date_created, (SELECT UUID()));
-    
+        
+        
+        #create person_name_coded
+        INSERT INTO person_name_code (person_name_id, given_name_code, middle_name_code, family_name_code)
+        VALUES (patient_id, soundex(given_name), soundex(middle_name), soundex(family_name));
+
         # Check variables for several person attribute type ids
         SET @cellphone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Cell Phone Number");
         SET @home_phone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Home Phone Number");
