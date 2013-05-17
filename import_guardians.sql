@@ -26,6 +26,7 @@ BEGIN
     # Declare fields to hold our values for our patients
     DECLARE id int(11);
     DECLARE patient_id int(11);
+    DECLARE relative_id int(11);
     DECLARE name varchar(255);
     DECLARE relationship varchar(255);
     DECLARE family_name varchar(255);
@@ -39,7 +40,9 @@ BEGIN
     DECLARE guardian_id INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT `bart1_intermediate_bare_bones`.`guardians`.`id`,        `bart1_intermediate_bare_bones`.`guardians`.`patient_id`,                              `bart1_intermediate_bare_bones`.`guardians`.`name`,                              `bart1_intermediate_bare_bones`.`guardians`.`relationship`,                             `bart1_intermediate_bare_bones`.`guardians`.`family_name`,                             `bart1_intermediate_bare_bones`.`guardians`.`gender`,                 `bart1_intermediate_bare_bones`.`guardians`.`voided`,                  `bart1_intermediate_bare_bones`.`guardians`.`void_reason`,  
+    DECLARE cur CURSOR FOR SELECT `bart1_intermediate_bare_bones`.`guardians`.`id`,        `bart1_intermediate_bare_bones`.`guardians`.`patient_id`,
+`bart1_intermediate_bare_bones`.`guardians`.`relative_id`,
+`bart1_intermediate_bare_bones`.`guardians`.`name`,                              `bart1_intermediate_bare_bones`.`guardians`.`relationship`,                             `bart1_intermediate_bare_bones`.`guardians`.`family_name`,                             `bart1_intermediate_bare_bones`.`guardians`.`gender`,                 `bart1_intermediate_bare_bones`.`guardians`.`voided`,                  `bart1_intermediate_bare_bones`.`guardians`.`void_reason`,  
 `bart1_intermediate_bare_bones`.`guardians`.`date_voided`,    
 `bart1_intermediate_bare_bones`.`guardians`.`voided_by`,  
 `bart1_intermediate_bare_bones`.`guardians`.`date_created`, 
@@ -61,7 +64,20 @@ BEGIN
 
 		# Get the fields into the variables declared earlier
 		FETCH cur INTO
-			id, patient_id, name, relationship, family_name, gender, voided, void_reason, date_voided, voided_by, date_created, creator, guardian_id;
+			id,
+			patient_id,
+			relative_id,
+			name,
+			relationship,
+			family_name,
+			gender,
+			voided,
+			void_reason,
+			date_voided,
+			voided_by,
+			date_created,
+			creator,
+			guardian_id;
 
 		# Check if we are done and exit loop if done
 		IF done THEN
@@ -75,34 +91,23 @@ BEGIN
 	# Map destination user to source user
 	SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
 
-  IF ISNULL(name) THEN
-    SET @guardian_id = COALESCE((SELECT guardian_id
-                                 FROM bart1_intermediate_bare_bones.patients p
-                                 WHERE p.patient_id = in_patient_id),0);
-   select @guardian_id;
-
-    SET @merged_patient_id = COALESCE((SELECT REPLACE(o.void_reason, 'merged with patient ', '') 
-                                       FROM openmrs_st_gabriel_database.patient o
-                                       WHERE o.patient_id = @guardian_id),0);
-     select @merged_patient_id;
-     
-    IF (@merged_patient_id != 0) THEN
-      IF (relationship = 'Sister/brother') THEN
-        SET @relationship = 'Sibling';
-      ELSE
-        SET @relationship = relationship;
-      END IF;
-
-      SET @relationship_type = (SELECT relationship_type_id FROM relationship_type WHERE a_is_to_b = @relationship);
-        
-      INSERT INTO relationship (person_a, relationship, person_b, creator, date_created, uuid)
-      VALUES (patient_id, @relationship_type, @merged_patient_id, @creator, date_created, (SELECT UUID()));
-      
-      select patient_id, guardian_id;
+  IF NOT ISNULL(patient_id) THEN
+    IF (relationship = 'Sister/brother') THEN
+      SET @relationship = 'Sibling';
     ELSE
-      select patient_id;
+      SET @relationship = relationship;
     END IF;
+
+    SET @relationship_type = (SELECT relationship_type_id FROM relationship_type WHERE a_is_to_b = @relationship);
+
+    INSERT INTO relationship (person_a, relationship, person_b, creator, date_created, uuid)
+    VALUES (patient_id, @relationship_type, relative_id, @creator, date_created, (SELECT UUID()));
+      
+    select patient_id, guardian_id;
+  ELSE
+    select patient_id;
   END IF;
+  #--END IF;
  END LOOP;
 
 END$$
