@@ -1,7 +1,7 @@
 # This procedure imports patients hiv_staging encounters from intermediate tables to ART2 OpenMRS database
 # ASSUMPTION
 # ==========
-# The assumption here is your source database name is `bart1_intermediate_bare_bones`
+# The assumption here is your source database name is `bart1_area_25_intermediate_tables`
 # and the destination any name you prefer.
 # This has been necessary because there seems to be no way to use dynamic database 
 # names in procedures yet
@@ -10,14 +10,14 @@
 DELIMITER $$
 
 # Check if a similar procedure exists and drop it so we can start from a clean slate
-DROP PROCEDURE IF EXISTS `proc_import_give_drugs_fast`$$
+DROP PROCEDURE IF EXISTS `proc_import_give_drugs`$$
 
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
-CREATE PROCEDURE `proc_import_give_drugs_fast`(
-#--IN in_patient_id INT(11)
+CREATE PROCEDURE `proc_import_give_drugs`(
+IN in_patient_id INT(11)
 )
-#--	IN in_patient_id INT(11)
+
 BEGIN
     
     # Declare condition for exiting loop
@@ -66,20 +66,20 @@ BEGIN
     DECLARE  visit_patient_id INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`give_drugs_encounters`.id, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.visit_encounter_id, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.old_enc_id, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.patient_id, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name2, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage2, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency2, 
-`bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name3, 
-`bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage3, 
-`bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency3, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name5, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage5, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency5,                                                    `bart1_intermediate_bare_bones`.`give_drugs_encounters`.prescription_duration,                                                                     `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name2, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity2, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name3, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity3, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name5, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity5,
-`bart1_intermediate_bare_bones`.`give_drugs_encounters`.appointment_date, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.location,       
- `bart1_intermediate_bare_bones`.`give_drugs_encounters`.voided, 
- `bart1_intermediate_bare_bones`.`give_drugs_encounters`.void_reason, 
- `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_voided, 
- `bart1_intermediate_bare_bones`.`give_drugs_encounters`.voided_by, 
- `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_created, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.creator,   COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_created) FROM 
-`bart1_intermediate_bare_bones`.`give_drugs_encounters` 
-        LEFT OUTER JOIN bart1_intermediate_bare_bones.visit_encounters ON 
-        visit_encounter_id = bart1_intermediate_bare_bones.visit_encounters.id;
-       #-- WHERE `bart1_intermediate_bare_bones`.`give_drugs_encounters`.`patient_id` = in_patient_id;
+    DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.id, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.visit_encounter_id, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.old_enc_id, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.patient_id, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_drug_name1, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_dosage1, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_frequency1, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_drug_name2, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_dosage2, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_frequency2, 
+`bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_drug_name3, 
+`bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_dosage3, 
+`bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_frequency3, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_drug_name4, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_dosage4, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_frequency4, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_drug_name5, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_dosage5, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.pres_frequency5,                                                    `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.prescription_duration,                                                                     `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_drug_name1, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_quantity1, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_drug_name2, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_quantity2, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_drug_name3, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_quantity3, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_drug_name4, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_quantity4, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_drug_name5, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.dispensed_quantity5,
+`bart1_area_25_intermediate_tables`.`give_drugs_encounters`.appointment_date, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.location,       
+ `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.voided, 
+ `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.void_reason, 
+ `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.date_voided, 
+ `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.voided_by, 
+ `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.date_created, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.creator,   COALESCE(`bart1_area_25_intermediate_tables`.`visit_encounters`.visit_date, `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.date_created) FROM 
+`bart1_area_25_intermediate_tables`.`give_drugs_encounters` 
+        LEFT OUTER JOIN bart1_area_25_intermediate_tables.visit_encounters ON 
+        visit_encounter_id = bart1_area_25_intermediate_tables.visit_encounters.id
+       WHERE `bart1_area_25_intermediate_tables`.`give_drugs_encounters`.`patient_id` = in_patient_id;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -144,9 +144,9 @@ BEGIN
         
         END IF;
         
-        SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_final_database.encounter
-                                WHERE voided = 0 AND encounter_id = old_enc_id), 0);
-        IF @migrated_encounter_id = 0 THEN
+        #--SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM bart2_development.encounter
+        #--                       WHERE voided = 0 AND encounter_id = old_enc_id), 0);
+        #--IF @migrated_encounter_id = 0 THEN
         
           # Not done, process the parameters
 
@@ -199,7 +199,7 @@ BEGIN
                 SET @pres_drug1_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
 
               ELSE
-                SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
+                SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
                 select @weight;
@@ -303,12 +303,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug1_order_id,
                         visit_date, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator, 
                         date_created, (SELECT UUID()));
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id);
                        
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                          creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                                @pres_drug1_order_id, visit_date, @dispensed_drug_name1_concept_id,
+                                @pres_drug1_order_id, visit_date, @drug_concept_id,
                                  @creator, date_created, (SELECT UUID()));
                   END IF; #--7
                 ELSEIF (@dispensed_drug_name1_bart2_name <> @pres_drug_name1_bart2_name) THEN #--6
@@ -352,12 +354,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                                visit_date, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator,
                                date_created, (SELECT UUID()));
-                   
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id);
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                         creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                               @dispensed_drug_order_id, visit_date, @dispensed_drug_name1_concept_id, @creator,
+                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator,
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
@@ -437,12 +441,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                               visit_date, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator, date_created,
                               (SELECT UUID()));
-                      
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id);
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator,
                                        date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                              @dispensed_drug_order_id, visit_date, @dispensed_drug_name1_concept_id, @creator, date_created,
+                              @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
                   select @dispensed_drug_name1_bart2_name;
                   END IF; #--12                
@@ -485,7 +491,7 @@ BEGIN
                 SET @pres_drug2_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
 
               ELSE
-                SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
+                SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
                 select @weight;
@@ -589,12 +595,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug2_order_id,
                         visit_date, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, 
                         date_created, (SELECT UUID()));
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
                        
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                          creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                                @pres_drug2_order_id, visit_date, @dispensed_drug_name2_concept_id,
+                                @pres_drug2_order_id, visit_date, @drug_concept_id,
                                  @creator, date_created, (SELECT UUID()));
                   END IF; #--7
                 ELSEIF (@dispensed_drug_name2_bart2_name <> @pres_drug_name2_bart2_name) THEN #--6
@@ -638,12 +646,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                                visit_date, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator,
                                date_created, (SELECT UUID()));
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                         creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                               @dispensed_drug_order_id, visit_date, @dispensed_drug_name2_concept_id, @creator,
+                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator,
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
@@ -723,12 +733,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                               visit_date, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created,
                               (SELECT UUID()));
-                      
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator,
                                        date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                              @dispensed_drug_order_id, visit_date, @dispensed_drug_name2_concept_id, @creator, date_created,
+                              @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
                   select @dispensed_drug_name2_bart2_name;
                   END IF; #--12                
@@ -771,7 +783,7 @@ BEGIN
                 SET @pres_drug3_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
 
               ELSE
-                SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
+                SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
                 select @weight;
@@ -875,12 +887,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug3_order_id,
                         visit_date, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, 
                         date_created, (SELECT UUID()));
-                       
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
+                      
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                          creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                                @pres_drug3_order_id, visit_date, @dispensed_drug_name3_concept_id,
+                                @pres_drug3_order_id, visit_date, @drug_concept_id,
                                  @creator, date_created, (SELECT UUID()));
                   END IF; #--7
                 ELSEIF (@dispensed_drug_name3_bart2_name <> @pres_drug_name3_bart2_name) THEN #--6
@@ -925,11 +939,13 @@ BEGIN
                                visit_date, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator,
                                date_created, (SELECT UUID()));
                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
+
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                         creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                               @dispensed_drug_order_id, visit_date, @dispensed_drug_name3_concept_id, @creator,
+                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator,
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
@@ -1009,12 +1025,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                               visit_date, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created,
                               (SELECT UUID()));
-                      
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator,
                                        date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                              @dispensed_drug_order_id, visit_date, @dispensed_drug_name3_concept_id, @creator, date_created,
+                              @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
                   select @dispensed_drug_name3_bart2_name;
                   END IF; #--12                
@@ -1057,7 +1075,7 @@ BEGIN
                 SET @pres_drug4_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
 
               ELSE
-                SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
+                SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
                 select @weight;
@@ -1161,12 +1179,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @pres_drug4_order_id,
                         visit_date, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, 
                         date_created, (SELECT UUID()));
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);
                        
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                          creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                                @pres_drug4_order_id, visit_date, @dispensed_drug_name4_concept_id,
+                                @pres_drug4_order_id, visit_date, @drug_concept_id,
                                  @creator, date_created, (SELECT UUID()));
                   END IF; #--7
                 ELSEIF (@dispensed_drug_name4_bart2_name <> @pres_drug_name4_bart2_name) THEN #--6
@@ -1211,11 +1231,13 @@ BEGIN
                                visit_date, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator,
                                date_created, (SELECT UUID()));
                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                         creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                               @dispensed_drug_order_id, visit_date, @dispensed_drug_name4_concept_id, @creator,
+                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator,
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
@@ -1296,11 +1318,13 @@ BEGIN
                               visit_date, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created,
                               (SELECT UUID()));
                       
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator,
                                        date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                              @dispensed_drug_order_id, visit_date, @dispensed_drug_name4_concept_id, @creator, date_created,
+                              @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
                   select @dispensed_drug_name4_bart2_name;
                   END IF; #--12                
@@ -1343,7 +1367,7 @@ BEGIN
                 SET @pres_drug5_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
 
               ELSE
-                SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
+                SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
                 select @weight;
@@ -1447,11 +1471,13 @@ BEGIN
                         visit_date, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, 
                         date_created, (SELECT UUID()));
                        
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                          creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                                @pres_drug5_order_id, visit_date, @dispensed_drug_name5_concept_id,
+                                @pres_drug5_order_id, visit_date, @drug_concept_id,
                                  @creator, date_created, (SELECT UUID()));
                   END IF; #--7
                 ELSEIF (@dispensed_drug_name5_bart2_name <> @pres_drug_name5_bart2_name) THEN #--6
@@ -1496,11 +1522,13 @@ BEGIN
                                visit_date, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator,
                                date_created, (SELECT UUID()));
                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, 
                                         creator, date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                               @dispensed_drug_order_id, visit_date, @dispensed_drug_name5_concept_id, @creator,
+                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator,
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
@@ -1580,12 +1608,14 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                               visit_date, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created,
                               (SELECT UUID()));
-                      
+                    
+                    SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);  
+                    
                     # create arv_regimens_received_abstracted_construct observation         
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator,
                                        date_created, uuid)
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
-                              @dispensed_drug_order_id, visit_date, @dispensed_drug_name5_concept_id, @creator, date_created,
+                              @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
                   select @dispensed_drug_name5_bart2_name;
                   END IF; #--12                
@@ -1608,9 +1638,9 @@ BEGIN
             ELSE
              select patient_id;
             END IF;
-      ELSE
-        select patient_id, old_enc_id;
-      END IF;
+      #--ELSE
+      #--  select patient_id, old_enc_id;
+      #--END IF;
     END LOOP;
 
     # SET UNIQUE_CHECKS = 1;
