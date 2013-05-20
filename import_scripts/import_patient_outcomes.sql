@@ -43,8 +43,8 @@ BEGIN
     DECLARE outcome_date DATE; 
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patient_outcomes`
-                           WHERE `bart1_intermediate_bare_bones`.`patient_outcomes`.`patient_id` = in_patient_id;
+    DECLARE cur CURSOR FOR SELECT * FROM `bart1_area_25_intermediate_tables`.`patient_outcomes`
+                           WHERE `bart1_area_25_intermediate_tables`.`patient_outcomes`.`patient_id` = in_patient_id;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;

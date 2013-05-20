@@ -1,4 +1,4 @@
-# This procedure imports data from `bart1_intermediate_bare_bones` to `bart2`
+# This procedure imports data from `bart1_area_25_intermediate_tables` to `bart2`
 
 # The default DELIMITER is disabled to avoid conflicting with our scripts
 DELIMITER $$
@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS `proc_import_hiv_reception_encounters`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_hiv_reception_encounters`(
-#--IN in_patient_id INT(11)
+IN in_patient_id INT(11)
 )
 
 BEGIN
@@ -35,9 +35,9 @@ BEGIN
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
-DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`guardian`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_present`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`guardian_present`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`location`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`voided`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`hiv_reception_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
-        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`;
-        #--WHERE `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_id` = in_patient_id;
+DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`id`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`visit_encounter_id`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`old_enc_id`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`patient_id`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`guardian`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`patient_present`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`guardian_present`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`location`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`voided`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`void_reason`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`date_voided`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`voided_by`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`date_created`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`creator`, COALESCE(`bart1_area_25_intermediate_tables`.`visit_encounters`.visit_date, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.date_created) FROM `bart1_area_25_intermediate_tables`.`hiv_reception_encounters` LEFT OUTER JOIN `bart1_area_25_intermediate_tables`.`visit_encounters` ON
+        visit_encounter_id = `bart1_area_25_intermediate_tables`.`visit_encounters`.`id`
+        WHERE `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -73,9 +73,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
-  SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM openmrs_bart2_area_25_final_database.encounter
-                                WHERE encounter_id = old_enc_id), 0);
-  IF @migrated_encounter_id = 0 THEN
+  #--SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM bart2_development.encounter
+  #--                              WHERE encounter_id = old_enc_id), 0);
+  #--IF @migrated_encounter_id = 0 THEN
 
 	# Not done, process the parameters
 
@@ -174,9 +174,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
         END IF;
       Select patient_id, old_enc_id;
-     ELSE
-      Select patient_id;
-     END IF;
+     #--ELSE
+     #-- Select patient_id;
+     #--END IF;
         
 	END LOOP;
 
