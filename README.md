@@ -4,15 +4,8 @@ This application is used to import data from the intermediate tables into OpenMR
 
 Getting started 
 
-1. Create a database, initialize it using bart2 application.
-2. Load into the database you have just created above the following
-   - latest concepts
-   - concept_name_map and drug_map
-    
-   - under bart2: enter the details of your Source database. (This is the database you want to export from. The OpenMRS 1.1 dataset).
-
-2. Run rake db:create RAILS_ENV=['environment for execution'] eg  rake db:create RAILS_ENV='development' to create database to keep the exported data. This is the database which will hold 12/14 flat tables.
-
-3. If database has been succesfully created, run rake db:migrate to create the tables and relations.
-
-4. You can now run the migrator script in the script folder with script runner. ie script/runner script/migrator.rb
+1. Make sure you have an up-to-date migration_imports application
+2. In migration_imports terminal create database e.g mysqladmin -u username -p password create database_name; 
+3. Run the procedure_setup.sh to initialize the database you have created above, load all the procedures and import data.
+   type: ruby procedure_setup.sh database_name username password site_code
+   for example ruby procedure_setup.sh database_name test testing mpc

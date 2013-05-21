@@ -16,7 +16,7 @@ if [ -z "$DATABASE" ] || [ -z "$USERNAME" ] || [ -z "$PASSWORD" ] || [ -z "$SITE
     usage
     exit
 fi
-echo "initializing $DATABASE database..............................\n\n"
+echo "initializing $DATABASE database.............................."
 
 echo "DROP DATABASE $DATABASE;" | mysql --user=$USERNAME --password=$PASSWORD
 echo "CREATE DATABASE $DATABASE;" | mysql --user=$USERNAME --password=$PASSWORD
@@ -44,7 +44,7 @@ mysql  --user=$USERNAME --password=$PASSWORD $DATABASE < db/migrate/insert_weigh
 echo "loading up-to-date concepts"
 mysql  --user=$USERNAME --password=$PASSWORD $DATABASE < db/openmrs_metadata_1_7.sql
 
-echo "loading import scripts..............................\n\n"
+echo "loading import scripts.............................."
 
 FILES=import_scripts/*.sql
 for f in $FILES
@@ -53,7 +53,7 @@ do
 	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
 done
 
-echo "import data..............................\n\n"
+echo "import data.............................."
 
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_patients;
