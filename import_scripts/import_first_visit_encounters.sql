@@ -114,9 +114,6 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
-  #--SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM bart2_development.encounter
-  #--                              WHERE encounter_id = old_enc_id), 0);
-  #--IF @migrated_encounter_id = 0 THEN
 	# Not done, process the parameters
 
 	# Map destination user to source user
@@ -549,10 +546,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
         END IF;
 
-        select patient_id, old_enc_id;
-   #--  ELSE
-   #--   select patient_id; 
-   #--  END IF;
+
 	END LOOP;
 
 END$$

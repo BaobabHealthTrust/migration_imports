@@ -225,7 +225,7 @@ BEGIN
                 @transfer_out_location_id, @creator, voided, @voided_by, date_voided, void_reason, (SELECT UUID()));
         END IF;
      END IF;
-     select patient_id, old_enc_id;
+
  
     END LOOP;
 

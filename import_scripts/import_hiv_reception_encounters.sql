@@ -73,10 +73,6 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
-  #--SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM bart2_development.encounter
-  #--                              WHERE encounter_id = old_enc_id), 0);
-  #--IF @migrated_encounter_id = 0 THEN
-
 	# Not done, process the parameters
 
 	# Map destination user to source user
@@ -91,7 +87,6 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	# Create encounter
 	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
-	
         # Check if the field is not empty
         IF NOT ISNULL(guardian) THEN
 
@@ -173,11 +168,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @guardian_present_id = (SELECT LAST_INSERT_ID());
 
         END IF;
-      Select patient_id, old_enc_id;
-     #--ELSE
-     #-- Select patient_id;
-     #--END IF;
-        
+
 	END LOOP;
 
 

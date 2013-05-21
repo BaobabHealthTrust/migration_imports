@@ -259,12 +259,12 @@ BEGIN
               INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
               VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
 
-            ELSE
-              select patient_id;
+            #--ELSE
+            #--  select patient_id;
             END IF;
-              select patient_id, state;
-          ELSE
-            select patient_id;
+             #-- select patient_id, state;
+          #--ELSE
+           #-- select patient_id;
           END IF; #end_state
 
       ELSE #patient_program
@@ -431,12 +431,12 @@ BEGIN
               INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
               VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
 
-            ELSE
-              select patient_id;
+            #--ELSE
+            #--  select patient_id;
             END IF;
-              select patient_id, state;
-          ELSE
-            select patient_id;
+            #--  select patient_id, state;
+          #--ELSE
+           #-- select patient_id;
           END IF; #end_state
 
         ELSE #previous_state
@@ -604,12 +604,12 @@ BEGIN
               INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
               VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
 
-            ELSE
-              select patient_id;
+            #--ELSE
+            #--  select patient_id;
             END IF;
-              select patient_id, state;
-          ELSE
-            select patient_id;
+              #--select patient_id, state;
+          #--ELSE
+          #--  select patient_id;
           END IF; #end_state
         END IF; #end previous_state
 

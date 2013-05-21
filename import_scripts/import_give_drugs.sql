@@ -202,7 +202,7 @@ BEGIN
                 SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
-                select @weight;
+                #--select @weight;
           
                 IF NOT ISNULL(@weight) THEN #--3
                   SET @regimen_category = ( SELECT regimen_index FROM regimen
@@ -283,7 +283,7 @@ BEGIN
                 
                 # check if prescibed_drug equal dispensed
                 IF (@dispensed_drug_name1_bart2_name = @pres_drug_name1_bart2_name) THEN #--6
-                  select pres_drug_name1;
+                  #--select pres_drug_name1;
                   #create drug_order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
                   VALUES (@pres_drug1_order_id, @dispensed_drug_name1_concept_id, pres_dosage1, pres_dosage1, 
@@ -335,7 +335,7 @@ BEGIN
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
 
                   # create drug order with quantity
-                  select pres_drug_name1;
+                  #--select pres_drug_name1;
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name1_concept_id, dispensed_quantity1);
     
@@ -365,14 +365,14 @@ BEGIN
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
-                  select pres_drug_name1;
+                  #--select pres_drug_name1;
                   #create drug_order without quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
                   VALUES (@pres_drug1_order_id, @pres_drug_name1_concept_id, pres_dosage1, pres_dosage1, pres_frequency1);
                 END IF; #--6
               END IF; #--5
             ELSE #--1
-              select dispensed_drug_name1;
+              #--select dispensed_drug_name1;
               IF NOT ISNULL(dispensed_drug_name1) THEN #--10
                 # Get id of dispense encounter type
                   SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
@@ -385,7 +385,7 @@ BEGIN
                   VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
    
                   SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
-                  select @dispensing_encounter_id;
+                  #--select @dispensing_encounter_id;
                   #get the bart2_drug_names from drug_map table
                   SET @dispensed_drug_name1_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                           WHERE bart_one_name = dispensed_drug_name1 LIMIT 1);
@@ -421,7 +421,7 @@ BEGIN
                     
                   # get the dispensed_drug_order_id
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
-                  select @dispensed_drug_order_id;
+                  #--select @dispensed_drug_order_id;
                   # create drug order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name1_concept_id, dispensed_quantity1);
@@ -433,7 +433,7 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                              visit_date, @dispensed_drug_name1_concept_id, dispensed_quantity1,
                              @creator, date_created, (SELECT UUID()));
-                             select @dispensed_drug_name1_bart2_name;
+                             #--select @dispensed_drug_name1_bart2_name;
                   ELSE #--12
                     # create amount_dispensed observation
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric,
@@ -450,10 +450,9 @@ BEGIN
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
-                  select @dispensed_drug_name1_bart2_name;
+                  #--select @dispensed_drug_name1_bart2_name;
                   END IF; #--12                
-              ELSE #--10
-                select patient_id;
+              
               END IF; #--10
             END IF; #--1
   #-----------------------------------------------------------------------------------------------------------------------------
@@ -494,7 +493,7 @@ BEGIN
                 SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
-                select @weight;
+                #--select @weight;
 
                 IF NOT ISNULL(@weight) THEN #--3
                   SET @regimen_category = ( SELECT regimen_index FROM regimen
@@ -575,7 +574,7 @@ BEGIN
                 
                 # check if prescibed_drug equal dispensed
                 IF (@dispensed_drug_name2_bart2_name = @pres_drug_name2_bart2_name) THEN #--6
-                  select pres_drug_name2;
+                  #--select pres_drug_name2;
                   #create drug_order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
                   VALUES (@pres_drug2_order_id, @dispensed_drug_name2_concept_id, pres_dosage2, pres_dosage2, 
@@ -627,7 +626,7 @@ BEGIN
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
 
                   # create drug order with quantity
-                  select pres_drug_name2;
+                  #--select pres_drug_name2;
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name2_concept_id, dispensed_quantity2);
     
@@ -657,14 +656,14 @@ BEGIN
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
-                  select pres_drug_name2;
+                  #--select pres_drug_name2;
                   #create drug_order without quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
                   VALUES (@pres_drug2_order_id, @pres_drug_name2_concept_id, pres_dosage2, pres_dosage2, pres_frequency2);
                 END IF; #--6
               END IF; #--5
             ELSE #--1
-              select dispensed_drug_name2;
+              #--select dispensed_drug_name2;
               IF NOT ISNULL(dispensed_drug_name2) THEN #--10
                 # Get id of dispense encounter type
                   SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
@@ -677,7 +676,7 @@ BEGIN
                   VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
    
                   SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
-                  select @dispensing_encounter_id;
+                  #--select @dispensing_encounter_id;
                   #get the bart2_drug_names from drug_map table
                   SET @dispensed_drug_name2_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                           WHERE bart_one_name = dispensed_drug_name2 LIMIT 1);
@@ -713,7 +712,7 @@ BEGIN
                     
                   # get the dispensed_drug_order_id
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
-                  select @dispensed_drug_order_id;
+                 #-- select @dispensed_drug_order_id;
                   # create drug order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name2_concept_id, dispensed_quantity2);
@@ -725,7 +724,7 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                              visit_date, @dispensed_drug_name2_concept_id, dispensed_quantity2,
                              @creator, date_created, (SELECT UUID()));
-                             select @dispensed_drug_name1_bart2_name;
+                             #--select @dispensed_drug_name1_bart2_name;
                   ELSE #--12
                     # create amount_dispensed observation
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric,
@@ -742,10 +741,9 @@ BEGIN
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
-                  select @dispensed_drug_name2_bart2_name;
+                  #--select @dispensed_drug_name2_bart2_name;
                   END IF; #--12                
-              ELSE #--10
-                select patient_id;
+              
               END IF; #--10
             END IF; #--1
   #------------------------------------------------------------------------------------------------------------------------------
@@ -786,7 +784,7 @@ BEGIN
                 SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
-                select @weight;
+                #--select @weight;
                 
                 IF NOT ISNULL(@weight) THEN #--3
                   SET @regimen_category = ( SELECT regimen_index FROM regimen
@@ -867,7 +865,7 @@ BEGIN
                 
                 # check if prescibed_drug equal dispensed
                 IF (@dispensed_drug_name3_bart2_name = @pres_drug_name3_bart2_name) THEN #--6
-                  select pres_drug_name3;
+                  #--select pres_drug_name3;
                   #create drug_order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
                   VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, pres_dosage3, pres_dosage3, 
@@ -919,7 +917,7 @@ BEGIN
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
 
                   # create drug order with quantity
-                  select pres_drug_name3;
+                  #--select pres_drug_name3;
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name3_concept_id, dispensed_quantity3);
     
@@ -949,14 +947,14 @@ BEGIN
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
-                  select pres_drug_name3;
+                  #--select pres_drug_name3;
                   #create drug_order without quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
                   VALUES (@pres_drug3_order_id, @pres_drug_name3_concept_id, pres_dosage3, pres_dosage3, pres_frequency3);
                 END IF; #--6
               END IF; #--5
             ELSE #--1
-              select dispensed_drug_name3;
+              #--select dispensed_drug_name3;
               IF NOT ISNULL(dispensed_drug_name3) THEN #--10
                 # Get id of dispense encounter type
                   SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
@@ -969,7 +967,7 @@ BEGIN
                   VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
    
                   SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
-                  select @dispensing_encounter_id;
+                  #--select @dispensing_encounter_id;
                   #get the bart2_drug_names from drug_map table
                   SET @dispensed_drug_name3_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                           WHERE bart_one_name = dispensed_drug_name3 LIMIT 1);
@@ -1005,7 +1003,7 @@ BEGIN
                     
                   # get the dispensed_drug_order_id
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
-                  select @dispensed_drug_order_id;
+                  #--select @dispensed_drug_order_id;
                   # create drug order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name3_concept_id, dispensed_quantity3);
@@ -1017,7 +1015,7 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                              visit_date, @dispensed_drug_name3_concept_id, dispensed_quantity3,
                              @creator, date_created, (SELECT UUID()));
-                             select @dispensed_drug_name1_bart2_name;
+                             #--select @dispensed_drug_name1_bart2_name;
                   ELSE #--12
                     # create amount_dispensed observation
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric,
@@ -1034,10 +1032,8 @@ BEGIN
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
-                  select @dispensed_drug_name3_bart2_name;
+                  #--select @dispensed_drug_name3_bart2_name;
                   END IF; #--12                
-              ELSE #--10
-                select patient_id;
               END IF; #--10
             END IF; #--1
   #-------------------------------------------------------------------------------------------------------------------------------
@@ -1078,7 +1074,7 @@ BEGIN
                 SET @weight = COALESCE((SELECT weight FROM bart1_area_25_intermediate_tables.vitals_encounters vts
                                         WHERE vts.patient_id = patient_id
                                         AND vts.visit_encounter_id = visit_encounter_id),NULL);          
-                select @weight;
+                #--select @weight;
                 
                 IF NOT ISNULL(@weight) THEN #--3
                   SET @regimen_category = ( SELECT regimen_index FROM regimen
@@ -1159,7 +1155,7 @@ BEGIN
                 
                 # check if prescibed_drug equal dispensed
                 IF (@dispensed_drug_name4_bart2_name = @pres_drug_name4_bart2_name) THEN #--6
-                  select pres_drug_name4;
+                  #--select pres_drug_name4;
                   #create drug_order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
                   VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, pres_dosage4, pres_dosage4, 
@@ -1241,14 +1237,14 @@ BEGIN
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
-                  select pres_drug_name4;
+                  #--select pres_drug_name4;
                   #create drug_order without quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
                   VALUES (@pres_drug4_order_id, @pres_drug_name4_concept_id, pres_dosage4, pres_dosage4, pres_frequency3);
                 END IF; #--6
               END IF; #--5
             ELSE #--1
-              select dispensed_drug_name4;
+              #--select dispensed_drug_name4;
               IF NOT ISNULL(dispensed_drug_name4) THEN #--10
                 # Get id of dispense encounter type
                   SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
@@ -1261,7 +1257,7 @@ BEGIN
                   VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
    
                   SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
-                  select @dispensing_encounter_id;
+                  #--select @dispensing_encounter_id;
                   #get the bart2_drug_names from drug_map table
                   SET @dispensed_drug_name4_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                           WHERE bart_one_name = dispensed_drug_name4 LIMIT 1);
@@ -1297,7 +1293,7 @@ BEGIN
                     
                   # get the dispensed_drug_order_id
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
-                  select @dispensed_drug_order_id;
+                  #--select @dispensed_drug_order_id;
                   # create drug order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name4_concept_id, dispensed_quantity4);
@@ -1309,7 +1305,7 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                              visit_date, @dispensed_drug_name4_concept_id, dispensed_quantity4,
                              @creator, date_created, (SELECT UUID()));
-                             select @dispensed_drug_name1_bart2_name;
+                             #--select @dispensed_drug_name1_bart2_name;
                   ELSE #--12
                     # create amount_dispensed observation
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric,
@@ -1326,10 +1322,9 @@ BEGIN
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
-                  select @dispensed_drug_name4_bart2_name;
+                  #--select @dispensed_drug_name4_bart2_name;
                   END IF; #--12                
-              ELSE #--10
-                select patient_id;
+              
               END IF; #--10
             END IF; #--1          
   #-------------------------------------------------------------------------------------------------------------------------------
@@ -1450,7 +1445,7 @@ BEGIN
                 
                 # check if prescibed_drug equal dispensed
                 IF (@dispensed_drug_name5_bart2_name = @pres_drug_name5_bart2_name) THEN #--6
-                  select pres_drug_name5;
+                  #--select pres_drug_name5;
                   #create drug_order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
                   VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, pres_dosage5, pres_dosage5, 
@@ -1502,7 +1497,7 @@ BEGIN
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
 
                   # create drug order with quantity
-                  select pres_drug_name5;
+                  #--select pres_drug_name5;
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name5_concept_id, dispensed_quantity5);
     
@@ -1532,14 +1527,14 @@ BEGIN
                                date_created, (SELECT UUID()));                
                   END IF; #--9
                 ELSE #--6
-                  select pres_drug_name5;
+                  #--select pres_drug_name5;
                   #create drug_order without quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
                   VALUES (@pres_drug5_order_id, @pres_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5);
                 END IF; #--6
               END IF; #--5
             ELSE #--1
-              select dispensed_drug_name5;
+              #--select dispensed_drug_name5;
               IF NOT ISNULL(dispensed_drug_name5) THEN #--10
                 # Get id of dispense encounter type
                   SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
@@ -1552,7 +1547,7 @@ BEGIN
                   VALUES (@dispensing_encounter_type_id, patient_id, @creator, visit_date, @creator, date_created, @dispensing_encounter_uuid);
    
                   SET @dispensing_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_uuid);
-                  select @dispensing_encounter_id;
+                  #--select @dispensing_encounter_id;
                   #get the bart2_drug_names from drug_map table
                   SET @dispensed_drug_name5_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                           WHERE bart_one_name = dispensed_drug_name5 LIMIT 1);
@@ -1588,7 +1583,7 @@ BEGIN
                     
                   # get the dispensed_drug_order_id
                   SET @dispensed_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_order_uuid);
-                  select @dispensed_drug_order_id;
+                  #--select @dispensed_drug_order_id;
                   # create drug order with quantity
                   INSERT INTO drug_order (order_id, drug_inventory_id, quantity)
                   VALUES (@dispensed_drug_order_id, @dispensed_drug_name5_concept_id, dispensed_quantity5);
@@ -1600,7 +1595,7 @@ BEGIN
                     VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_encounter_id, @dispensed_drug_order_id,
                              visit_date, @dispensed_drug_name5_concept_id, dispensed_quantity5,
                              @creator, date_created, (SELECT UUID()));
-                             select @dispensed_drug_name1_bart2_name;
+                             #--select @dispensed_drug_name1_bart2_name;
                   ELSE #--12
                     # create amount_dispensed observation
                     INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric,
@@ -1617,10 +1612,9 @@ BEGIN
                     VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_encounter_id,
                               @dispensed_drug_order_id, visit_date, @drug_concept_id, @creator, date_created,
                               (SELECT UUID()));
-                  select @dispensed_drug_name5_bart2_name;
+                  #--select @dispensed_drug_name5_bart2_name;
                   END IF; #--12                
-              ELSE #--10
-                select patient_id;
+ 
               END IF; #--10
             END IF; #--1
             
@@ -1634,9 +1628,8 @@ BEGIN
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
               VALUES (patient_id, @appointment_date_concept_id, @encounter_id, visit_date, @location_id , appointment_date, @creator, date_created, (SELECT UUID()));
               
-              select patient_id,appointment_date;
-            ELSE
-             select patient_id;
+              #--select patient_id,appointment_date;
+
             END IF;
       #--ELSE
       #--  select patient_id, old_enc_id;

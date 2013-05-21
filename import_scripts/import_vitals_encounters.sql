@@ -235,11 +235,8 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @weight_for_height_id = (SELECT LAST_INSERT_ID());
 
         END IF;
-        select patient_id, old_enc_id;
-      #--ELSE
-      #--  select patient_id;
-      #--END IF;
-        
+
+             
 	END LOOP;
 
 END$$

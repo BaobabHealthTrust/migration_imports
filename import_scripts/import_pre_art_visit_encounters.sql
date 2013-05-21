@@ -1868,7 +1868,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @prescribe_ipt_id = (SELECT LAST_INSERT_ID());
 
         END IF;
-    select patient_id, old_enc_id;
+
   #--ELSE
   #--  select patient_id;
   #--END IF;

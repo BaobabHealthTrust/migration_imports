@@ -103,9 +103,6 @@ BEGIN
     INSERT INTO relationship (person_a, relationship, person_b, creator, date_created, uuid)
     VALUES (patient_id, @relationship_type, relative_id, @creator, date_created, (SELECT UUID()));
       
-    select patient_id, guardian_id;
-  ELSE
-    select patient_id;
   END IF;
   #--END IF;
  END LOOP;

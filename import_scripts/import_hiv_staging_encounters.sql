@@ -187,9 +187,6 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 		END IF;
 
 	# Not done, process the parameters
-  #--SET @migrated_encounter_id = COALESCE((SELECT encounter_id FROM bart2_development.encounter
-  #--                              WHERE encounter_id = old_enc_id), 0);
-  #--IF @migrated_encounter_id = 0 THEN
 
 	# Map destination user to source user
 	SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
@@ -1766,7 +1763,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
            ELSE            
             SET reason_for_starting_art = reason_for_starting_art;
           END IF;
-select reason_for_starting_art;
+
             # Get concept_id
             SET @reason_for_starting_art_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
@@ -1817,10 +1814,8 @@ select reason_for_starting_art;
             SET @who_stage_id = (SELECT LAST_INSERT_ID());
 
         END IF;
-     select patient_id, old_enc_id;
-   #--ELSE
-   #-- select patient_id;
-   #--END IF;
+     #--select patient_id, "hiv_staging";
+
 	END LOOP;
 
 END$$

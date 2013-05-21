@@ -292,7 +292,7 @@ BEGIN
         CALL proc_import_patient_outcome(@person_id);                 # good
         CALL proc_import_guardians(@person_id);                       # good
         
-        select patient_id, given_name, family_name;
+        select patient_id;
 
     END LOOP;
 
