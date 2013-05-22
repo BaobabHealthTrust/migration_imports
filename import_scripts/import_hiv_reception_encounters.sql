@@ -1,4 +1,4 @@
-# This procedure imports data from `bart1_area_25_intermediate_tables` to `bart2`
+# This procedure imports data from `bart1_intermediate_bare_bones` to `bart2`
 
 # The default DELIMITER is disabled to avoid conflicting with our scripts
 DELIMITER $$
@@ -28,6 +28,7 @@ BEGIN
 	DECLARE location varchar(255);
 	DECLARE voided tinyint(1);
 	DECLARE void_reason varchar(255);
+	DECLARE encounter_datetime datetime;	
 	DECLARE date_voided date;
 	DECLARE voided_by int(11);
 	DECLARE date_created datetime;
@@ -35,9 +36,9 @@ BEGIN
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
-DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`id`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`visit_encounter_id`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`old_enc_id`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`patient_id`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`guardian`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`patient_present`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`guardian_present`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`location`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`voided`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`void_reason`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`date_voided`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`voided_by`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`date_created`, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`creator`, COALESCE(`bart1_area_25_intermediate_tables`.`visit_encounters`.visit_date, `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.date_created) FROM `bart1_area_25_intermediate_tables`.`hiv_reception_encounters` LEFT OUTER JOIN `bart1_area_25_intermediate_tables`.`visit_encounters` ON
-        visit_encounter_id = `bart1_area_25_intermediate_tables`.`visit_encounters`.`id`
-        WHERE `bart1_area_25_intermediate_tables`.`hiv_reception_encounters`.`patient_id` = in_patient_id;
+DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`guardian`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_present`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`guardian_present`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`location`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`voided`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`encounter_datetime`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`hiv_reception_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
+        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
+        WHERE `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -62,6 +63,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 			void_reason,
 			date_voided,
 			voided_by,
+			encounter_datetime,
 			date_created,
 			creator,
 			visit_date;
@@ -85,7 +87,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'HIV RECEPTION');
 
 	# Create encounter
-	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
         # Check if the field is not empty
         IF NOT ISNULL(guardian) THEN
@@ -107,7 +109,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @guardian_concept_id, old_enc_id, visit_date, @location_id , @guardian_value_coded, @guardian_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @guardian_concept_id, old_enc_id, encounter_datetime, @location_id , @guardian_value_coded, @guardian_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @guardian_id = (SELECT LAST_INSERT_ID());
@@ -135,7 +137,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Create observation
 
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @patient_present_concept_id, old_enc_id, visit_date, @location_id , @patient_present_value_coded, @patient_present_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @patient_present_concept_id, old_enc_id, encounter_datetime, @location_id , @patient_present_value_coded, @patient_present_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @patient_present_id = (SELECT LAST_INSERT_ID());
@@ -162,7 +164,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @guardian_present_concept_id, old_enc_id, visit_date, @location_id , @guardian_present_value_coded, @guardian_present_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @guardian_present_concept_id, old_enc_id, encounter_datetime, @location_id , @guardian_present_value_coded, @guardian_present_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @guardian_present_id = (SELECT LAST_INSERT_ID());

@@ -1,4 +1,4 @@
-# This procedure imports data from `bart1_area_25_intermediate_tables` to `bart2`
+# This procedure imports data from `bart1_intermediate_bare_bones` to `bart2`
 
 # The default DELIMITER is disabled to avoid conflicting with our scripts
 DELIMITER $$
@@ -45,24 +45,26 @@ BEGIN
 	DECLARE void_reason varchar(255);
 	DECLARE date_voided date;
 	DECLARE voided_by int(11);
+	DECLARE encounter_datetime datetime;
 	DECLARE date_created datetime;
 	DECLARE creator int(11);
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
-DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`id`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`visit_encounter_id`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`old_enc_id`, 
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`patient_id`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`agrees_to_follow_up`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`date_of_hiv_pos_test`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`date_of_hiv_pos_test_estimated`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`location_of_hiv_pos_test`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`arv_number_at_that_site`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`location_of_art_initiation`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`taken_arvs_in_last_two_months`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`taken_arvs_in_last_two_weeks`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`has_transfer_letter`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`site_transferred_from`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`date_of_art_initiation`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`ever_registered_at_art`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`ever_received_arv`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`last_arv_regimen`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`date_last_arv_taken`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`date_last_arv_taken_estimated`,
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`weight`,
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`height`,
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`bmi`, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`location`, 
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`voided`, 
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`void_reason`, 
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`date_voided`, 
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`voided_by`, 
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`date_created`, 
-`bart1_area_25_intermediate_tables`.`first_visit_encounters`.`creator`, COALESCE(`bart1_area_25_intermediate_tables`.`visit_encounters`.visit_date, `bart1_area_25_intermediate_tables`.`first_visit_encounters`.date_created) FROM `bart1_area_25_intermediate_tables`.`first_visit_encounters` LEFT OUTER JOIN `bart1_area_25_intermediate_tables`.`visit_encounters` ON
-        visit_encounter_id = `bart1_area_25_intermediate_tables`.`visit_encounters`.`id`
-        WHERE `bart1_area_25_intermediate_tables`.`first_visit_encounters`.`patient_id` = in_patient_id;
+DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`first_visit_encounters`.`id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`old_enc_id`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`agrees_to_follow_up`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_hiv_pos_test_estimated`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_hiv_pos_test`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`arv_number_at_that_site`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_months`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`taken_arvs_in_last_two_weeks`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`has_transfer_letter`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`site_transferred_from`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_of_art_initiation`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_registered_at_art`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`ever_received_arv`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`last_arv_regimen`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_last_arv_taken_estimated`,
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`weight`,
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`height`,
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`bmi`, `bart1_intermediate_bare_bones`.`first_visit_encounters`.`location`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`voided`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`void_reason`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_voided`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`voided_by`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`encounter_datetime`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`date_created`, 
+`bart1_intermediate_bare_bones`.`first_visit_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`first_visit_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`first_visit_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
+        visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
+        WHERE `bart1_intermediate_bare_bones`.`first_visit_encounters`.`patient_id` = in_patient_id;
 
 	# Declare loop position check
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -103,6 +105,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 			void_reason,
 			date_voided,
 			voided_by,
+			encounter_datetime,
 			date_created,
 			creator,
 			visit_date;
@@ -126,7 +129,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'HIV CLINIC REGISTRATION');
 
 	# Create encounter
-	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
 	
         # Check if the field is not empty
@@ -149,7 +152,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @agrees_to_follow_up_concept_id, old_enc_id, visit_date, @location_id , @agrees_to_follow_up_value_coded, @agrees_to_follow_up_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @agrees_to_follow_up_concept_id, old_enc_id, encounter_datetime, @location_id , @agrees_to_follow_up_value_coded, @agrees_to_follow_up_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @agrees_to_follow_up_id = (SELECT LAST_INSERT_ID());
@@ -166,7 +169,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
-            VALUES (patient_id, @date_of_hiv_pos_test_concept_id, old_enc_id, visit_date, @location_id , date_of_hiv_pos_test, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @date_of_hiv_pos_test_concept_id, old_enc_id, encounter_datetime, @location_id , date_of_hiv_pos_test, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_of_hiv_pos_test_id = (SELECT LAST_INSERT_ID());
@@ -183,7 +186,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_boolean, creator, date_created, uuid)
-            VALUES (patient_id, @date_of_hiv_pos_test_estimated_concept_id, old_enc_id, visit_date, @location_id , date_of_hiv_pos_test_estimated, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @date_of_hiv_pos_test_estimated_concept_id, old_enc_id, encounter_datetime, @location_id , date_of_hiv_pos_test_estimated, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_of_hiv_pos_test_estimated_id = (SELECT LAST_INSERT_ID());
@@ -200,7 +203,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-            VALUES (patient_id, @location_of_hiv_pos_test_concept_id, old_enc_id, visit_date, @location_id , location_of_hiv_pos_test, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @location_of_hiv_pos_test_concept_id, old_enc_id, encounter_datetime, @location_id , location_of_hiv_pos_test, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @location_of_hiv_pos_test_id = (SELECT LAST_INSERT_ID());
@@ -217,7 +220,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-            VALUES (patient_id, @arv_number_at_that_site_concept_id, old_enc_id, visit_date, @location_id , arv_number_at_that_site, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @arv_number_at_that_site_concept_id, old_enc_id, encounter_datetime, @location_id , arv_number_at_that_site, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @arv_number_at_that_site_id = (SELECT LAST_INSERT_ID());
@@ -234,7 +237,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-            VALUES (patient_id, @location_of_art_initiation_concept_id, old_enc_id, visit_date, @location_id , location_of_art_initiation, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @location_of_art_initiation_concept_id, old_enc_id, encounter_datetime, @location_id , location_of_art_initiation, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @location_of_art_initiation_id = (SELECT LAST_INSERT_ID());
@@ -261,7 +264,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @taken_arvs_in_last_two_months_concept_id, old_enc_id, visit_date, @location_id , @taken_arvs_in_last_two_months_value_coded, @taken_arvs_in_last_two_months_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @taken_arvs_in_last_two_months_concept_id, old_enc_id, encounter_datetime, @location_id , @taken_arvs_in_last_two_months_value_coded, @taken_arvs_in_last_two_months_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @taken_arvs_in_last_two_months_id = (SELECT LAST_INSERT_ID());
@@ -288,7 +291,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @taken_arvs_in_last_two_weeks_concept_id, old_enc_id, visit_date, @location_id , @taken_arvs_in_last_two_weeks_value_coded, @taken_arvs_in_last_two_weeks_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @taken_arvs_in_last_two_weeks_concept_id, old_enc_id, encounter_datetime, @location_id , @taken_arvs_in_last_two_weeks_value_coded, @taken_arvs_in_last_two_weeks_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @taken_arvs_in_last_two_weeks_id = (SELECT LAST_INSERT_ID());
@@ -315,7 +318,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @has_transfer_letter_concept_id, old_enc_id, visit_date, @location_id , @has_transfer_letter_value_coded, @has_transfer_letter_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @has_transfer_letter_concept_id, old_enc_id, encounter_datetime, @location_id , @has_transfer_letter_value_coded, @has_transfer_letter_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @has_transfer_letter_id = (SELECT LAST_INSERT_ID());
@@ -332,7 +335,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-            VALUES (patient_id, @site_transferred_from_concept_id, old_enc_id, visit_date, @location_id , site_transferred_from, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @site_transferred_from_concept_id, old_enc_id, encounter_datetime, @location_id , site_transferred_from, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @site_transferred_from_id = (SELECT LAST_INSERT_ID());
@@ -349,7 +352,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
-            VALUES (patient_id, @date_of_art_initiation_concept_id, old_enc_id, visit_date, @location_id , date_of_art_initiation, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @date_of_art_initiation_concept_id, old_enc_id, encounter_datetime, @location_id , date_of_art_initiation, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_of_art_initiation_id = (SELECT LAST_INSERT_ID());
@@ -376,7 +379,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @ever_registered_at_art_concept_id, old_enc_id, visit_date, @location_id , @ever_registered_at_art_value_coded, @ever_registered_at_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @ever_registered_at_art_concept_id, old_enc_id, encounter_datetime, @location_id , @ever_registered_at_art_value_coded, @ever_registered_at_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @ever_registered_at_art_id = (SELECT LAST_INSERT_ID());
@@ -403,7 +406,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @ever_received_arv_concept_id, old_enc_id, visit_date, @location_id , @ever_received_arv_value_coded, @ever_received_arv_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @ever_received_arv_concept_id, old_enc_id, encounter_datetime, @location_id , @ever_received_arv_value_coded, @ever_received_arv_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @ever_received_arv_id = (SELECT LAST_INSERT_ID());
@@ -432,11 +435,11 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             IF ISNULL(@last_arv_regimen_value_coded) THEN
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-              VALUES (patient_id, @last_arv_regimen_concept_id, old_enc_id, visit_date, @location_id , last_arv_regimen, @creator, date_created, (SELECT UUID()));
+              VALUES (patient_id, @last_arv_regimen_concept_id, old_enc_id, encounter_datetime, @location_id , last_arv_regimen, @creator, date_created, (SELECT UUID()));
             ELSE
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-              VALUES (patient_id, @last_arv_regimen_concept_id, old_enc_id, visit_date, @location_id , @last_arv_regimen_value_coded, @last_arv_regimen_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+              VALUES (patient_id, @last_arv_regimen_concept_id, old_enc_id, encounter_datetime, @location_id , @last_arv_regimen_value_coded, @last_arv_regimen_value_coded_name_id, @creator, date_created, (SELECT UUID()));
             END IF;
 
             # Get last obs id for association later to other records
@@ -454,7 +457,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
-            VALUES (patient_id, @date_last_arv_taken_concept_id, old_enc_id, visit_date, @location_id , date_last_arv_taken, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @date_last_arv_taken_concept_id, old_enc_id, encounter_datetime, @location_id , date_last_arv_taken, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_last_arv_taken_id = (SELECT LAST_INSERT_ID());
@@ -471,7 +474,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_boolean, creator, date_created, uuid)
-            VALUES (patient_id, @date_last_arv_taken_estimated_concept_id, old_enc_id, visit_date, @location_id , date_last_arv_taken_estimated, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @date_last_arv_taken_estimated_concept_id, old_enc_id, encounter_datetime, @location_id , date_last_arv_taken_estimated, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_last_arv_taken_estimated_id = (SELECT LAST_INSERT_ID());
@@ -488,11 +491,11 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
           IF (weight = 'Unknown') THEN
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-            VALUES (patient_id, @weight_concept_id, old_enc_id, visit_date, @location_id , weight, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @weight_concept_id, old_enc_id, encounter_datetime, @location_id , weight, @creator, date_created, (SELECT UUID()));
           ELSE
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
-            VALUES (patient_id, @weight_concept_id, old_enc_id, visit_date, @location_id , ROUND(weight,1), @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @weight_concept_id, old_enc_id, encounter_datetime, @location_id , ROUND(weight,1), @creator, date_created, (SELECT UUID()));
           END IF;
 
           # Get last obs id for association later to other records
@@ -511,10 +514,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
           IF (height = 'Unknown') THEN
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-            VALUES (patient_id, @height_concept_id, old_enc_id, visit_date, @location_id , height, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @height_concept_id, old_enc_id, encounter_datetime, @location_id , height, @creator, date_created, (SELECT UUID()));
           ELSE
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            INSERT INTO obs (person_id, concept_id, encounter_id, encounter_datetime, location_id , value_numeric, creator, date_created, uuid)
             VALUES (patient_id, @height_concept_id, old_enc_id, visit_date, @location_id , height, @creator, date_created, (SELECT UUID()));
           END IF;
 
@@ -534,10 +537,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             IF (bmi = 'Unknown') THEN
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-              VALUES (patient_id, @bmi_concept_id, old_enc_id, visit_date, @location_id , bmi, @creator, date_created, (SELECT UUID()));
+              VALUES (patient_id, @bmi_concept_id, old_enc_id, encounter_datetime, @location_id , bmi, @creator, date_created, (SELECT UUID()));
             ELSE
                # Create observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+              INSERT INTO obs (person_id, concept_id, encounter_id, encounter_datetime, location_id , value_numeric, creator, date_created, uuid)
               VALUES (patient_id, @bmi_concept_id, old_enc_id, visit_date, @location_id , ROUND(bmi,1), @creator, date_created, (SELECT UUID()));
             END IF;
 

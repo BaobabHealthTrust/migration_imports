@@ -79,11 +79,13 @@ BEGIN
 	DECLARE cytomegalovirus_infection varchar(25);
 	DECLARE toxoplasomis_of_the_brain_1month varchar(25);
 	DECLARE recto_vaginal_fitsula varchar(25);
+	DECLARE hiv_wasting_syndrome varchar(25);
 	DECLARE reason_for_starting_art varchar(255);
 	DECLARE who_stage varchar(255);
 	DECLARE location varchar(255);
 	DECLARE voided tinyint(1);
 	DECLARE void_reason varchar(255);
+	DECLARE encounter_datetime datetime;
 	DECLARE date_voided date;
 	DECLARE voided_by int(11);
 	DECLARE date_created datetime;
@@ -91,7 +93,7 @@ BEGIN
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
-DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`id`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`patient_pregnant`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`patient_breast_feeding`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cd4_count_available`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cd4_count`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cd4_count_modifier`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cd4_count_percentage`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`date_of_cd4_count`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`asymptomatic`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`persistent_generalized_lymphadenopathy`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`unspecified_stage_1_cond`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`molluscumm_contagiosum`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`wart_virus_infection_extensive`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`oral_ulcerations_recurrent`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`parotid_enlargement_persistent_unexplained`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`lineal_gingival_erythema`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`herpes_zoster`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`respiratory_tract_infections_recurrent`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`unspecified_stage2_condition`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`angular_chelitis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`papular_prurtic_eruptions`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`hepatosplenomegaly_unexplained`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`oral_hairy_leukoplakia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`severe_weight_loss`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`fever_persistent_unexplained`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`pulmonary_tuberculosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`pulmonary_tuberculosis_last_2_years`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`severe_bacterial_infection`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`bacterial_pnuemonia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`symptomatic_lymphoid_interstitial_pnuemonitis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`chronic_hiv_assoc_lung_disease`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`unspecified_stage3_condition`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`aneamia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`neutropaenia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`thrombocytopaenia_chronic`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`diarhoea`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`oral_candidiasis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`acute_necrotizing_ulcerative_gingivitis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`lymph_node_tuberculosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`toxoplasmosis_of_brain`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cryptococcal_meningitis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`progressive_multifocal_leukoencephalopathy`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`disseminated_mycosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`candidiasis_of_oesophagus`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`extrapulmonary_tuberculosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cerebral_non_hodgkin_lymphoma`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`kaposis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`hiv_encephalopathy`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`bacterial_infections_severe_recurrent`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`unspecified_stage_4_condition`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`pnuemocystis_pnuemonia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`disseminated_non_tuberculosis_mycobactierial_infection`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cryptosporidiosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`isosporiasis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`symptomatic_hiv_asscoiated_nephropathy`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`chronic_herpes_simplex_infection`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cytomegalovirus_infection`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`toxoplasomis_of_the_brain_1month`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`recto_vaginal_fitsula`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`reason_for_starting_art`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`who_stage`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`location`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`voided`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`hiv_staging_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
+DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`id`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`patient_pregnant`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`patient_breast_feeding`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cd4_count_available`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cd4_count`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cd4_count_modifier`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cd4_count_percentage`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`date_of_cd4_count`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`asymptomatic`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`persistent_generalized_lymphadenopathy`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`unspecified_stage_1_cond`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`molluscumm_contagiosum`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`wart_virus_infection_extensive`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`oral_ulcerations_recurrent`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`parotid_enlargement_persistent_unexplained`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`lineal_gingival_erythema`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`herpes_zoster`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`respiratory_tract_infections_recurrent`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`unspecified_stage2_condition`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`angular_chelitis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`papular_prurtic_eruptions`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`hepatosplenomegaly_unexplained`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`oral_hairy_leukoplakia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`severe_weight_loss`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`fever_persistent_unexplained`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`pulmonary_tuberculosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`pulmonary_tuberculosis_last_2_years`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`severe_bacterial_infection`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`bacterial_pnuemonia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`symptomatic_lymphoid_interstitial_pnuemonitis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`chronic_hiv_assoc_lung_disease`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`unspecified_stage3_condition`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`aneamia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`neutropaenia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`thrombocytopaenia_chronic`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`diarhoea`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`oral_candidiasis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`acute_necrotizing_ulcerative_gingivitis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`lymph_node_tuberculosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`toxoplasmosis_of_brain`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cryptococcal_meningitis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`progressive_multifocal_leukoencephalopathy`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`disseminated_mycosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`candidiasis_of_oesophagus`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`extrapulmonary_tuberculosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cerebral_non_hodgkin_lymphoma`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`kaposis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`hiv_encephalopathy`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`bacterial_infections_severe_recurrent`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`unspecified_stage_4_condition`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`pnuemocystis_pnuemonia`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`disseminated_non_tuberculosis_mycobactierial_infection`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cryptosporidiosis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`isosporiasis`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`symptomatic_hiv_asscoiated_nephropathy`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`chronic_herpes_simplex_infection`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`cytomegalovirus_infection`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`toxoplasomis_of_the_brain_1month`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`recto_vaginal_fitsula`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`hiv_wasting_syndrome`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`reason_for_starting_art`,  `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`who_stage`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`location`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`voided`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`encounter_datetime`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`hiv_staging_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
         visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
         WHERE `bart1_intermediate_bare_bones`.`hiv_staging_encounters`.`patient_id` = in_patient_id;
 
@@ -168,6 +170,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 			cytomegalovirus_infection,
 			toxoplasomis_of_the_brain_1month,
 			recto_vaginal_fitsula,
+			hiv_wasting_syndrome,
 			reason_for_starting_art,
 			who_stage,
 			location,
@@ -175,6 +178,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 			void_reason,
 			date_voided,
 			voided_by,
+			encounter_datetime,
 			date_created,
 			creator,
 			visit_date;
@@ -198,7 +202,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'hiv staging');
 
 	# Create encounter
-	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, visit_date, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
 	
         # Check if the field is not empty
@@ -221,7 +225,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @patient_pregnant_concept_id, old_enc_id, visit_date, @location_id , @patient_pregnant_value_coded, @patient_pregnant_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @patient_pregnant_concept_id, old_enc_id, encounter_datetime, @location_id , @patient_pregnant_value_coded, @patient_pregnant_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @patient_pregnant_id = (SELECT LAST_INSERT_ID());
@@ -248,7 +252,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @patient_breast_feeding_concept_id, old_enc_id, visit_date, @location_id , @patient_breast_feeding_value_coded, @patient_breast_feeding_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @patient_breast_feeding_concept_id, old_enc_id, encounter_datetime, @location_id , @patient_breast_feeding_value_coded, @patient_breast_feeding_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @patient_breast_feeding_id = (SELECT LAST_INSERT_ID());
@@ -275,7 +279,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @cd4_count_available_concept_id, old_enc_id, visit_date, @location_id , @cd4_count_available_value_coded, @cd4_count_available_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cd4_count_available_concept_id, old_enc_id, encounter_datetime, @location_id , @cd4_count_available_value_coded, @cd4_count_available_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @cd4_count_available_id = (SELECT LAST_INSERT_ID());
@@ -292,7 +296,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
-            VALUES (patient_id, @cd4_count_concept_id, old_enc_id, visit_date, @location_id , cd4_count, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cd4_count_concept_id, old_enc_id, encounter_datetime, @location_id , cd4_count, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @cd4_count_id = (SELECT LAST_INSERT_ID());
@@ -309,7 +313,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-            VALUES (patient_id, @cd4_count_modifier_concept_id, old_enc_id, visit_date, @location_id , cd4_count_modifier, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cd4_count_modifier_concept_id, old_enc_id, encounter_datetime, @location_id , cd4_count_modifier, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @cd4_count_modifier_id = (SELECT LAST_INSERT_ID());
@@ -326,7 +330,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
-            VALUES (patient_id, @cd4_count_percentage_concept_id, old_enc_id, visit_date, @location_id , cd4_count_percentage, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cd4_count_percentage_concept_id, old_enc_id, encounter_datetime, @location_id , cd4_count_percentage, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @cd4_count_percentage_id = (SELECT LAST_INSERT_ID());
@@ -343,7 +347,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
-            VALUES (patient_id, @date_of_cd4_count_concept_id, old_enc_id, visit_date, @location_id , date_of_cd4_count, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @date_of_cd4_count_concept_id, old_enc_id, encounter_datetime, @location_id , date_of_cd4_count, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @date_of_cd4_count_id = (SELECT LAST_INSERT_ID());
@@ -370,7 +374,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @asymptomatic_concept_id, old_enc_id, visit_date, @location_id , @asymptomatic_value_coded, @asymptomatic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @asymptomatic_concept_id, old_enc_id, encounter_datetime, @location_id , @asymptomatic_value_coded, @asymptomatic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @asymptomatic_id = (SELECT LAST_INSERT_ID());
@@ -397,7 +401,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @persistent_generalized_lymphadenopathy_concept_id, old_enc_id, visit_date, @location_id , @persistent_generalized_lymphadenopathy_value_coded, @persistent_generalized_lymphadenopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @persistent_generalized_lymphadenopathy_concept_id, old_enc_id, encounter_datetime, @location_id , @persistent_generalized_lymphadenopathy_value_coded, @persistent_generalized_lymphadenopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @persistent_generalized_lymphadenopathy_id = (SELECT LAST_INSERT_ID());
@@ -424,7 +428,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @unspecified_stage_1_cond_concept_id, old_enc_id, visit_date, @location_id , @unspecified_stage_1_cond_value_coded, @unspecified_stage_1_cond_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @unspecified_stage_1_cond_concept_id, old_enc_id, encounter_datetime, @location_id , @unspecified_stage_1_cond_value_coded, @unspecified_stage_1_cond_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @unspecified_stage_1_cond_id = (SELECT LAST_INSERT_ID());
@@ -452,7 +456,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @molluscumm_contagiosum_concept_id, old_enc_id, visit_date, @location_id , @molluscumm_contagiosum_value_coded, @molluscumm_contagiosum_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @molluscumm_contagiosum_concept_id, old_enc_id, encounter_datetime, @location_id , @molluscumm_contagiosum_value_coded, @molluscumm_contagiosum_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @molluscumm_contagiosum_id = (SELECT LAST_INSERT_ID());
@@ -479,7 +483,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @wart_virus_infection_extensive_concept_id, old_enc_id, visit_date, @location_id , @wart_virus_infection_extensive_value_coded, @wart_virus_infection_extensive_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @wart_virus_infection_extensive_concept_id, old_enc_id, encounter_datetime, @location_id , @wart_virus_infection_extensive_value_coded, @wart_virus_infection_extensive_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @wart_virus_infection_extensive_id = (SELECT LAST_INSERT_ID());
@@ -506,7 +510,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @oral_ulcerations_recurrent_concept_id, old_enc_id, visit_date, @location_id , @oral_ulcerations_recurrent_value_coded, @oral_ulcerations_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @oral_ulcerations_recurrent_concept_id, old_enc_id, encounter_datetime, @location_id , @oral_ulcerations_recurrent_value_coded, @oral_ulcerations_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @oral_ulcerations_recurrent_id = (SELECT LAST_INSERT_ID());
@@ -533,7 +537,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @parotid_enlargement_persistent_unexplained_concept_id, old_enc_id, visit_date, @location_id , @parotid_enlargement_persistent_unexplained_value_coded, @parotid_enlargement_persistent_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @parotid_enlargement_persistent_unexplained_concept_id, old_enc_id, encounter_datetime, @location_id , @parotid_enlargement_persistent_unexplained_value_coded, @parotid_enlargement_persistent_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @parotid_enlargement_persistent_unexplained_id = (SELECT LAST_INSERT_ID());
@@ -560,7 +564,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @lineal_gingival_erythema_concept_id, old_enc_id, visit_date, @location_id , @lineal_gingival_erythema_value_coded, @lineal_gingival_erythema_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @lineal_gingival_erythema_concept_id, old_enc_id, encounter_datetime, @location_id , @lineal_gingival_erythema_value_coded, @lineal_gingival_erythema_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @lineal_gingival_erythema_id = (SELECT LAST_INSERT_ID());
@@ -587,7 +591,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @herpes_zoster_concept_id, old_enc_id, visit_date, @location_id , @herpes_zoster_value_coded, @herpes_zoster_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @herpes_zoster_concept_id, old_enc_id, encounter_datetime, @location_id , @herpes_zoster_value_coded, @herpes_zoster_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @herpes_zoster_id = (SELECT LAST_INSERT_ID());
@@ -614,7 +618,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @respiratory_tract_infections_recurrent_concept_id, old_enc_id, visit_date, @location_id , @respiratory_tract_infections_recurrent_value_coded, @respiratory_tract_infections_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @respiratory_tract_infections_recurrent_concept_id, old_enc_id, encounter_datetime, @location_id , @respiratory_tract_infections_recurrent_value_coded, @respiratory_tract_infections_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @respiratory_tract_infections_recurrent_id = (SELECT LAST_INSERT_ID());
@@ -641,7 +645,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @unspecified_stage2_condition_concept_id, old_enc_id, visit_date, @location_id , @unspecified_stage2_condition_value_coded, @unspecified_stage2_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @unspecified_stage2_condition_concept_id, old_enc_id, encounter_datetime, @location_id , @unspecified_stage2_condition_value_coded, @unspecified_stage2_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @unspecified_stage2_condition_id = (SELECT LAST_INSERT_ID());
@@ -668,7 +672,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @angular_chelitis_concept_id, old_enc_id, visit_date, @location_id , @angular_chelitis_value_coded, @angular_chelitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @angular_chelitis_concept_id, old_enc_id, encounter_datetime, @location_id , @angular_chelitis_value_coded, @angular_chelitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @angular_chelitis_id = (SELECT LAST_INSERT_ID());
@@ -695,7 +699,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @papular_prurtic_eruptions_concept_id, old_enc_id, visit_date, @location_id , @papular_prurtic_eruptions_value_coded, @papular_prurtic_eruptions_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @papular_prurtic_eruptions_concept_id, old_enc_id, encounter_datetime, @location_id , @papular_prurtic_eruptions_value_coded, @papular_prurtic_eruptions_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @papular_prurtic_eruptions_id = (SELECT LAST_INSERT_ID());
@@ -722,7 +726,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @hepatosplenomegaly_unexplained_concept_id, old_enc_id, visit_date, @location_id , @hepatosplenomegaly_unexplained_value_coded, @hepatosplenomegaly_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @hepatosplenomegaly_unexplained_concept_id, old_enc_id, encounter_datetime, @location_id , @hepatosplenomegaly_unexplained_value_coded, @hepatosplenomegaly_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @hepatosplenomegaly_unexplained_id = (SELECT LAST_INSERT_ID());
@@ -749,7 +753,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @oral_hairy_leukoplakia_concept_id, old_enc_id, visit_date, @location_id , @oral_hairy_leukoplakia_value_coded, @oral_hairy_leukoplakia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @oral_hairy_leukoplakia_concept_id, old_enc_id, encounter_datetime, @location_id , @oral_hairy_leukoplakia_value_coded, @oral_hairy_leukoplakia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @oral_hairy_leukoplakia_id = (SELECT LAST_INSERT_ID());
@@ -776,7 +780,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @severe_weight_loss_concept_id, old_enc_id, visit_date, @location_id , @severe_weight_loss_value_coded, @severe_weight_loss_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @severe_weight_loss_concept_id, old_enc_id, encounter_datetime, @location_id , @severe_weight_loss_value_coded, @severe_weight_loss_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @severe_weight_loss_id = (SELECT LAST_INSERT_ID());
@@ -803,7 +807,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @fever_persistent_unexplained_concept_id, old_enc_id, visit_date, @location_id , @fever_persistent_unexplained_value_coded, @fever_persistent_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @fever_persistent_unexplained_concept_id, old_enc_id, encounter_datetime, @location_id , @fever_persistent_unexplained_value_coded, @fever_persistent_unexplained_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @fever_persistent_unexplained_id = (SELECT LAST_INSERT_ID());
@@ -830,7 +834,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @pulmonary_tuberculosis_concept_id, old_enc_id, visit_date, @location_id , @pulmonary_tuberculosis_value_coded, @pulmonary_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @pulmonary_tuberculosis_concept_id, old_enc_id, encounter_datetime, @location_id , @pulmonary_tuberculosis_value_coded, @pulmonary_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @pulmonary_tuberculosis_id = (SELECT LAST_INSERT_ID());
@@ -857,7 +861,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @pulmonary_tuberculosis_last_2_years_concept_id, old_enc_id, visit_date, @location_id , @pulmonary_tuberculosis_last_2_years_value_coded, @pulmonary_tuberculosis_last_2_years_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @pulmonary_tuberculosis_last_2_years_concept_id, old_enc_id, encounter_datetime, @location_id , @pulmonary_tuberculosis_last_2_years_value_coded, @pulmonary_tuberculosis_last_2_years_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @pulmonary_tuberculosis_last_2_years_id = (SELECT LAST_INSERT_ID());
@@ -884,7 +888,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @severe_bacterial_infection_concept_id, old_enc_id, visit_date, @location_id , @severe_bacterial_infection_value_coded, @severe_bacterial_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @severe_bacterial_infection_concept_id, old_enc_id, encounter_datetime, @location_id , @severe_bacterial_infection_value_coded, @severe_bacterial_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @severe_bacterial_infection_id = (SELECT LAST_INSERT_ID());
@@ -911,7 +915,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @bacterial_pnuemonia_concept_id, old_enc_id, visit_date, @location_id , @bacterial_pnuemonia_value_coded, @bacterial_pnuemonia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @bacterial_pnuemonia_concept_id, old_enc_id, encounter_datetime, @location_id , @bacterial_pnuemonia_value_coded, @bacterial_pnuemonia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @bacterial_pnuemonia_id = (SELECT LAST_INSERT_ID());
@@ -938,7 +942,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @symptomatic_lymphoid_interstitial_pnuemonitis_concept_id, old_enc_id, visit_date, @location_id , @symptomatic_lymphoid_interstitial_pnuemonitis_value_coded, @symptomatic_lymphoid_interstitial_pnuemonitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @symptomatic_lymphoid_interstitial_pnuemonitis_concept_id, old_enc_id, encounter_datetime, @location_id , @symptomatic_lymphoid_interstitial_pnuemonitis_value_coded, @symptomatic_lymphoid_interstitial_pnuemonitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @symptomatic_lymphoid_interstitial_pnuemonitis_id = (SELECT LAST_INSERT_ID());
@@ -965,7 +969,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @chronic_hiv_assoc_lung_disease_concept_id, old_enc_id, visit_date, @location_id , @chronic_hiv_assoc_lung_disease_value_coded, @chronic_hiv_assoc_lung_disease_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @chronic_hiv_assoc_lung_disease_concept_id, old_enc_id, encounter_datetime, @location_id , @chronic_hiv_assoc_lung_disease_value_coded, @chronic_hiv_assoc_lung_disease_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @chronic_hiv_assoc_lung_disease_id = (SELECT LAST_INSERT_ID());
@@ -992,7 +996,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @unspecified_stage3_condition_concept_id, old_enc_id, visit_date, @location_id , @unspecified_stage3_condition_value_coded, @unspecified_stage3_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @unspecified_stage3_condition_concept_id, old_enc_id, encounter_datetime, @location_id , @unspecified_stage3_condition_value_coded, @unspecified_stage3_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @unspecified_stage3_condition_id = (SELECT LAST_INSERT_ID());
@@ -1019,7 +1023,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @aneamia_concept_id, old_enc_id, visit_date, @location_id , @aneamia_value_coded, @aneamia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @aneamia_concept_id, old_enc_id, encounter_datetime, @location_id , @aneamia_value_coded, @aneamia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @aneamia_id = (SELECT LAST_INSERT_ID());
@@ -1046,7 +1050,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @neutropaenia_concept_id, old_enc_id, visit_date, @location_id , @neutropaenia_value_coded, @neutropaenia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @neutropaenia_concept_id, old_enc_id, encounter_datetime, @location_id , @neutropaenia_value_coded, @neutropaenia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @neutropaenia_id = (SELECT LAST_INSERT_ID());
@@ -1073,7 +1077,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @thrombocytopaenia_chronic_concept_id, old_enc_id, visit_date, @location_id , @thrombocytopaenia_chronic_value_coded, @thrombocytopaenia_chronic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @thrombocytopaenia_chronic_concept_id, old_enc_id, encounter_datetime, @location_id , @thrombocytopaenia_chronic_value_coded, @thrombocytopaenia_chronic_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @thrombocytopaenia_chronic_id = (SELECT LAST_INSERT_ID());
@@ -1100,7 +1104,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @diarhoea_concept_id, old_enc_id, visit_date, @location_id , @diarhoea_value_coded, @diarhoea_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @diarhoea_concept_id, old_enc_id, encounter_datetime, @location_id , @diarhoea_value_coded, @diarhoea_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @diarhoea_id = (SELECT LAST_INSERT_ID());
@@ -1127,7 +1131,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @oral_candidiasis_concept_id, old_enc_id, visit_date, @location_id , @oral_candidiasis_value_coded, @oral_candidiasis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @oral_candidiasis_concept_id, old_enc_id, encounter_datetime, @location_id , @oral_candidiasis_value_coded, @oral_candidiasis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @oral_candidiasis_id = (SELECT LAST_INSERT_ID());
@@ -1154,7 +1158,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @acute_necrotizing_ulcerative_gingivitis_concept_id, old_enc_id, visit_date, @location_id , @acute_necrotizing_ulcerative_gingivitis_value_coded, @acute_necrotizing_ulcerative_gingivitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @acute_necrotizing_ulcerative_gingivitis_concept_id, old_enc_id, encounter_datetime, @location_id , @acute_necrotizing_ulcerative_gingivitis_value_coded, @acute_necrotizing_ulcerative_gingivitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @acute_necrotizing_ulcerative_gingivitis_id = (SELECT LAST_INSERT_ID());
@@ -1181,7 +1185,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @lymph_node_tuberculosis_concept_id, old_enc_id, visit_date, @location_id , @lymph_node_tuberculosis_value_coded, @lymph_node_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @lymph_node_tuberculosis_concept_id, old_enc_id, encounter_datetime, @location_id , @lymph_node_tuberculosis_value_coded, @lymph_node_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @lymph_node_tuberculosis_id = (SELECT LAST_INSERT_ID());
@@ -1208,7 +1212,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @toxoplasmosis_of_brain_concept_id, old_enc_id, visit_date, @location_id , @toxoplasmosis_of_brain_value_coded, @toxoplasmosis_of_brain_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @toxoplasmosis_of_brain_concept_id, old_enc_id, encounter_datetime, @location_id , @toxoplasmosis_of_brain_value_coded, @toxoplasmosis_of_brain_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @toxoplasmosis_of_brain_id = (SELECT LAST_INSERT_ID());
@@ -1235,7 +1239,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @cryptococcal_meningitis_concept_id, old_enc_id, visit_date, @location_id , @cryptococcal_meningitis_value_coded, @cryptococcal_meningitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cryptococcal_meningitis_concept_id, old_enc_id, encounter_datetime, @location_id , @cryptococcal_meningitis_value_coded, @cryptococcal_meningitis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @cryptococcal_meningitis_id = (SELECT LAST_INSERT_ID());
@@ -1262,7 +1266,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @progressive_multifocal_leukoencephalopathy_concept_id, old_enc_id, visit_date, @location_id , @progressive_multifocal_leukoencephalopathy_value_coded, @progressive_multifocal_leukoencephalopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @progressive_multifocal_leukoencephalopathy_concept_id, old_enc_id, encounter_datetime, @location_id , @progressive_multifocal_leukoencephalopathy_value_coded, @progressive_multifocal_leukoencephalopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @progressive_multifocal_leukoencephalopathy_id = (SELECT LAST_INSERT_ID());
@@ -1289,7 +1293,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @disseminated_mycosis_concept_id, old_enc_id, visit_date, @location_id , @disseminated_mycosis_value_coded, @disseminated_mycosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @disseminated_mycosis_concept_id, old_enc_id, encounter_datetime, @location_id , @disseminated_mycosis_value_coded, @disseminated_mycosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @disseminated_mycosis_id = (SELECT LAST_INSERT_ID());
@@ -1316,7 +1320,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @candidiasis_of_oesophagus_concept_id, old_enc_id, visit_date, @location_id , @candidiasis_of_oesophagus_value_coded, @candidiasis_of_oesophagus_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @candidiasis_of_oesophagus_concept_id, old_enc_id, encounter_datetime, @location_id , @candidiasis_of_oesophagus_value_coded, @candidiasis_of_oesophagus_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @candidiasis_of_oesophagus_id = (SELECT LAST_INSERT_ID());
@@ -1343,7 +1347,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @extrapulmonary_tuberculosis_concept_id, old_enc_id, visit_date, @location_id , @extrapulmonary_tuberculosis_value_coded, @extrapulmonary_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @extrapulmonary_tuberculosis_concept_id, old_enc_id, encounter_datetime, @location_id , @extrapulmonary_tuberculosis_value_coded, @extrapulmonary_tuberculosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @extrapulmonary_tuberculosis_id = (SELECT LAST_INSERT_ID());
@@ -1370,7 +1374,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @cerebral_non_hodgkin_lymphoma_concept_id, old_enc_id, visit_date, @location_id , @cerebral_non_hodgkin_lymphoma_value_coded, @cerebral_non_hodgkin_lymphoma_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cerebral_non_hodgkin_lymphoma_concept_id, old_enc_id, encounter_datetime, @location_id , @cerebral_non_hodgkin_lymphoma_value_coded, @cerebral_non_hodgkin_lymphoma_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @cerebral_non_hodgkin_lymphoma_id = (SELECT LAST_INSERT_ID());
@@ -1397,7 +1401,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @kaposis_concept_id, old_enc_id, visit_date, @location_id , @kaposis_value_coded, @kaposis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @kaposis_concept_id, old_enc_id, encounter_datetime, @location_id , @kaposis_value_coded, @kaposis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @kaposis_id = (SELECT LAST_INSERT_ID());
@@ -1424,7 +1428,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @hiv_encephalopathy_concept_id, old_enc_id, visit_date, @location_id , @hiv_encephalopathy_value_coded, @hiv_encephalopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @hiv_encephalopathy_concept_id, old_enc_id, encounter_datetime, @location_id , @hiv_encephalopathy_value_coded, @hiv_encephalopathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @hiv_encephalopathy_id = (SELECT LAST_INSERT_ID());
@@ -1451,7 +1455,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @bacterial_infections_severe_recurrent_concept_id, old_enc_id, visit_date, @location_id , @bacterial_infections_severe_recurrent_value_coded, @bacterial_infections_severe_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @bacterial_infections_severe_recurrent_concept_id, old_enc_id, encounter_datetime, @location_id , @bacterial_infections_severe_recurrent_value_coded, @bacterial_infections_severe_recurrent_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @bacterial_infections_severe_recurrent_id = (SELECT LAST_INSERT_ID());
@@ -1478,7 +1482,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @unspecified_stage_4_condition_concept_id, old_enc_id, visit_date, @location_id , @unspecified_stage_4_condition_value_coded, @unspecified_stage_4_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @unspecified_stage_4_condition_concept_id, old_enc_id, encounter_datetime, @location_id , @unspecified_stage_4_condition_value_coded, @unspecified_stage_4_condition_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @unspecified_stage_4_condition_id = (SELECT LAST_INSERT_ID());
@@ -1505,7 +1509,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @pnuemocystis_pnuemonia_concept_id, old_enc_id, visit_date, @location_id , @pnuemocystis_pnuemonia_value_coded, @pnuemocystis_pnuemonia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @pnuemocystis_pnuemonia_concept_id, old_enc_id, encounter_datetime, @location_id , @pnuemocystis_pnuemonia_value_coded, @pnuemocystis_pnuemonia_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @pnuemocystis_pnuemonia_id = (SELECT LAST_INSERT_ID());
@@ -1532,7 +1536,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @disseminated_non_tuberculosis_mycobactierial_infection_concept_id, old_enc_id, visit_date, @location_id , @disseminated_non_tuberculosis_mycobactierial_infection_value_coded, @disseminated_non_tuberculosis_mycobactierial_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @disseminated_non_tuberculosis_mycobactierial_infection_concept_id, old_enc_id, encounter_datetime, @location_id , @disseminated_non_tuberculosis_mycobactierial_infection_value_coded, @disseminated_non_tuberculosis_mycobactierial_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @disseminated_non_tuberculosis_mycobactierial_infection_id = (SELECT LAST_INSERT_ID());
@@ -1559,7 +1563,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @cryptosporidiosis_concept_id, old_enc_id, visit_date, @location_id , @cryptosporidiosis_value_coded, @cryptosporidiosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cryptosporidiosis_concept_id, old_enc_id, encounter_datetime, @location_id , @cryptosporidiosis_value_coded, @cryptosporidiosis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @cryptosporidiosis_id = (SELECT LAST_INSERT_ID());
@@ -1586,7 +1590,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @isosporiasis_concept_id, old_enc_id, visit_date, @location_id , @isosporiasis_value_coded, @isosporiasis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @isosporiasis_concept_id, old_enc_id, encounter_datetime, @location_id , @isosporiasis_value_coded, @isosporiasis_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @isosporiasis_id = (SELECT LAST_INSERT_ID());
@@ -1613,7 +1617,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @symptomatic_hiv_asscoiated_nephropathy_concept_id, old_enc_id, visit_date, @location_id , @symptomatic_hiv_asscoiated_nephropathy_value_coded, @symptomatic_hiv_asscoiated_nephropathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @symptomatic_hiv_asscoiated_nephropathy_concept_id, old_enc_id, encounter_datetime, @location_id , @symptomatic_hiv_asscoiated_nephropathy_value_coded, @symptomatic_hiv_asscoiated_nephropathy_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @symptomatic_hiv_asscoiated_nephropathy_id = (SELECT LAST_INSERT_ID());
@@ -1640,7 +1644,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @chronic_herpes_simplex_infection_concept_id, old_enc_id, visit_date, @location_id , @chronic_herpes_simplex_infection_value_coded, @chronic_herpes_simplex_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @chronic_herpes_simplex_infection_concept_id, old_enc_id, encounter_datetime, @location_id , @chronic_herpes_simplex_infection_value_coded, @chronic_herpes_simplex_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @chronic_herpes_simplex_infection_id = (SELECT LAST_INSERT_ID());
@@ -1667,7 +1671,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @cytomegalovirus_infection_concept_id, old_enc_id, visit_date, @location_id , @cytomegalovirus_infection_value_coded, @cytomegalovirus_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @cytomegalovirus_infection_concept_id, old_enc_id, encounter_datetime, @location_id , @cytomegalovirus_infection_value_coded, @cytomegalovirus_infection_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @cytomegalovirus_infection_id = (SELECT LAST_INSERT_ID());
@@ -1694,7 +1698,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @toxoplasomis_of_the_brain_1month_concept_id, old_enc_id, visit_date, @location_id , @toxoplasomis_of_the_brain_1month_value_coded, @toxoplasomis_of_the_brain_1month_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @toxoplasomis_of_the_brain_1month_concept_id, old_enc_id, encounter_datetime, @location_id , @toxoplasomis_of_the_brain_1month_value_coded, @toxoplasomis_of_the_brain_1month_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @toxoplasomis_of_the_brain_1month_id = (SELECT LAST_INSERT_ID());
@@ -1721,13 +1725,40 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @recto_vaginal_fitsula_concept_id, old_enc_id, visit_date, @location_id , @recto_vaginal_fitsula_value_coded, @recto_vaginal_fitsula_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @recto_vaginal_fitsula_concept_id, old_enc_id, encounter_datetime, @location_id , @recto_vaginal_fitsula_value_coded, @recto_vaginal_fitsula_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @recto_vaginal_fitsula_id = (SELECT LAST_INSERT_ID());
 
         END IF;
         
+        # Check if the field is not empty
+        IF NOT ISNULL(hiv_wasting_syndrome) THEN
+
+            # Get concept_id
+            SET @hiv_wasting_syndrome_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = 'HIV wasting syndrome (severe weight loss + persistent fever or severe weight loss + chronic diarrhoea)' AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded id
+            SET @hiv_wasting_syndrome_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = hiv_wasting_syndrome AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Get value_coded_name_id
+            SET @hiv_wasting_syndrome_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                        WHERE name = hiv_wasting_syndrome AND voided = 0 AND retired = 0 LIMIT 1);
+
+            # Create observation
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+            VALUES (patient_id, @hiv_wasting_syndrome_concept_id, old_enc_id, encounter_datetime, @location_id , @hiv_wasting_syndrome_value_coded, @hiv_wasting_syndrome_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+
+            # Get last obs id for association later to other records
+            SET @hiv_wasting_syndrome_id = (SELECT LAST_INSERT_ID());
+
+        END IF;
+
         # Check if the field is not empty
         IF NOT ISNULL(reason_for_starting_art) THEN
             IF (reason_for_starting_art = "WHO stage 1 adult") THEN
@@ -1781,7 +1812,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @reason_for_starting_art_concept_id, old_enc_id, visit_date, @location_id , @reason_for_starting_art_value_coded, @reason_for_starting_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @reason_for_starting_art_concept_id, old_enc_id,encounter_datetime, @location_id , @reason_for_starting_art_value_coded, @reason_for_starting_art_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @reason_for_starting_art_id = (SELECT LAST_INSERT_ID());
@@ -1808,7 +1839,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-            VALUES (patient_id, @who_stage_concept_id, old_enc_id, visit_date, @location_id , @who_stage_value_coded, @who_stage_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @who_stage_concept_id, old_enc_id, encounter_datetime, @location_id , @who_stage_value_coded, @who_stage_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
             # Get last obs id for association later to other records
             SET @who_stage_id = (SELECT LAST_INSERT_ID());
