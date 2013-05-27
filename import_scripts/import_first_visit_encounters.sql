@@ -517,8 +517,8 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             VALUES (patient_id, @height_concept_id, old_enc_id, encounter_datetime, @location_id , height, @creator, date_created, (SELECT UUID()));
           ELSE
             # Create observation
-            INSERT INTO obs (person_id, concept_id, encounter_id, encounter_datetime, location_id , value_numeric, creator, date_created, uuid)
-            VALUES (patient_id, @height_concept_id, old_enc_id, visit_date, @location_id , height, @creator, date_created, (SELECT UUID()));
+            INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+            VALUES (patient_id, @height_concept_id, old_enc_id, encounter_datetime, @location_id , height, @creator, date_created, (SELECT UUID()));
           END IF;
 
           # Get last obs id for association later to other records
@@ -540,8 +540,8 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               VALUES (patient_id, @bmi_concept_id, old_enc_id, encounter_datetime, @location_id , bmi, @creator, date_created, (SELECT UUID()));
             ELSE
                # Create observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, encounter_datetime, location_id , value_numeric, creator, date_created, uuid)
-              VALUES (patient_id, @bmi_concept_id, old_enc_id, visit_date, @location_id , ROUND(bmi,1), @creator, date_created, (SELECT UUID()));
+              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_numeric, creator, date_created, uuid)
+              VALUES (patient_id, @bmi_concept_id, old_enc_id, encounter_datetime, @location_id , ROUND(bmi,1), @creator, date_created, (SELECT UUID()));
             END IF;
 
             # Get last obs id for association later to other records

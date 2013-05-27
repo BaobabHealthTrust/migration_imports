@@ -60,9 +60,9 @@ BEGIN
     DECLARE creator INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`;
+    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`
            #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` = 25505;
-           #--LIMIT start_pos, end_pos;
+           LIMIT 3000;#--start_pos, end_pos;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -280,17 +280,38 @@ BEGIN
         
         END IF;
     
+        select "first_visit_encounter";
         CALL proc_import_first_visit_encounters(@person_id);          # good
-        CALL proc_import_art_visit_encounters(@person_id);            # good
-        CALL proc_import_pre_art_visit_encounters(@person_id);        # good
-        CALL proc_import_vitals_encounters(@person_id);               # good
-        CALL proc_import_hiv_staging_encounters(@person_id);          # good
+        
+        select "hiv_reception_encounter";
         CALL proc_import_hiv_reception_encounters(@person_id);        # good
+        
+        select "vitals_encounter";
+        CALL proc_import_vitals_encounters(@person_id);               # good
+        
+        select "first_visit_encounter";
+        CALL proc_import_art_visit_encounters(@person_id);            # good
+        
+        select "pre_art_visit_encounter";
+        CALL proc_import_pre_art_visit_encounters(@person_id);        # good
+        
+        select "hiv_staging_encounter";        
+        CALL proc_import_hiv_staging_encounters(@person_id);          # good
+
+        select "give_drugs_encounter";        
         CALL proc_import_give_drugs(@person_id);                      # good
-        CALL proc_import_general_reception_encounters(@person_id);    # good
-        CALL proc_import_outpatient_diagnosis_encounters(@person_id); # good
+        
+        select "patient_outcome_encounter";        
         CALL proc_import_patient_outcome(@person_id);                 # good
+        
+        select "guardians_encounter";        
         CALL proc_import_guardians(@person_id);                       # good
+        
+        select "general_reception_encounter";        
+        CALL proc_import_general_reception_encounters(@person_id);    # good
+        
+        select "outpatient_diagnosis_encounter";        
+        CALL proc_import_outpatient_diagnosis_encounters(@person_id); # good
         
         select patient_id;
 
