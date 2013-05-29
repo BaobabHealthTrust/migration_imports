@@ -178,6 +178,18 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
 		END IF;
 
+    SET @drug_name_brought_to_clinic1_drug_id = (SELECT new_drug_id FROM drug_map 
+                                                 WHERE bart_one_name = drug_name_brought_to_clinic1 LIMIT 1);
+                                                    
+    SET @drug_name_brought_to_clinic2_drug_id = (SELECT new_drug_id FROM drug_map 
+                                                 WHERE bart_one_name = drug_name_brought_to_clinic2 LIMIT 1);
+
+    SET @drug_name_brought_to_clinic3_drug_id = (SELECT new_drug_id FROM drug_map 
+                                                 WHERE bart_one_name = drug_name_brought_to_clinic3 LIMIT 1);
+
+    SET @drug_name_brought_to_clinic4_drug_id = (SELECT new_drug_id FROM drug_map 
+                                                 WHERE bart_one_name = drug_name_brought_to_clinic4 LIMIT 1);
+
 	  # Not done, process the parameters
 
 	  # Map destination user to source user
@@ -1928,12 +1940,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
               IF (drug_quantity_brought_to_clinic1 = 'Unknown') THEN
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @drug_quantity_brought_to_clinic1_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic1_id, drug_quantity_brought_to_clinic1, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id ,value_drug, obs_group_id, value_text, creator, date_created, uuid)
+                VALUES (patient_id, @drug_quantity_brought_to_clinic1_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic1_drug_id, @drug_name_brought_to_clinic1_id, drug_quantity_brought_to_clinic1, @creator, date_created, (SELECT UUID()));
               ELSE
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @drug_quantity_brought_to_clinic1_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic1_id, drug_quantity_brought_to_clinic1, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_numeric, creator, date_created, uuid)
+                VALUES (patient_id, @drug_quantity_brought_to_clinic1_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic1_drug_id,  @drug_name_brought_to_clinic1_id, drug_quantity_brought_to_clinic1, @creator, date_created, (SELECT UUID()));
               END IF;
 
               # Get last obs id for association later to other records
@@ -1951,12 +1963,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
               IF (drug_left_at_home1 = 'Unknown') THEN
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @drug_left_at_home1_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic1_id, drug_left_at_home1, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_text, creator, date_created, uuid)
+                VALUES (patient_id, @drug_left_at_home1_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic1_drug_id, @drug_name_brought_to_clinic1_id, drug_left_at_home1, @creator, date_created, (SELECT UUID()));
               ELSE
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @drug_left_at_home1_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic1_id, drug_left_at_home1, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_numeric, creator, date_created, uuid)
+                VALUES (patient_id, @drug_left_at_home1_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic1_drug_id, @drug_name_brought_to_clinic1_id, drug_left_at_home1, @creator, date_created, (SELECT UUID()));
               END IF;
 
               # Get last obs id for association later to other records
@@ -1990,12 +2002,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                           WHERE name = 'Amount of drug brought to clinic' AND voided = 0 AND retired = 0 LIMIT 1);
               IF (drug_quantity_brought_to_clinic2 = 'Unknown') THEN
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @drug_quantity_brought_to_clinic2_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic2_id, drug_quantity_brought_to_clinic2, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_text, creator, date_created, uuid)
+                VALUES (patient_id, @drug_quantity_brought_to_clinic2_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic2_drug_id, @drug_name_brought_to_clinic2_id, drug_quantity_brought_to_clinic2, @creator, date_created, (SELECT UUID()));
               ELSE
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @drug_quantity_brought_to_clinic2_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic2_id, drug_quantity_brought_to_clinic2, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_numeric, creator, date_created, uuid)
+                VALUES (patient_id, @drug_quantity_brought_to_clinic2_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic2_drug_id, @drug_name_brought_to_clinic2_id, drug_quantity_brought_to_clinic2, @creator, date_created, (SELECT UUID()));
               END IF;
 
               # Get last obs id for association later to other records
@@ -2013,12 +2025,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
               IF (drug_left_at_home2 = 'Unknown') THEN
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @drug_left_at_home2_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic2_id, drug_left_at_home2, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_text, creator, date_created, uuid)
+                VALUES (patient_id, @drug_left_at_home2_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic2_drug_id, @drug_name_brought_to_clinic2_id, drug_left_at_home2, @creator, date_created, (SELECT UUID()));
               ELSE
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @drug_left_at_home2_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic2_id, drug_left_at_home2, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_numeric, creator, date_created, uuid)
+                VALUES (patient_id, @drug_left_at_home2_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic2_drug_id, @drug_name_brought_to_clinic2_id, drug_left_at_home2, @creator, date_created, (SELECT UUID()));
               END IF;
 
               # Get last obs id for association later to other records
@@ -2053,12 +2065,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
               IF (drug_quantity_brought_to_clinic3 = 'Unknown') THEN
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @drug_quantity_brought_to_clinic3_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic3_id, drug_quantity_brought_to_clinic3, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_text, creator, date_created, uuid)
+                VALUES (patient_id, @drug_quantity_brought_to_clinic3_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic3_drug_id, @drug_name_brought_to_clinic3_id, drug_quantity_brought_to_clinic3, @creator, date_created, (SELECT UUID()));
               ELSE
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @drug_quantity_brought_to_clinic3_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic3_id, drug_quantity_brought_to_clinic3, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_numeric, creator, date_created, uuid)
+                VALUES (patient_id, @drug_quantity_brought_to_clinic3_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic3_drug_id, @drug_name_brought_to_clinic3_id, drug_quantity_brought_to_clinic3, @creator, date_created, (SELECT UUID()));
               END IF;
 
               # Get last obs id for association later to other records
@@ -2076,12 +2088,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
               IF (drug_left_at_home3 = 'Unknown') THEN
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @drug_left_at_home3_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic3_id, drug_left_at_home3, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_text, creator, date_created, uuid)
+                VALUES (patient_id, @drug_left_at_home3_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic3_drug_id, @drug_name_brought_to_clinic3_id, drug_left_at_home3, @creator, date_created, (SELECT UUID()));
               ELSE
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @drug_left_at_home3_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic3_id, drug_left_at_home3, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_numeric, creator, date_created, uuid)
+                VALUES (patient_id, @drug_left_at_home3_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic3_drug_id, @drug_name_brought_to_clinic3_id, drug_left_at_home3, @creator, date_created, (SELECT UUID()));
               END IF;
 
               # Get last obs id for association later to other records
@@ -2116,12 +2128,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
               IF (drug_quantity_brought_to_clinic4 = 'Unknown') THEN
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @drug_quantity_brought_to_clinic4_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic4_id, drug_quantity_brought_to_clinic4, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_text, creator, date_created, uuid)
+                VALUES (patient_id, @drug_quantity_brought_to_clinic4_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic4_drug_id, @drug_name_brought_to_clinic4_id, drug_quantity_brought_to_clinic4, @creator, date_created, (SELECT UUID()));
               ELSE
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @drug_quantity_brought_to_clinic4_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic4_id, drug_quantity_brought_to_clinic4, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_numeric, creator, date_created, uuid)
+                VALUES (patient_id, @drug_quantity_brought_to_clinic4_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic4_drug_id, @drug_name_brought_to_clinic4_id, drug_quantity_brought_to_clinic4, @creator, date_created, (SELECT UUID()));
               END IF;
 
               # Get last obs id for association later to other records
@@ -2139,12 +2151,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
               IF (drug_left_at_home4 = 'Unknown') THEN
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_text, creator, date_created, uuid)
-                VALUES (patient_id, @drug_left_at_home4_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic4_id, drug_left_at_home4, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_text, creator, date_created, uuid)
+                VALUES (patient_id, @drug_left_at_home4_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic4_drug_id, @drug_name_brought_to_clinic4_id, drug_left_at_home4, @creator, date_created, (SELECT UUID()));
               ELSE
                 # Create observation
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , obs_group_id, value_numeric, creator, date_created, uuid)
-                VALUES (patient_id, @drug_left_at_home4_concept_id, old_enc_id, encounter_datetime, @location_id , @drug_name_brought_to_clinic4_id, drug_left_at_home4, @creator, date_created, (SELECT UUID()));
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id, value_drug, obs_group_id, value_numeric, creator, date_created, uuid)
+                VALUES (patient_id, @drug_left_at_home4_concept_id, old_enc_id, encounter_datetime, @location_id, @drug_name_brought_to_clinic4_drug_id, @drug_name_brought_to_clinic4_id, drug_left_at_home4, @creator, date_created, (SELECT UUID()));
               END IF;
 
               # Get last obs id for association later to other records
