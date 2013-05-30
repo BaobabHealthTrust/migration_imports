@@ -2117,7 +2117,7 @@ BEGIN
            IF ( dispensed_drug_name5 = pres_drug_name5 ) THEN
               select dispensed_drug_name5, old_enc_id;
            ELSEIF ( dispensed_drug_name5 = pres_drug_name4 ) THEN
-                select dispensed_name5, old_enc_id;
+                select dispensed_drug_name5, old_enc_id;
            ELSEIF ( dispensed_drug_name5 = pres_drug_name5 ) THEN
                   select dispensed_drug_name5, old_enc_id;
            ELSEIF ( dispensed_drug_name5 =  pres_drug_name5) THEN
