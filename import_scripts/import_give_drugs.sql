@@ -67,7 +67,7 @@ BEGIN
     DECLARE  visit_patient_id INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`give_drugs_encounters`.id, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.visit_encounter_id,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.old_enc_id,                   `bart1_intermediate_bare_bones`.`give_drugs_encounters`.patient_id,                  `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name1,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage1,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency1,          `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name2,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage2,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency2,          `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name3,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage3,     `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency3,         `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name4,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage4,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency4,              `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name5,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage5, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency5,                                                    `bart1_intermediate_bare_bones`.`give_drugs_encounters`.prescription_duration,                                                                     `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name2, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity2, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name3, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity3, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name5, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity5,  `bart1_intermediate_bare_bones`.`give_drugs_encounters`.appointment_date,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.location,                          `bart1_intermediate_bare_bones`.`give_drugs_encounters`.voided,                       `bart1_intermediate_bare_bones`.`give_drugs_encounters`.void_reason,                  `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_voided,                    `bart1_intermediate_bare_bones`.`give_drugs_encounters`.voided_by,              `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_created,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.encounter_datetime,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.creator,   COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_created) FROM 
+    DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`give_drugs_encounters`.id, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.visit_encounter_id,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.old_enc_id,                   `bart1_intermediate_bare_bones`.`give_drugs_encounters`.patient_id,                  `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name1,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage1,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency1,          `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name2,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage2,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency2,          `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name3,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage3,     `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency3,         `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name4,             `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage4,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency4,              `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_drug_name5,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_dosage5, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.pres_frequency5,                                                    `bart1_intermediate_bare_bones`.`give_drugs_encounters`.prescription_duration,                                                                     `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity1, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name2, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity2, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name3, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity3, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity4, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_drug_name5, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.dispensed_quantity5,  `bart1_intermediate_bare_bones`.`give_drugs_encounters`.appointment_date,            `bart1_intermediate_bare_bones`.`give_drugs_encounters`.location,                          `bart1_intermediate_bare_bones`.`give_drugs_encounters`.voided,                       `bart1_intermediate_bare_bones`.`give_drugs_encounters`.void_reason,                  `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_voided,                    `bart1_intermediate_bare_bones`.`give_drugs_encounters`.voided_by,  `bart1_intermediate_bare_bones`.`give_drugs_encounters`.encounter_datetime,                         `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_created,              `bart1_intermediate_bare_bones`.`give_drugs_encounters`.creator,   COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`give_drugs_encounters`.date_created) FROM 
 `bart1_intermediate_bare_bones`.`give_drugs_encounters` 
         LEFT OUTER JOIN bart1_intermediate_bare_bones.visit_encounters ON 
         visit_encounter_id = bart1_intermediate_bare_bones.visit_encounters.id
@@ -305,14 +305,14 @@ BEGIN
         IF NOT ISNULL(prescription_duration) THEN #--4
           SET @auto_expire_date = (SELECT 
                 CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                 ELSE 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                 END AS prescription_duration_in_days);
         END IF; #--4
               
         INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-        VALUES (1, @pres_drug_name1_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name1_uuid);
+        VALUES (1, @pres_drug_name1_concept_id, 1, @encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @pres_drug_name1_uuid);
         SET @pres_drug1_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name1_uuid);
 
         IF (pres_drug_name1 = dispensed_drug_name1) THEN #--5
@@ -565,14 +565,14 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = (SELECT 
                   CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                    ELSE 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                    END AS prescription_duration_in_days);
             END IF; #--11
             
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name1_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name1_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
               
             SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
               
@@ -667,14 +667,14 @@ BEGIN
         IF NOT ISNULL(prescription_duration) THEN #--4
           SET @auto_expire_date = (SELECT 
                 CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                 ELSE 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                 END AS prescription_duration_in_days);
         END IF; #--4
               
         INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-        VALUES (1, @pres_drug_name2_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name2_uuid);
+        VALUES (1, @pres_drug_name2_concept_id, 1, @encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @pres_drug_name2_uuid);
         SET @pres_drug2_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name2_uuid);
 
         IF (pres_drug_name2 = dispensed_drug_name1) THEN #--5
@@ -961,14 +961,14 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = (SELECT 
                   CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                    ELSE 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                    END AS prescription_duration_in_days);
             END IF; #--11
             
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name2_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name2_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
               
             SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
               
@@ -1063,14 +1063,14 @@ BEGIN
         IF NOT ISNULL(prescription_duration) THEN #--4
           SET @auto_expire_date = (SELECT 
                 CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                 ELSE 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                 END AS prescription_duration_in_days);
         END IF; #--4
               
         INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-        VALUES (1, @pres_drug_name3_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name3_uuid);
+        VALUES (1, @pres_drug_name3_concept_id, 1, @encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @pres_drug_name3_uuid);
         SET @pres_drug3_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name3_uuid);
 
         IF (pres_drug_name3 = dispensed_drug_name1) THEN #--5
@@ -1357,14 +1357,14 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = (SELECT 
                   CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                    ELSE 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                    END AS prescription_duration_in_days);
             END IF; #--11
             
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name3_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name3_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
               
             SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
               
@@ -1459,14 +1459,14 @@ BEGIN
         IF NOT ISNULL(prescription_duration) THEN #--4
           SET @auto_expire_date = (SELECT 
                 CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                 ELSE 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                 END AS prescription_duration_in_days);
         END IF; #--4
               
         INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-        VALUES (1, @pres_drug_name4_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name4_uuid);
+        VALUES (1, @pres_drug_name4_concept_id, 1, @encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @pres_drug_name4_uuid);
         SET @pres_drug4_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name4_uuid);
 
         IF (pres_drug_name4 = dispensed_drug_name1) THEN #--5
@@ -1753,14 +1753,14 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = (SELECT 
                   CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                    ELSE 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                    END AS prescription_duration_in_days);
             END IF; #--11
             
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name4_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name4_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
               
             SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
               
@@ -1855,14 +1855,14 @@ BEGIN
         IF NOT ISNULL(prescription_duration) THEN #--4
           SET @auto_expire_date = (SELECT 
                 CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                 ELSE 
-                  ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                  ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                 END AS prescription_duration_in_days);
         END IF; #--4
               
         INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-        VALUES (1, @pres_drug_name5_concept_id, 1, @encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  date_created, @pres_drug_name5_uuid);
+        VALUES (1, @pres_drug_name5_concept_id, 1, @encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @pres_drug_name5_uuid);
         SET @pres_drug5_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name5_uuid);
 
         IF (pres_drug_name5 = dispensed_drug_name1) THEN #--5
@@ -2149,14 +2149,14 @@ BEGIN
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = (SELECT 
                   CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
                    ELSE 
-                     ADDDATE(visit_date,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
                    END AS prescription_duration_in_days);
             END IF; #--11
             
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name5_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, visit_date, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name5_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  encounter_datetime, @dispensed_without_pres_order_uuid);
               
             SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
               
