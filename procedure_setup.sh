@@ -58,3 +58,7 @@ echo "importing data.............................."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_patients;
 EOFMYSQL
+
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+CALL proc_update_obs_order_id;
+EOFMYSQL
