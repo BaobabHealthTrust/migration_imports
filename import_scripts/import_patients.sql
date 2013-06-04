@@ -60,9 +60,9 @@ BEGIN
     DECLARE creator INT(11);
     
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`
-           #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` = 25505;
-           LIMIT 3000;#--start_pos, end_pos;
+    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`;
+           #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` = 18688;
+           #--LIMIT 3000;#--start_pos, end_pos;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -182,7 +182,7 @@ BEGIN
             VALUES (patient_id, home_phone_number, @home_phone_number_type_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
-    
+  #--  
         # Create a patient
         INSERT INTO patient (patient_id, creator, date_created)
         VALUES (patient_id, @creator, date_created)  ON DUPLICATE KEY UPDATE patient_id = patient_id;
@@ -279,7 +279,7 @@ BEGIN
             VALUES (patient_id, legacy_id3, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
-    
+        select patient_id, old_enc_id;
         select "first_visit_encounter";
         CALL proc_import_first_visit_encounters(@person_id);          # good
         
@@ -312,8 +312,8 @@ BEGIN
         
         select "outpatient_diagnosis_encounter";        
         CALL proc_import_outpatient_diagnosis_encounters(@person_id); # good
-        
-        select patient_id;
+
+        select patient_id, old_enc_id;
 
     END LOOP;
 
