@@ -58,11 +58,11 @@ BEGIN
     DECLARE voided_by INT(11);
     DECLARE date_created DATE;
     DECLARE creator INT(11);
-    
+
     # Declare and initialise cursor for looping through the table
     DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`;
-           #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` = 18688;
-           #--LIMIT 3000;#--start_pos, end_pos;
+           #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` = in_patient_id;
+           #--LIMIT 20;#--start_pos, end_pos;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -139,20 +139,26 @@ BEGIN
         END IF;
     
         IF COALESCE(current_address, "") != "" THEN
-        
+            SET @person_address_uuid = (SELECT UUID());
+
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
             VALUES (patient_id, current_address, @current_address_type_id, @creator, date_created, (SELECT UUID()));
             
             INSERT INTO person_address (person_id, city_village, creator, date_created, uuid)
-            VALUES (patient_id, current_address, @creator, date_created, (SELECT UUID()));
-        
-        END IF;
-    
-        IF COALESCE(landmark, "") != "" THEN
-        
+            VALUES (patient_id, current_address, @creator, date_created, @person_address_uuid);
+
+            SET @person_address_id = (SELECT person_address_id FROM person_address WHERE uuid = @person_address_uuid);
+
+          IF COALESCE(landmark, "") != "" THEN
+
             INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
-            VALUES (patient_id, landmark, @landmark_type_id, @creator, date_created, (SELECT UUID()));
-        
+            VALUES (patient_id, landmark, @landmark_type_id, @creator, date_created, @person_address_uuid);
+
+            UPDATE person_address SET address1 = landmark
+            WHERE uuid = @person_address_uuid;
+
+          END IF;
+
         END IF;
     
         IF COALESCE(occupation, "") != "" THEN
@@ -279,7 +285,7 @@ BEGIN
             VALUES (patient_id, legacy_id3, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
-        select patient_id, old_enc_id;
+        select patient_id;
         select "first_visit_encounter";
         CALL proc_import_first_visit_encounters(@person_id);          # good
         
@@ -313,7 +319,7 @@ BEGIN
         select "outpatient_diagnosis_encounter";        
         CALL proc_import_outpatient_diagnosis_encounters(@person_id); # good
 
-        select patient_id, old_enc_id;
+        select patient_id;
 
     END LOOP;
 
