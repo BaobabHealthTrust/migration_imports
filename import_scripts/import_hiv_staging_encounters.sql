@@ -85,9 +85,9 @@ BEGIN
 	DECLARE location varchar(255);
 	DECLARE voided tinyint(1);
 	DECLARE void_reason varchar(255);
-	DECLARE encounter_datetime datetime;
 	DECLARE date_voided date;
 	DECLARE voided_by int(11);
+	DECLARE encounter_datetime datetime;
 	DECLARE date_created datetime;
 	DECLARE creator int(11);
 	DECLARE visit_date DATE;

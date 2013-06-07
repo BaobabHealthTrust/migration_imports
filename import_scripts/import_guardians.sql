@@ -104,7 +104,6 @@ BEGIN
     VALUES (patient_id, @relationship_type, relative_id, @creator, date_created, (SELECT UUID()));
       
   END IF;
-  #--END IF;
  END LOOP;
 
 END$$
