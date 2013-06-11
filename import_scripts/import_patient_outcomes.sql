@@ -272,13 +272,14 @@ BEGIN
         SET @previous_state = COALESCE((SELECT max(patient_state_id) 
                                         FROM patient_state 
                                         WHERE patient_program_id = @patient_hiv_program_id AND voided = 0), 0);
+                                                                                
         IF (@previous_state = 0) THEN
           # create the new state
           IF NOT ISNULL(state) THEN
             IF state = 'On ART' THEN
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid)
-              VALUES (@patient_hiv_program_id, 7, outcome_date, 1 , outcome_date,(SELECT UUID()));
-            
+
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid)
+		            VALUES (@patient_hiv_program_id, 7, outcome_date, 1 , outcome_date,(SELECT UUID()));
             ELSEIF state = 'Pre-ART' THEN
               INSERT INTO patient_state (patient_program_id, state, start_date, creator,  date_created, uuid) 
               VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
@@ -440,8 +441,12 @@ BEGIN
           END IF; #end_state
 
         ELSE #previous_state
+
+	        SET @last_state = (SELECT state FROM patient_state 
+        										WHERE patient_state_id = @previous_state);                                
+
           # close the previous state
-          IF @previous_state != 0 THEN # previous state exists, therefore update the end date
+          IF @previous_state != 0  THEN # previous state exists, therefore update the end date
             #check if previous_state is voided 
             UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state and voided = 0;
           END IF; # end of previous state
@@ -449,13 +454,19 @@ BEGIN
           # create the new state
           IF NOT ISNULL(state) THEN
             IF state = 'On ART' THEN
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid)
-              VALUES (@patient_hiv_program_id, 7, outcome_date, 1 , outcome_date,(SELECT UUID()));
-            
+            	IF @last_state != 'On ART' THEN	
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid)
+		            VALUES (@patient_hiv_program_id, 7, outcome_date, 1 , outcome_date,(SELECT UUID()));
+		          ELSE 
+		          	UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state;
+            	END IF;            
             ELSEIF state = 'Pre-ART' THEN
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator,  date_created, uuid) 
-              VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
-            
+            	IF @last_state != 'Pre-ART' THEN	
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator,  date_created, uuid) 
+		            VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
+            	ELSE
+		          	UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state;
+            	END IF;
             ELSEIF state = 'ART Stop' THEN
               #create exit_from_care_encounter
               INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
@@ -479,10 +490,13 @@ BEGIN
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
                
-              #create state                                                       
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created, uuid) 
-              VALUES (@patient_hiv_program_id, 6, outcome_date, 1 , outcome_date,(SELECT UUID()));
-
+              #create state                     
+             	IF @last_state != 'ART Stop' THEN	                                  
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created, uuid) 
+		            VALUES (@patient_hiv_program_id, 6, outcome_date, 1 , outcome_date,(SELECT UUID()));
+							ELSE
+		          	UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state;							
+							END IF;
             ELSEIF state = 'Died' THEN
               #create exit_from_care_encounter
               INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
@@ -510,9 +524,12 @@ BEGIN
               UPDATE person SET dead = 1, death_date = outcome_date, date_changed = outcome_date 
               WHERE person_id = patient_id;
                                                        
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
-              VALUES (@patient_hiv_program_id, 3, outcome_date, 1 , outcome_date, (SELECT UUID()));
-            
+             	IF @last_state != 'Died' THEN	                                                                
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
+		            VALUES (@patient_hiv_program_id, 3, outcome_date, 1 , outcome_date, (SELECT UUID()));
+            	ELSE
+		          	UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state;           	
+            	END IF;
             ELSEIF state = 'Transfer out' THEN
               #create exit_from_care_encounter
               INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
@@ -537,9 +554,13 @@ BEGIN
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
-              VALUES (@patient_hiv_program_id, 2, outcome_date, 1 , outcome_date,(SELECT UUID()));
-            
+             	IF @last_state != 'Transfer out' THEN	                                                              
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
+		            VALUES (@patient_hiv_program_id, 2, outcome_date, 1 , outcome_date,(SELECT UUID()));
+							ELSE
+		          	UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state;   							
+							END IF;
+							            
             ELSEIF state = 'Transfer Out(With Transfer Note)' THEN
               #create exit_from_care_encounter
               INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
@@ -564,8 +585,12 @@ BEGIN
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
-              VALUES (@patient_hiv_program_id, 2, outcome_date, 1 , outcome_date,(SELECT UUID()));
+							IF @last_state = 'Transfer Out(With Transfer Note)' THEN
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
+		            VALUES (@patient_hiv_program_id, 2, outcome_date, 1 , outcome_date,(SELECT UUID()));
+							ELSE
+								UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state;   							
+							END IF;
             
             ELSEIF state = 'Transfer Out(Without Transfer Note)' THEN
               #create exit_from_care_encounter
@@ -590,19 +615,31 @@ BEGIN
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
-              #create patient_state                                        
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
-              VALUES (@patient_hiv_program_id, 2, outcome_date, 1 , outcome_date,(SELECT UUID()));
+              #create patient_state                                  
+              IF @last_state = 'Transfer Out(Without Transfer Note)' THEN      
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
+		            VALUES (@patient_hiv_program_id, 2, outcome_date, 1 , outcome_date,(SELECT UUID()));
+							ELSE
+								UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state; 						
+							END IF;
 
             ELSEIF state = 'Missing' THEN
-              # create update_outcome encounter and outcome observation
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
-              VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
+              # create update_outcome encounter and outcome observation                            
+              IF @last_state = 'Missing' THEN      
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
+		            VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
+              ELSE
+								UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state; 						
+              END IF;
               
             ELSEIF state = 'Never Started ART' THEN
               # create update_outcome encounter and outcome observation
-              INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
-              VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
+              IF @last_state = 'Never Started ART' THEN                    
+		            INSERT INTO patient_state (patient_program_id, state, start_date, creator, date_created,uuid) 
+		            VALUES (@patient_hiv_program_id, 1, outcome_date, 1 , outcome_date,(SELECT UUID()));
+							ELSE
+								UPDATE patient_state SET end_date = outcome_date WHERE patient_state_id = @previous_state; 						
+							END IF;
 
             #--ELSE
             #--  select patient_id;
