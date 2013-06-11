@@ -344,15 +344,15 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                                                   WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
-              # Get value_coded id
-              SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+# Get value_coded id
+              SET @abdominal_pains_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Abdominal pain' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
-              SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+              SET @abdominal_pains_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Abdominal pain' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -418,14 +418,14 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                                                   WHERE name = 'Symptom present' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded id
-              SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+              SET @anorexia_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Anorexia' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
-              SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+              SET @anorexia_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Anorexia' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -493,12 +493,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Cough' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Cough' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -565,12 +565,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Diarrhoea' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Diarrhoea' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -638,12 +638,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Fever' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Fever' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -711,12 +711,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Jaundice' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Jaundice' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -784,12 +784,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Leg pain / numbness' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Leg pain / numbness' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -857,12 +857,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Vomiting' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Vomiting' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -930,12 +930,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Weight loss' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Weight loss' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -1003,12 +1003,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Peripheral neuropathy' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Peripheral neuropathy' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -1077,12 +1077,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Hepatitis' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Hepatitis' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -1150,12 +1150,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Anaemia' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Anaemia' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -1223,12 +1223,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Lactic acidosis' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Lactic acidosis' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -1296,12 +1296,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @other_symptoms_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Lipodystrophy' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @other_symptoms_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Lipodystrophy' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -1392,12 +1392,12 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               # Get value_coded id
               SET @drug_induced_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                                                   LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                  WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                  WHERE name = 'Skin rash' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Get value_coded_name_id
               SET @drug_induced_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                                                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                                                          WHERE name = 'Other symptoms' AND voided = 0 AND retired = 0 LIMIT 1);
+                                                          WHERE name = 'Skin rash' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # Create observation
               INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)

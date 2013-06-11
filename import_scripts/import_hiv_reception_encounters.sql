@@ -36,7 +36,8 @@ BEGIN
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
-DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`guardian`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_present`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`guardian_present`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`location`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`voided`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`voided_by`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`encounter_datetime`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`hiv_reception_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
+DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`guardian`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_present`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`guardian_present`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`location`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`voided`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`void_reason`,
+`bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`encounter_datetime`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`voided_by`,  `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`date_created`, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`hiv_reception_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
         visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
         WHERE `bart1_intermediate_bare_bones`.`hiv_reception_encounters`.`patient_id` = in_patient_id;
 
@@ -61,9 +62,9 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 			location,
 			voided,
 			void_reason,
+		  encounter_datetime,
 			date_voided,
 			voided_by,
-			encounter_datetime,
 			date_created,
 			creator,
 			visit_date;
