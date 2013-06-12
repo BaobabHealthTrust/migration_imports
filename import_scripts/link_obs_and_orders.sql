@@ -30,8 +30,10 @@ DELIMITER $$
 		END IF;
 		
 		
-		SET @order_id = (SELECT obs.order_id FROM obs WHERE concept_id = @amount_dispensed_concept_id AND person_id = var_person_id 
-										AND value_drug = var_drug_id AND DATE(obs_datetime) < DATE(var_obs_date) ORDER BY obs_datetime DESC LIMIT 1);
+		SET @order_id = (SELECT obs.order_id FROM obs INNER JOIN drug_order ON obs.order_id = drug_order.order_id 
+											WHERE concept_id = @amount_dispensed_concept_id AND person_id = var_person_id 
+											AND value_drug = var_drug_id AND DATE(obs_datetime) < DATE(var_obs_date) 
+											ORDER BY obs_datetime DESC,equivalent_daily_dose DESC  LIMIT 1);
 		
 		
 		IF NOT ISNULL(@order_id) THEN
