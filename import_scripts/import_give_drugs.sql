@@ -331,10 +331,11 @@ BEGIN
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id LIMIT 1);
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug1_order_id, @dispensed_drug_name1_concept_id, pres_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug1_order_id, @dispensed_drug_name1_concept_id, @equivalent_daily_dose, pres_dosage1, pres_frequency1, dispensed_quantity1);
           
           SET @amount_dispensed_drug_1 = (SELECT UUID());
           #create amount dispensed observation
@@ -375,10 +376,11 @@ BEGIN
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id LIMIT 1);
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug1_order_id, @dispensed_drug_name2_concept_id, pres_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity2);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug1_order_id, @dispensed_drug_name2_concept_id, @equivalent_daily_dose, pres_dosage1, pres_frequency1, dispensed_quantity2);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -417,10 +419,11 @@ BEGIN
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug1_order_id, @dispensed_drug_name3_concept_id, pres_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity3);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug1_order_id, @dispensed_drug_name3_concept_id, @equivalent_daily_dose, pres_dosage1, pres_frequency1, dispensed_quantity3);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -459,10 +462,11 @@ BEGIN
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug1_order_id, @dispensed_drug_name4_concept_id, pres_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity4);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug1_order_id, @dispensed_drug_name4_concept_id, @equivalent_daily_dose, pres_dosage1, pres_frequency1, dispensed_quantity4);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -501,10 +505,11 @@ BEGIN
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug1_order_id, @dispensed_drug_name5_concept_id, pres_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity5);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency, quantity)
+          VALUES (@pres_drug1_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage1, pres_frequency1, dispensed_quantity5);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -536,9 +541,12 @@ BEGIN
 
         ELSE #--5        
           SET @prescription_without_dispensation = (SELECT pres_drug_name1);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
+          
+          
           #create drug_order without quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
-          VALUES (@pres_drug1_order_id, @dispensed_drug_name5_concept_id, pres_dosage1, pres_dosage1, pres_frequency1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency)
+          VALUES (@pres_drug1_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage1, pres_frequency1);
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
@@ -704,10 +712,11 @@ BEGIN
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
-
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id LIMIT 1);
+          
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug2_order_id, @dispensed_drug_name2_concept_id, pres_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity2);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug2_order_id, @dispensed_drug_name2_concept_id, @equivalent_daily_dose, pres_dosage2, pres_frequency2, dispensed_quantity2);
           
           SET @amount_dispensed_drug_2 = (SELECT UUID());
           #create amount dispensed observation
@@ -755,8 +764,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug2_order_id, @dispensed_drug_name2_concept_id, pres_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity2);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug2_order_id, @dispensed_drug_name2_concept_id, @equivalent_daily_dose, pres_dosage2, pres_frequency2, dispensed_quantity2);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -802,8 +813,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug2_order_id, @dispensed_drug_name3_concept_id, pres_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity3);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug2_order_id, @dispensed_drug_name3_concept_id, @equivalent_daily_dose, pres_dosage2, pres_frequency2, dispensed_quantity3);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -850,8 +863,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug2_order_id, @dispensed_drug_name4_concept_id, pres_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity4);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
+
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug2_order_id, @dispensed_drug_name4_concept_id, @equivalent_daily_dose, pres_dosage2, pres_frequency2, dispensed_quantity4);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -897,8 +912,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug2_order_id, @dispensed_drug_name5_concept_id, pres_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity5);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug2_order_id, @dispensed_drug_name5_concept_id, equivalent_daily_dose, pres_dosage2, pres_frequency2, dispensed_quantity5);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -931,8 +948,10 @@ BEGIN
         ELSE #--5        
           SET @prescription_without_dispensation = (SELECT pres_drug_name2);
           #create drug_order without quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
-          VALUES (@pres_drug2_order_id, @dispensed_drug_name5_concept_id, pres_dosage2, pres_dosage2, pres_frequency2);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency)
+          VALUES (@pres_drug2_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage2, pres_frequency2);
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
@@ -1108,8 +1127,10 @@ BEGIN
           END IF;
 
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, pres_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity3);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, @equivalent_daily_dose, pres_dosage3, pres_frequency3, dispensed_quantity3);
           
           SET @amount_dispensed_drug_3 = (SELECT UUID());
           #create amount dispensed observation
@@ -1157,8 +1178,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, pres_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity3);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency, quantity)
+          VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, equivalent_daily_dose, pres_dosage3, pres_frequency3, dispensed_quantity3);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -1204,8 +1227,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, pres_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity3);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
+
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose,  dose, frequency, quantity)
+          VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, @equivalent_daily_dose, pres_dosage3, pres_frequency3, dispensed_quantity3);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -1252,8 +1277,9 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug3_order_id, @dispensed_drug_name4_concept_id, pres_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity4);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug3_order_id, @dispensed_drug_name4_concept_id, @equivalent_daily_dose, pres_dosage3, pres_frequency3, dispensed_quantity4);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -1299,8 +1325,9 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug3_order_id, @dispensed_drug_name5_concept_id, pres_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity5);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug3_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage3, pres_frequency3, dispensed_quantity5);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -1333,8 +1360,10 @@ BEGIN
         ELSE #--5        
           SET @prescription_without_dispensation = (SELECT pres_drug_name3);
           #create drug_order without quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
-          VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, pres_dosage3, pres_dosage3, pres_frequency3);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
+
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency)
+          VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, @equivalent_daily_dose, pres_dosage3, pres_frequency3);
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
@@ -1510,8 +1539,9 @@ BEGIN
           END IF;
 
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, pres_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity4);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency, quantity)
+          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, @equivalent_daily_dose, pres_dosage4, pres_frequency4, dispensed_quantity4);
           
           SET @amount_dispensed_drug_4 = (SELECT UUID());
           #create amount dispensed observation
@@ -1559,8 +1589,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, pres_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity4);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
+
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency, quantity)
+          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, @equivalent_daily_dose, pres_dosage4, pres_frequency4, dispensed_quantity4);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -1606,8 +1638,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, pres_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity4);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency, quantity)
+          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, @equivalent_daily_dose, pres_dosage4, pres_frequency4, dispensed_quantity4);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -1654,8 +1688,9 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, pres_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity4);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, @equivalent_daily_dose, pres_dosage4, pres_frequency4, dispensed_quantity4);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -1701,8 +1736,9 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug4_order_id, @dispensed_drug_name5_concept_id, pres_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity5);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug4_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage4, pres_frequency4, dispensed_quantity5);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -1735,8 +1771,10 @@ BEGIN
         ELSE #--5        
           SET @prescription_without_dispensation = (SELECT pres_drug_name4);
           #create drug_order without quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
-          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, pres_dosage4, pres_dosage4, pres_frequency4);
+          
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency)
+          VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, @equivalent_daily_dose, pres_dosage4, pres_frequency4);
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
@@ -1912,8 +1950,10 @@ BEGIN
           END IF;
 
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity5);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage5, pres_frequency5, dispensed_quantity5);
           
           SET @amount_dispensed_drug_5 = (SELECT UUID());
           #create amount dispensed observation
@@ -1961,8 +2001,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity5);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose,  dose, frequency, quantity)
+          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage5, pres_frequency5, dispensed_quantity5);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -2008,8 +2050,9 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity5);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage5, pres_frequency5, dispensed_quantity5);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -2056,8 +2099,9 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity4);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency, quantity)
+          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage5, pres_frequency5, dispensed_quantity4);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -2103,8 +2147,10 @@ BEGIN
           END IF;
           
           #create drug_order with quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency, quantity)
-          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity5);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id LIMIT 1);
+
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage5, pres_frequency5, dispensed_quantity5);
           
           #create amount dispensed observation
           INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
@@ -2137,8 +2183,10 @@ BEGIN
         ELSE #--5        
           SET @prescription_without_dispensation = (SELECT pres_drug_name5);
           #create drug_order without quantity
-          INSERT INTO drug_order (order_id, drug_inventory_id, dose, equivalent_daily_dose, frequency)
-          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5);
+          SET @equivalent_daily_dose = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
+          
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency)
+          VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, @equivalent_daily_dose, pres_dosage5, pres_frequency5);
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
