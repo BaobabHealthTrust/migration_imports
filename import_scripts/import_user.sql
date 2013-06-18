@@ -25,7 +25,6 @@ BEGIN
     DECLARE done INT DEFAULT FALSE;
 
     DECLARE id int(11);
-    DECLARE user_id int(11);
     DECLARE username varchar(255);
     DECLARE first_name varchar(255);
     DECLARE middle_name varchar(255);
@@ -52,7 +51,6 @@ BEGIN
     
     # Declare and initialise cursor for looping through the table
     DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`users`.id,
-`bart1_intermediate_bare_bones`.`users`.user_id,
 `bart1_intermediate_bare_bones`.`users`.username,
 `bart1_intermediate_bare_bones`.`users`.first_name,
 `bart1_intermediate_bare_bones`.`users`.middle_name,
@@ -94,7 +92,6 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         # Get the fields into the variables declared earlier
         FETCH cur INTO  
           id,
-          user_id,
           username,
           first_name,
           middle_name,
@@ -123,25 +120,31 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
             LEAVE read_loop;
         
         END IF;
-    
+
+        # Map destination user to source user
+        SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
+
     IF NOT ISNULL(id) THEN
 
-      IF (id > 1) THEN
         #create person
         SET @person_uuid = (SELECT UUID());
-        
+
         INSERT INTO person (date_created, date_changed, creator, uuid)
-        VALUES (date_created, date_created, creator, @person_uuid);
+        VALUES (date_created, date_created, @creator, @person_uuid);
 
         #create person_names
         SET @person_id = (SELECT person_id FROM person WHERE uuid = @person_uuid);
 
         INSERT INTO person_name(person_id, given_name, middle_name, family_name, date_created, creator, uuid)
-        VALUES (@person_id, last_name, middle_name, first_name, date_created, creator, (SELECT UUID()));
+        VALUES (@person_id, last_name, middle_name, first_name, date_created, @creator, (SELECT UUID()));
         
         #create user
-        INSERT INTO users(user_id, username, password, salt, person_id, date_created, creator, uuid)
-        VALUES (id, username, password, salt, @person_id, date_created, creator, (SELECT UUID()));
+        SET @user_uuid = (SELECT UUID());
+        
+        INSERT INTO users(username, password, salt, person_id, date_created, creator, uuid)
+        VALUES (username, password, salt, @person_id, date_created, @creator, @user_uuid);
+
+        SET @user_id = (SELECT user_id FROM users WHERE uuid = @user_uuid);
 
         #create user_roles
         IF NOT ISNULL(user_role1) THEN
@@ -152,7 +155,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role1);
+          VALUES(@user_id, @user_role1);
         END IF;
         
         IF NOT ISNULL(user_role2) THEN
@@ -163,7 +166,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role2);
+          VALUES(@user_id, @user_role2);
         END IF;
         
         IF NOT ISNULL(user_role3) THEN
@@ -174,7 +177,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role3);
+          VALUES(@user_id, @user_role3);
         END IF;
         
         IF NOT ISNULL(user_role4) THEN
@@ -185,7 +188,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role4);
+          VALUES(@user_id, @user_role4);
         END IF;
         
         IF NOT ISNULL(user_role5) THEN
@@ -196,7 +199,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role5);
+          VALUES(@user_id, @user_role5);
         END IF;
         
         IF NOT ISNULL(user_role6) THEN
@@ -207,7 +210,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role6);
+          VALUES(@user_id, @user_role6);
         END IF;
         
         IF NOT ISNULL(user_role7) THEN
@@ -218,7 +221,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role7);
+          VALUES(@user_id, @user_role7);
         END IF;
         
         IF NOT ISNULL(user_role8) THEN
@@ -229,7 +232,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role8);
+          VALUES(@user_id, @user_role8);
         END IF;
         
         IF NOT ISNULL(user_role9) THEN
@@ -240,7 +243,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role9);
+          VALUES(@user_id, @user_role9);
         END IF;
         
         IF NOT ISNULL(user_role10) THEN
@@ -251,10 +254,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           END IF;
           
           INSERT INTO user_role(user_id, role)
-          VALUES(id, @user_role10);
+          VALUES(@user_id, @user_role10);
         END IF;
 
-      END IF;
+      #--END IF;
     END IF;
    END LOOP;
 
