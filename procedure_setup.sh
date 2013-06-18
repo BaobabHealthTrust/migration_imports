@@ -16,6 +16,9 @@ if [ -z "$DATABASE" ] || [ -z "$USERNAME" ] || [ -z "$PASSWORD" ] || [ -z "$SITE
     usage
     exit
 fi
+now=$(date +"%T")
+echo "start time : $now"
+
 echo "initializing $DATABASE database.............................."
 
 echo "DROP DATABASE $DATABASE;" | mysql --user=$USERNAME --password=$PASSWORD
@@ -69,3 +72,7 @@ echo "calculating adherence................................"
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
 EOFMYSQL
+
+later=$(date +"%T")
+echo "start time : $now"
+echo "end time : $later"
