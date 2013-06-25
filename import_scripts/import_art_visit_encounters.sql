@@ -55,7 +55,7 @@ BEGIN
 	DECLARE drug_induced_lipodystrophy varchar(25);
 	DECLARE drug_induced_skin_rash varchar(25);
 	DECLARE drug_induced_other_symptom varchar(25);
-	DECLARE tb_status varchar(25);
+	DECLARE tb_status varchar(255);
 	DECLARE refer_to_clinician varchar(25);
 	DECLARE prescribe_arv varchar(25);
 	DECLARE drug_name_brought_to_clinic1 varchar(255);
