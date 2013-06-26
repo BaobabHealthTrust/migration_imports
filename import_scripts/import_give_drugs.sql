@@ -60,7 +60,7 @@ BEGIN
     DECLARE  void_reason varchar(255);
     DECLARE  date_voided date;
     DECLARE  voided_by int(11);
-	  DECLARE  encounter_datetime datetime;
+    DECLARE  encounter_datetime datetime;
     DECLARE  date_created datetime;
     DECLARE  creator int(11);
     DECLARE  visit_id INT(11);
@@ -233,11 +233,20 @@ BEGIN
        SET @dispensed_drug_name1_concept_id = (SELECT new_drug_id  FROM drug_map 
                                                WHERE bart2_two_name = @dispensed_drug_name1_bart2_name LIMIT 1);
 
+       SET @dispensed_drug_name1_new_concept_id = (SELECT concept_id  FROM drug
+                                           WHERE drug_id = @dispensed_drug_name1_concept_id
+                                           AND name = @dispensed_drug_name1_bart2_name LIMIT 1);
+                                               
+                                               
        SET @dispensed_drug_name2_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                WHERE bart_one_name = dispensed_drug_name2 LIMIT 1);
 
        SET @dispensed_drug_name2_concept_id = (SELECT new_drug_id  FROM drug_map 
                                                WHERE bart2_two_name = @dispensed_drug_name2_bart2_name LIMIT 1);
+                                               
+       SET @dispensed_drug_name2_new_concept_id = (SELECT concept_id  FROM drug
+                                           WHERE drug_id = @dispensed_drug_name2_concept_id
+                                           AND name = @dispensed_drug_name2_bart2_name LIMIT 1);                                        
 
        SET @dispensed_drug_name3_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                WHERE bart_one_name = dispensed_drug_name3 LIMIT 1);
@@ -245,17 +254,31 @@ BEGIN
        SET @dispensed_drug_name3_concept_id = (SELECT new_drug_id  FROM drug_map 
                                                WHERE bart2_two_name = @dispensed_drug_name3_bart2_name LIMIT 1);
                                                
+       SET @dispensed_drug_name3_new_concept_id = (SELECT concept_id  FROM drug
+                                           WHERE drug_id = @dispensed_drug_name3_concept_id
+                                           AND name = @dispensed_drug_name3_bart2_name LIMIT 1);
+       
+       
        SET @dispensed_drug_name4_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                WHERE bart_one_name = dispensed_drug_name4 LIMIT 1);
 
        SET @dispensed_drug_name4_concept_id = (SELECT new_drug_id  FROM drug_map 
                                                WHERE bart2_two_name = @dispensed_drug_name4_bart2_name LIMIT 1);
                                                
+       SET @dispensed_drug_name4_new_concept_id = (SELECT concept_id  FROM drug
+                                           WHERE drug_id = @dispensed_drug_name4_concept_id
+                                           AND name = @dispensed_drug_name4_bart2_name LIMIT 1);
+       
+       
        SET @dispensed_drug_name5_bart2_name = (SELECT bart2_two_name FROM drug_map 
                                                WHERE bart_one_name = dispensed_drug_name5 LIMIT 1);
 
        SET @dispensed_drug_name5_concept_id = (SELECT new_drug_id  FROM drug_map 
                                                WHERE bart2_two_name = @dispensed_drug_name5_bart2_name LIMIT 1);
+                                               
+       SET @dispensed_drug_name5_new_concept_id = (SELECT concept_id  FROM drug
+                                           WHERE drug_id = @dispensed_drug_name5_concept_id
+                                           AND name = @dispensed_drug_name5_bart2_name LIMIT 1);
                                
 #-----------------------------------------------------------------------------------------------------------------------------------
       #Check if the field is not empty
