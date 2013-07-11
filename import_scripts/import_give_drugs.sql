@@ -67,7 +67,7 @@ BEGIN
     DECLARE  voided_by int(11);
     DECLARE  encounter_datetime datetime;
     DECLARE  date_created datetime;
-    DECLARE  creator int(11);
+    DECLARE  creator varchar(255);
     DECLARE  visit_id INT(11);
     DECLARE  visit_date DATE;
     DECLARE  visit_patient_id INT(11);
@@ -152,7 +152,7 @@ BEGIN
         # Not done, process the parameters
 
         # Map destination user to source user
-        SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
+        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
 
         #get concepts_ids
         SET @pres_drug_name1_bart2_name = (SELECT bart2_two_name FROM drug_map

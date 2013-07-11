@@ -36,7 +36,7 @@ BEGIN
     DECLARE date_voided DATE;
     DECLARE voided_by INT(11);
     DECLARE date_created DATE;
-    DECLARE creator INT(11);
+    DECLARE creator varchar(255);
     DECLARE guardian_id INT(11);
     
     # Declare and initialise cursor for looping through the table
@@ -89,7 +89,7 @@ BEGIN
 	# Not done, process the parameters
 
 	# Map destination user to source user
-	SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
+	SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
 
   IF NOT ISNULL(patient_id) THEN
     IF (relationship = 'Sister/brother') THEN

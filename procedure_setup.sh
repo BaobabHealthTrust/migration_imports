@@ -12,6 +12,13 @@ USERNAME=$2
 PASSWORD=$3
 SITE=$4
 
+echo "Creating intermediary storage"
+ rake db:create
+ rake db:migrate
+
+echo "Exporting to the intermediary storage"
+ script/runner script/migrator.rb
+
 if [ -z "$DATABASE" ] || [ -z "$USERNAME" ] || [ -z "$PASSWORD" ] || [ -z "$SITE" ] ; then
     usage
     exit
@@ -42,10 +49,45 @@ mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/data/${SITE}/tasks.sq
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/moh_regimens_only.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/retrospective_station_entries.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/create_dde_server_connection.sql
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migrate/create_weight_height_for_ages.sql
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migrate/insert_weight_for_ages.sql
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migration_imports/create_weight_height_for_ages.sql
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migration_imports/insert_weight_for_ages.sql
 echo "loading up-to-date concepts"
 mysql  --user=$USERNAME --password=$PASSWORD $DATABASE < db/openmrs_metadata_1_7.sql
+
+FILES=schema/*.sql
+for f in $FILES
+do
+	echo "Installing $f..."
+	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+done
+
+FILES=triggers/*.sql
+for f in $FILES
+do
+	echo "Installing $f..."
+	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+done
+
+FILES=procedures/*.sql
+for f in $FILES
+do
+	echo "Installing $f..."
+	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+done
+
+FILES=procedures/sub-procedures/inserts/*.sql
+for f in $FILES
+do
+	echo "Installing $f..."
+	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+done
+
+FILES=procedures/sub-procedures/updates/*.sql
+for f in $FILES
+do
+	echo "Installing $f..."
+	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+done
 
 echo "loading import scripts.............................."
 
@@ -56,15 +98,14 @@ do
 	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
 done
 
-echo "importing data......................................."
-
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
-CALL proc_import_patients;
-EOFMYSQL
-
 echo "importing users......................................"
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_users;
+EOFMYSQL
+
+echo "importing data......................................."
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+CALL proc_import_patients;
 EOFMYSQL
 
 echo "calculating adherence................................"

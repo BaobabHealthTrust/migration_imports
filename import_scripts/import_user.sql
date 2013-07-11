@@ -46,7 +46,7 @@ BEGIN
     DECLARE void_reason varchar(255);
     DECLARE date_voided date;
     DECLARE voided_by int(11);
-    DECLARE creator int(11);
+    DECLARE creator varchar(255);
 
     
     # Declare and initialise cursor for looping through the table
@@ -121,8 +121,8 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         
         END IF;
 
-        # Map destination user to source user
-        SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
+	      # Map destination user to source user
+	      SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
 
     IF NOT ISNULL(id) THEN
 

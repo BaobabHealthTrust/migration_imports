@@ -89,7 +89,7 @@ BEGIN
 	DECLARE voided_by int(11);
 	DECLARE encounter_datetime datetime;
 	DECLARE date_created datetime;
-	DECLARE creator int(11);
+	DECLARE creator varchar(255);
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
@@ -193,7 +193,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	# Not done, process the parameters
 
 	# Map destination user to source user
-	SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
+	SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
 
 	# Get location id
 	SET @location_id = (SELECT location_id FROM location WHERE name = location);
@@ -840,10 +840,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @pulmonary_tuberculosis_id = (SELECT LAST_INSERT_ID());
 
         END IF;
-        
+select pulmonary_tuberculosis_last_2_years;
         # Check if the field is not empty
         IF NOT ISNULL(pulmonary_tuberculosis_last_2_years) THEN
-
+select pulmonary_tuberculosis_last_2_years;
             # Get concept_id
             SET @pulmonary_tuberculosis_last_2_years_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id

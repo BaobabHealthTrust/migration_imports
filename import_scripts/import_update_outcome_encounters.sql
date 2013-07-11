@@ -48,7 +48,7 @@ BEGIN
     DECLARE date_voided DATE;
     DECLARE voided_by INT(11);
     DECLARE date_created DATETIME;
-    DECLARE creator INT(11);
+    DECLARE creator varchar(255);
     
     # Declare and initialise cursor for looping through the table
     DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`outcome_encounters`
@@ -74,7 +74,7 @@ BEGIN
         END IF;
 
         # Map destination user to source user
-        SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
+        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
         # Map destination user to source voided_by
         SET @voided_by = (SELECT user_id FROM users WHERE user_id = voided_by LIMIT 1);
         # Map location to source location

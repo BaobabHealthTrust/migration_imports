@@ -29,7 +29,7 @@ BEGIN
 	DECLARE voided_by int(11);
 	DECLARE encounter_datetime datetime;
 	DECLARE date_created datetime;
-	DECLARE creator int(11);
+	DECLARE creator varchar(255);
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
@@ -73,7 +73,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	  # Not done, process the parameters
 
 	  # Map destination user to source user
-	  SET @creator = COALESCE((SELECT user_id FROM users WHERE user_id = creator), 1);
+	  SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
 
 	  # Get location id
 	  SET @location_id = (SELECT location_id FROM location WHERE name = location);
