@@ -26,7 +26,7 @@ fi
 now=$(date +"%T")
 echo "start time : $now"
 
-echo "initializing $DATABASE database.............................."
+echo "initializing $DATABASE (OpenMRS 1.7) destination database.............................."
 
 echo "DROP DATABASE $DATABASE;" | mysql --user=$USERNAME --password=$PASSWORD
 echo "CREATE DATABASE $DATABASE;" | mysql --user=$USERNAME --password=$PASSWORD
@@ -113,6 +113,16 @@ echo "calculating adherence................................"
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
 EOFMYSQL
+
+echo "loading recalculating adherence scripts.............."
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/adherence_calculation.sql
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/recalculate_adherence.sql
+
+echo "recalculating adherence.............................."
+script/runner script/recalculate_adherence.rb
+
+echo "fixing program locations............................."
+script/runner script/fix_program_locations.rb
 
 later=$(date +"%T")
 echo "start time : $now"
