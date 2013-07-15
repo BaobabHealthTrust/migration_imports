@@ -60,6 +60,7 @@ create table `art_visit_encounters` (
 `drug_left_at_home4` varchar(25),
 `arv_regimen` varchar(255),
 `prescribe_cpt` varchar(25),
+`prescribe_ipt` varchar(25),
 `number_of_condoms_given` int,
 `depo_provera_given` varchar(25),
 `continue_treatment_at_clinic` varchar(25),
