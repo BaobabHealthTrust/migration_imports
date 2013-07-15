@@ -94,11 +94,13 @@ BEGIN
   IF NOT ISNULL(patient_id) THEN
     IF (relationship = 'Sister/brother') THEN
       SET @relationship = 'Sibling';
+    ELSEIF (relationship = 'ART Guardian') THEN
+      SET @relationship = 'Guardian';
     ELSE
       SET @relationship = relationship;
     END IF;
 
-    SET @relationship_type = (SELECT relationship_type_id FROM relationship_type WHERE a_is_to_b = @relationship);
+    SET @relationship_type = COALESCE((SELECT relationship_type_id FROM relationship_type WHERE a_is_to_b = @relationship), 6);
 
     INSERT INTO relationship (person_a, relationship, person_b, creator, date_created, uuid)
     VALUES (patient_id, @relationship_type, relative_id, @creator, date_created, (SELECT UUID()));
