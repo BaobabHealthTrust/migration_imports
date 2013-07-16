@@ -1,8 +1,9 @@
 
 development:
   adapter: mysql
-  database: destination
-  password: password
+  database: bart1_intermediate_bare_bones
+  username: root
+  password: mlambe
   host: localhost
   pool: 5
   timeout: 5000
@@ -12,6 +13,7 @@ test:
 production:
   adapter: mysql2
   database: migration
+  username: root
   password: letusout!
   host: localhost
   pool: 5
@@ -19,9 +21,9 @@ production:
   
 bart:
   adapter: mysql
-  database: source
-  password: password
+  database: source_database_name
+  username: root
+  password: mlambe
   host: localhost
   pool: 5
   timeout: 5000
-

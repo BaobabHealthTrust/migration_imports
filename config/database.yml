@@ -2,6 +2,7 @@
 development:
   adapter: mysql
   database: bart1_intermediate_bare_bones
+  username: root
   password: mlambe
   host: localhost
   pool: 5
@@ -12,6 +13,7 @@ test:
 production:
   adapter: mysql2
   database: migration
+  username: root
   password: letusout!
   host: localhost
   pool: 5
@@ -19,7 +21,8 @@ production:
   
 bart:
   adapter: mysql
-  database: test_st_gebriels1
+  database: source_database_name
+  username: root
   password: mlambe
   host: localhost
   pool: 5
