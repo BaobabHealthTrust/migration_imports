@@ -6,28 +6,47 @@ This application is used to migrated data from OpenMRS 1.1 to OpenMRS 1.7. The p
 
 Getting started 
 
-1. Make sure you have an up-to-date migration_imports application.
-    a. If you don't have the application type the command below in your terminal
-        https://github.com/BaobabHealthTrust/migration_imports.git
-    
-    b. If you have the application, type the comman below to update the application.
-       git pull orgin (run this command in the terminal which you have opened the application)
-       
-2. Edit the config/database.yml file
-   a. under bart2: enter details of your Source database. (This is the database you want to export from. OpenMRS 1.1 dataset).
-   b. under development/production: enter details of your intermediary database. (The database which will hold the flat tables) For the sake of constistency the database name should be bart1_intermediate_bare_bones.
+Steps on migrating data from OpenMRS 1.1 to OpenMRS 1.7
+1. Make sure you have the OpenMRS 1.1 dataset on your machine. 
 
-3. Run the procedure_setup.sh to migrate data.
-   type: ruby procedure_setup.sh database_name username password site_code
-   for example ruby procedure_setup.sh test_database test testing mpc
-   
-4. After successfully migrating data switch to bart2 application and make sure it is up-to-date. Change the bart2 config/database.yaml
-   update the database_name to the migrated OpenMRS 1.7 under production or development. 
+2. Make sure you have an up-to-date bart1 application and edit the config/database.yml to point to OpenMRS 1.1 dataset you want to migrate.
 
-5. Under bart2 terminal load the following into OpenMRS 1.7 dataset (the one which will has the imported data)
-   a. mysql -u username -p password openmrs_1.7_database_name < db/adherence_calculation.sql
-   b. mysql -u username -p password openmrs_1.7_database_name < db/recalculate_adherence.sql
+3. Under bart1 script/console run the following:
+  a) PersonAttribute.reset
+     This is done inorder to get the updated reason for starting ART and  WHO stage for patients.
 
-6. On the same bart2 terminal run the following scripts
-   a. script/runner script/recalculate_adherence.rb
-   b. script/runner script/fix_program_locations.rb
+  b) PatientHistoricalOutcome.reset
+    This is done inorder to get the updated patients' outcomes.
+
+  c) PatientHistoricalRegimen.reset
+  This is done inorder to get the updated regimen categories for patients.
+
+4. Make sure that you have migration_imports application on your machine
+
+5. Change database settings in config/database.yml of migration_imports application to your specifications as below:
+
+    Under bart2: enter the details of your Source database (the dataset you want to export from. This is the OpenMRS 1.1 dataset.)
+
+    Under development or production: enter the details of the intermediary database (the database that will hold the intermediary tables. For the sake of   consistency the database name should be bart1_intermediate_bare_bones.
+
+6. Enter the the command below to migrate data
+  a) ruby procedure_setup.rb openmrs1.7_database username password  site_code
+  For example: ruby procedure_setup.rb bart2_database root admin mpc
+
+7. After successfully migrating all the data, then switch to bart2 application and make sure it is up-to-date. 
+
+8. Change the bart2 config/database.yaml to point to the OpenMRS 1.7 you specified on step 6 above. 
+
+9. Under bart2 terminal load the following into OpenMRS 1.7 dataset (the one which will has the imported data). Remember to replace the username with the actual username of your MySQL, the password with also the actual password of your MySQL and finally openmrs_1.7_database_name with the actual database name you specified on step 6 above.
+
+  a) mysql -uusername -ppassword openmrs_1.7_database_name < db/adherence_calculation.sql
+
+  b) mysql -u username -p password openmrs_1.7_database_name < db/recalculate_adherence.sql
+
+10. On the same bart2 terminal run the following scripts
+  a) script/runner script/recalculate_adherence.rb
+     This script recalculates the patients' adherence.
+  b) script/runner script/fix_program_locations.rb
+     This script fix patients' program locations.
+
+11. Test the database by running bart2 application. Make sure your bart2 application is pointing to the migrated database.  Edit config/database.yml file.
