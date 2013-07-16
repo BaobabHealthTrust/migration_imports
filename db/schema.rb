@@ -65,6 +65,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.string   "drug_left_at_home4",                 :limit => 25
     t.string   "arv_regimen"
     t.string   "prescribe_cpt",                      :limit => 25
+    t.string   "prescribe_ipt",                      :limit => 25
     t.integer  "number_of_condoms_given"
     t.string   "depo_provera_given",                 :limit => 25
     t.string   "continue_treatment_at_clinic",       :limit => 25

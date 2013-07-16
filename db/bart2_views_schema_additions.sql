@@ -67,7 +67,7 @@ CREATE OR REPLACE ALGORITHM=UNDEFINED  SQL SECURITY INVOKER
 CREATE OR REPLACE ALGORITHM=UNDEFINED  SQL SECURITY INVOKER
   VIEW `earliest_start_date` AS
   SELECT `p`.`patient_id` AS `patient_id`,`p`.`date_enrolled`,
-         IFNULL((SELECT MIN(`value_datetime`) FROM `obs` WHERE `concept_id` = 8106 AND `person_id` = `person`.`person_id` LIMIT 1),MIN(`s`.`start_date`)) AS `earliest_start_date`, `person`.`death_date` AS death_date
+         MIN(`s`.`start_date`) AS `earliest_start_date`, `person`.`death_date` AS death_date
   FROM ((`patient_program` `p`
   LEFT JOIN `patient_state` `s` ON((`p`.`patient_program_id` = `s`.`patient_program_id`)))
   LEFT JOIN `person` ON((`person`.`person_id` = `p`.`patient_id`)))
@@ -340,6 +340,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 
+DROP FUNCTION IF EXISTS `current_defaulter`;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50020 */ /*!50003 FUNCTION `current_defaulter`(my_patient_id INT, my_end_date DATETIME) RETURNS int(1)
 BEGIN

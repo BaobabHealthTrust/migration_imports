@@ -840,10 +840,8 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             SET @pulmonary_tuberculosis_id = (SELECT LAST_INSERT_ID());
 
         END IF;
-select pulmonary_tuberculosis_last_2_years;
         # Check if the field is not empty
         IF NOT ISNULL(pulmonary_tuberculosis_last_2_years) THEN
-select pulmonary_tuberculosis_last_2_years;
             # Get concept_id
             SET @pulmonary_tuberculosis_last_2_years_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
