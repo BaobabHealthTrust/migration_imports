@@ -79,7 +79,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 and patient_id IN (27332,51523,51523,28808,53660,88155,103157,16208,64584,28333,67103,112138,83285,55502,50503,59646,3035,24612,106139,130787,121610,76703,124190,123612,127934,127932,130798,126214,130263,129514,128913,145756,172417,203668,69840,128603,127243,177873,1480,134870,68065)")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
   
@@ -920,23 +920,25 @@ def self.create_art_encounter(visit_encounter_id, encounter)
       when 'PRESCRIPTION TIME PERIOD'
         Prescriptions[visit_encounter_id.to_s+"pres_duration"] = ob.value_text
       when 'PRESCRIBED DOSE'
-        drug_name = Drug.find(ob.value_drug).name
-        @prescription_date = ob.obs_datetime.to_date
-        if prescribed_drug_name_hash[drug_name].blank?
-          daily_consumption = []
- 
-          Patient.find_by_sql("select * from #{Source_db}.patient_prescription_totals
-                   where patient_id = #{ob.patient_id}
-                   and drug_id = #{ob.value_drug}
-                   and prescription_date = '#{@prescription_date}'").each do |dose|
-                    daily_consumption << dose.daily_consumption
+        if !ob.value_drug.blank?
+          drug_name = Drug.find(ob.value_drug).name
+          @prescription_date = ob.obs_datetime.to_date
+          if prescribed_drug_name_hash[drug_name].blank?
+            daily_consumption = []
+   
+            Patient.find_by_sql("select * from #{Source_db}.patient_prescription_totals
+                     where patient_id = #{ob.patient_id}
+                     and drug_id = #{ob.value_drug}
+                     and prescription_date = '#{@prescription_date}'").each do |dose|
+                      daily_consumption << dose.daily_consumption
+            end
+            prescribed_drug_name_hash[drug_name] = drug_name
+            prescribed_drug_dosage_hash[drug_name] = "#{daily_consumption.to_s}"
+            prescribed_drug_frequency_hash[drug_name] = ob.value_text
+          else
+            prescribed_drug_dosage_hash[drug_name] += "-#{daily_consumption.to_s}"
+            prescribed_drug_frequency_hash[drug_name] += "-#{ob.value_text}"
           end
-          prescribed_drug_name_hash[drug_name] = drug_name
-          prescribed_drug_dosage_hash[drug_name] = "#{daily_consumption.to_s}"
-          prescribed_drug_frequency_hash[drug_name] = ob.value_text
-        else
-          prescribed_drug_dosage_hash[drug_name] += "-#{daily_consumption.to_s}"
-          prescribed_drug_frequency_hash[drug_name] += "-#{ob.value_text}"
         end
       else
         self.repeated_obs(enc, ob)
