@@ -47,40 +47,40 @@ mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migration_imports/ins
 echo "loading up-to-date concepts"
 mysql  --user=$USERNAME --password=$PASSWORD $DATABASE < db/openmrs_metadata_1_7.sql
 
-FILES=schema/*.sql
-for f in $FILES
-do
-	echo "Installing $f..."
-	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-done
+#FILES=schema/*.sql
+#for f in $FILES
+#do
+#	echo "Installing $f..."
+#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#done
 
-FILES=triggers/*.sql
-for f in $FILES
-do
-	echo "Installing $f..."
-	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-done
+#FILES=triggers/*.sql
+#for f in $FILES
+#do
+#	echo "Installing $f..."
+#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#done
 
-FILES=procedures/*.sql
-for f in $FILES
-do
-	echo "Installing $f..."
-	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-done
+#FILES=procedures/*.sql
+#for f in $FILES
+#do
+#	echo "Installing $f..."
+#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#done
 
-FILES=procedures/sub-procedures/inserts/*.sql
-for f in $FILES
-do
-	echo "Installing $f..."
-	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-done
+#FILES=procedures/sub-procedures/inserts/*.sql
+#for f in $FILES
+#do
+#	echo "Installing $f..."
+#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#done
 
-FILES=procedures/sub-procedures/updates/*.sql
-for f in $FILES
-do
-	echo "Installing $f..."
-	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-done
+#FILES=procedures/sub-procedures/updates/*.sql
+#for f in $FILES
+#do
+#	echo "Installing $f..."
+#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#done
 
 echo "loading import scripts.............................."
 
