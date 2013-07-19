@@ -135,19 +135,34 @@ def start
                                         group by e.encounter_id
                                         order by e.encounter_datetime desc, e.date_created desc")
 
+		ordered_encs = {}
+		
+		encounters.each do |enc|
+		
+			if ordered_encs[enc.encounter_datetime.to_date].blank?
+				ordered_encs[enc.encounter_datetime.to_date] = []				
+			end
+			
+			ordered_encs[enc.encounter_datetime.to_date] << enc
+			
+		end
+
     #check if patient does not have update outcome encounter
     patient_encounter_types = encounters.map{|enc| enc.encounter_type}
 
-    encounters.each do |enc|
-      total_enc +=1
-      pat_enc +=1
-      
-      visit_encounter_id = self.check_for_visitdate("#{patient.id}", enc.encounter_datetime.to_date)
-      if !enc.encounter_type.blank?
-      	self.create_record(visit_encounter_id, enc)
-      else 
-      	$failed_encs << "#{enc.encounter_id} : Missing encounter  type"
-      end
+    (ordered_encs.sort_by{|x,y| x} || {}).each do |visit_date, values|
+ 			
+ 			values.sort_by{|x| x.name }.each do |enc|   
+		    total_enc +=1
+		    pat_enc +=1
+		    
+		    visit_encounter_id = self.check_for_visitdate("#{patient.id}", enc.encounter_datetime.to_date)
+		    if !enc.encounter_type.blank?
+		    	self.create_record(visit_encounter_id, enc)
+		    else 
+		    	$failed_encs << "#{enc.encounter_id} : Missing encounter  type"
+		    end
+     	end
     end
 
     self.create_patient(patient)

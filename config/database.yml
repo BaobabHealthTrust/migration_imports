@@ -3,7 +3,7 @@ development:
   adapter: mysql
   database: bart1_intermediate_bare_bones
   username: root
-  password: mlambe
+  password: t1m0
   host: localhost
   pool: 5
   timeout: 5000
@@ -21,9 +21,9 @@ production:
   
 bart:
   adapter: mysql
-  database: source_database_name
+  database: bart_migration_trial
   username: root
-  password: mlambe
+  password: t1m0
   host: localhost
   pool: 5
   timeout: 5000
