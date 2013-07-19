@@ -12,13 +12,6 @@ USERNAME=$2
 PASSWORD=$3
 SITE=$4
 
-echo "Creating intermediary storage"
- rake db:create
- rake db:migrate
-
-echo "Exporting to the intermediary storage"
- script/runner script/migrator.rb
-
 if [ -z "$DATABASE" ] || [ -z "$USERNAME" ] || [ -z "$PASSWORD" ] || [ -z "$SITE" ] ; then
     usage
     exit
@@ -113,16 +106,6 @@ echo "calculating adherence................................"
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
 EOFMYSQL
-
-#echo "loading recalculating adherence scripts.............."
-#mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/adherence_calculation.sql
-#mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/recalculate_adherence.sql
-
-#echo "recalculating adherence.............................."
-#script/runner script/recalculate_adherence.rb
-
-#echo "fixing program locations............................."
-#script/runner script/fix_program_locations.rb
 
 later=$(date +"%T")
 echo "start time : $now"
