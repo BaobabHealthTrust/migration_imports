@@ -79,7 +79,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 and patient_id IN (27332,51523,51523,28808,53660,88155,103157,16208,64584,28333,67103,112138,83285,55502,50503,59646,3035,24612,106139,130787,121610,76703,124190,123612,127934,127932,130798,126214,130263,129514,128913,145756,172417,203668,69840,128603,127243,177873,1480,134870,68065)")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
   
