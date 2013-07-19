@@ -1,4 +1,4 @@
-migration_imports
+git migration_imports
 
 This application is used to migrated data from OpenMRS 1.1 to OpenMRS 1.7. The process of migrating data is categorized into two:
   1. Export data from OpenMRS 1.1 to the intermediary storage (flat tables).
@@ -27,17 +27,24 @@ Steps on migrating data from OpenMRS 1.1 to OpenMRS 1.7
 
     Under bart2: enter the details of your Source database (the dataset you want to export from. This is the OpenMRS 1.1 dataset.)
 
-    Under development or production: enter the details of the intermediary database (the database that will hold the intermediary tables. For the sake of   consistency the database name should be bart1_intermediate_bare_bones.
+    Under development or production: enter the details of the intermediary database (the database that will hold the intermediary tables.
+    For the sake of consistency the database name should be bart1_intermediate_bare_bones.
 
-6. Enter the the command below to migrate data
-  a) ruby procedure_setup.rb openmrs1.7_database username password  site_code
+6. Enter the command below to export data from OpenMRS1.1 into the intermediary storage
+   ruby export_setup.sh development|production
+   
+   for example: assuming on step 5 above you have specified intermediary database under production:
+   ruby export_setup.sh production 
+
+7. Enter the the command below to import data from intermediary storage into OpenMRS1.7
+  b) ruby procedure_setup.rb openmrs1.7_database username password  site_code
   For example: ruby procedure_setup.rb bart2_database root admin mpc
 
-7. After successfully migrating all the data, then switch to bart2 application and make sure it is up-to-date. 
+8. After successfully importing all the data, then switch to bart2 application and make sure it is up-to-date. 
 
-8. Change the bart2 config/database.yaml to point to the OpenMRS 1.7 you specified on step 6 above. 
+9. Change the bart2 config/database.yaml to point to the OpenMRS 1.7 you specified on step 7 above. 
 
-9. Under bart2 terminal load the following into OpenMRS 1.7 dataset (the one which will has the imported data). Remember to replace the username with the actual username of your MySQL, the password with also the actual password of your MySQL and finally openmrs_1.7_database_name with the actual database name you specified on step 6 above.
+9. Under bart2 terminal load the following into OpenMRS 1.7 dataset (the one which will has the imported data). Remember to replace the username with the actual username of your MySQL, the password with also the actual password of your MySQL and finally openmrs_1.7_database_name with the actual database name you specified on step 7 above.
 
   a) mysql -uusername -ppassword openmrs_1.7_database_name < db/adherence_calculation.sql
 
@@ -49,4 +56,4 @@ Steps on migrating data from OpenMRS 1.1 to OpenMRS 1.7
   b) script/runner script/fix_program_locations.rb
      This script fix patients' program locations.
 
-11. Test the database by running bart2 application. Make sure your bart2 application is pointing to the migrated database.  Edit config/database.yml file.
+10. Test the database by running bart2 application. Make sure your bart2 application is pointing to the migrated database.  Edit config/database.yml file.
