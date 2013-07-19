@@ -147,7 +147,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	SET @location_id = (SELECT location_id FROM location WHERE name = location);
 
 	# Get id of encounter type
-	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'PART_INITIAL');
+	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'HIV CLINIC CONSULTATION');
 
 	# Create encounter
 	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @creator, @location_id, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
