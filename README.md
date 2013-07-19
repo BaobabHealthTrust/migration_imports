@@ -36,7 +36,7 @@ Steps on migrating data from OpenMRS 1.1 to OpenMRS 1.7
    for example: assuming on step 5 above you have specified intermediary database under production:
    ruby export_setup.sh production 
 
-7. Enter the the command below to import data from intermediary storage into OpenMRS1.7
+7. Enter the command below to import data from intermediary storage into OpenMRS1.7
   b) ruby procedure_setup.rb openmrs1.7_database username password  site_code
   For example: ruby procedure_setup.rb bart2_database root admin mpc
 
