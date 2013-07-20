@@ -359,7 +359,7 @@ BEGIN
           SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                             WHERE name = "DISPENSING" LIMIT 1);
           
-          INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+          INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -370,13 +370,13 @@ BEGIN
           
           SET @amount_dispensed_drug_1 = (SELECT UUID());
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator, date_created, @amount_dispensed_drug_1);
            
           IF (@dispensed_drug_name1_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -403,7 +403,7 @@ BEGIN
           SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                             WHERE name = "DISPENSING" LIMIT 1);
           
-          INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+          INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -414,13 +414,13 @@ BEGIN
           VALUES (@pres_drug1_order_id, @dispensed_drug_name2_concept_id, dispensed_dosage2, pres_dosage1, pres_frequency1, dispensed_quantity2);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name2_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -446,7 +446,7 @@ BEGIN
           SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                             WHERE name = "DISPENSING" LIMIT 1);
           
-          INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+          INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -457,13 +457,13 @@ BEGIN
           VALUES (@pres_drug1_order_id, @dispensed_drug_name3_concept_id, dispensed_dosage3, pres_dosage1, pres_frequency1, dispensed_quantity1);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name3_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -489,7 +489,7 @@ BEGIN
           SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                             WHERE name = "DISPENSING" LIMIT 1);
           
-          INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+          INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -500,13 +500,13 @@ BEGIN
           VALUES (@pres_drug1_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, pres_dosage1, pres_frequency1, dispensed_quantity1);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name4_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);          
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -532,7 +532,7 @@ BEGIN
           SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                             WHERE name = "DISPENSING" LIMIT 1);
           
-          INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+          INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
           SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -543,13 +543,13 @@ BEGIN
           VALUES (@pres_drug1_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage1, pres_frequency1, dispensed_quantity1);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name5_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             
@@ -604,48 +604,44 @@ BEGIN
             IF (@old_dispensing_encounter_id = 0) THEN
               INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
               VALUES (old_enc_id, @dispensing_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
-            ELSE
-              INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
-              VALUES (@dispensing_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
-            END IF;              
 
-            SET @dispensing_without_pres_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid),0);
-            
+              SET @dispensing_without_pres_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid),0);
+
             # create order
             SET @dispensed_without_pres_order_uuid = (SELECT UUID());
 
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
-              SET @auto_expire_date = (SELECT 
-                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
-                   ELSE 
-                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+              SET @auto_expire_date = (SELECT
+                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                   ELSE
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
                    END AS prescription_duration_in_days);
             ELSE
               SET @auto_expire_date = NULL;
             END IF; #--11
-            
+
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
             VALUES (1, @dispensed_drug_name1_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
-              
+
             SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
-              
+
             SET @prescription_without_dispensation = (SELECT pres_drug_name1);
             SET @equivalent_daily_dose76 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id LIMIT 1);
-          
-          
+
+
             #create drug_order without quantity
             INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
             VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name1_concept_id, dispensed_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity1);
-            
+
             #create amount dispensed obs
             INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
             VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name1_concept_id, dispensed_quantity1,@creator, date_created, (SELECT UUID()));
 
             IF (@dispensed_drug_name1_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
               SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id);
-              
+
               #create arv_regimen_received_abstracted_construct obs
               INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
@@ -660,11 +656,77 @@ BEGIN
                                               AND max_weight >= @weight
                                               AND concept_id = @drug_concept_id  LIMIT 1);
               END IF; #--3
-                        
+
               #create regimen_category
               #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
               #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
             END IF; #--7
+
+            ELSE
+              INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (@dispensing_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+
+              SET @dispensing_without_pres_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid),0);
+
+            # create order
+            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+
+            IF NOT ISNULL(prescription_duration) THEN #--11
+              SET @auto_expire_date = NULL;
+              SET @auto_expire_date = (SELECT
+                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                   ELSE
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                   END AS prescription_duration_in_days);
+            ELSE
+              SET @auto_expire_date = NULL;
+            END IF; #--11
+
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+            VALUES (1, @dispensed_drug_name1_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+
+            SET @prescription_without_dispensation = (SELECT pres_drug_name1);
+            SET @equivalent_daily_dose76 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id LIMIT 1);
+
+
+            #create drug_order without quantity
+            INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+            VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name1_concept_id, dispensed_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity1);
+
+            #create amount dispensed obs
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+            VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name1_concept_id, dispensed_quantity1,@creator, date_created, (SELECT UUID()));
+
+            IF (@dispensed_drug_name1_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
+              SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id);
+
+              #create arv_regimen_received_abstracted_construct obs
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+              VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+
+              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
+                                       WHERE vts.patient_id = patient_id
+                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
+
+              IF NOT ISNULL(@weight) THEN #--3
+                SET @regimen_category = ( SELECT regimen_index FROM regimen
+                                              WHERE min_weight <= @weight
+                                              AND max_weight >= @weight
+                                              AND concept_id = @drug_concept_id  LIMIT 1);
+              END IF; #--3
+
+              #create regimen_category
+              #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
+              #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
+            END IF; #--7
+
+
+            END IF;              
+
+
            END IF;
         END IF;
       END IF; #--1
@@ -747,7 +809,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
@@ -760,13 +822,13 @@ BEGIN
           
           SET @amount_dispensed_drug_2 = (SELECT UUID());
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, @amount_dispensed_drug_2);
            
           IF (@dispensed_drug_name2_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -794,7 +856,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -809,13 +871,13 @@ BEGIN
           VALUES (@pres_drug2_order_id, @dispensed_drug_name2_concept_id, dispensed_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity2);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name2_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -843,7 +905,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -857,13 +919,13 @@ BEGIN
           VALUES (@pres_drug2_order_id, @dispensed_drug_name3_concept_id, dispensed_dosage3, pres_dosage2, pres_frequency2, dispensed_quantity3);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name3_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -892,7 +954,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -906,13 +968,13 @@ BEGIN
           VALUES (@pres_drug2_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, pres_dosage2, pres_frequency2, dispensed_quantity4);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name4_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);          
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -940,7 +1002,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -955,13 +1017,13 @@ BEGIN
           VALUES (@pres_drug2_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage2, pres_frequency2, dispensed_quantity5);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name5_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             
@@ -1014,7 +1076,7 @@ BEGIN
               # Create encounter
               SET @dispensing_encounter_without_pres_uuid = (SELECT UUID());
                                 
-              INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
               VALUES (@dispensing_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid)  ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
                  
               SET @dispensing_without_pres_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid);
@@ -1049,14 +1111,14 @@ BEGIN
             VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name2_concept_id, dispensed_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity2);
               
             #create amount dispensed obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
             VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, (SELECT UUID()));
 
             IF (@dispensed_drug_name2_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
               SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
               
               #create arv_regimen_received_abstracted_construct obs
-              INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
 
               SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1157,7 +1219,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1173,13 +1235,13 @@ BEGIN
           
           SET @amount_dispensed_drug_3 = (SELECT UUID());
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, @amount_dispensed_drug_3);
            
           IF (@dispensed_drug_name3_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1208,7 +1270,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1223,13 +1285,13 @@ BEGIN
           VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, dispensed_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity3);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name3_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1257,7 +1319,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1272,13 +1334,13 @@ BEGIN
           VALUES (@pres_drug3_order_id, @dispensed_drug_name3_concept_id, dispensed_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity3);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @dispensed_drug_name3_concept_id, dispensed_quantity3, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name3_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1307,7 +1369,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1321,13 +1383,13 @@ BEGIN
           VALUES (@pres_drug3_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, pres_dosage3, pres_frequency3, dispensed_quantity4);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name4_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);          
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1355,7 +1417,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1369,13 +1431,13 @@ BEGIN
           VALUES (@pres_drug3_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage3, pres_frequency3, dispensed_quantity5);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name5_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             
@@ -1428,34 +1490,83 @@ BEGIN
               # Create encounter
               SET @dispensing_encounter_without_pres_uuid = (SELECT UUID());
                                 
-              INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
               VALUES (@dispensing_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid)  ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
                  
               SET @dispensing_without_pres_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid);
-            ELSE
-               SET @dispensing_without_pres_encounter_id = @dispensing_encounter_with_old_enc_id;
-            END IF;
 
-            # create order
+
+              # create order
             SET @dispensed_without_pres_order_uuid = (SELECT UUID());
 
             IF NOT ISNULL(prescription_duration) THEN #--11
-              SET @auto_expire_date = NULL;              
-              SET @auto_expire_date = (SELECT 
-                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN 
-                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2)) 
-                   ELSE 
-                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2)) 
+              SET @auto_expire_date = NULL;
+              SET @auto_expire_date = (SELECT
+                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                   ELSE
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
                    END AS prescription_duration_in_days);
             ELSE
               SET @auto_expire_date = NULL;
             END IF; #--11
-            
+
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
             VALUES (1, @dispensed_drug_name3_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
-              
+
             SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
-              
+
+            SET @equivalent_daily_dose38 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
+
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name3_concept_id, dispensed_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity3);
+
+            #create amount dispensed obs
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+            VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name3_concept_id, dispensed_quantity3,@creator, date_created, (SELECT UUID()));
+
+            IF (@dispensed_drug_name3_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
+              SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
+
+              #create arv_regimen_received_abstracted_construct obs
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+              VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+
+              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
+                                       WHERE vts.patient_id = patient_id
+                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
+
+              IF NOT ISNULL(@weight) THEN #--3
+                SET @regimen_category = ( SELECT regimen_index FROM regimen
+                                              WHERE min_weight <= @weight
+                                              AND max_weight >= @weight
+                                              AND concept_id = @drug_concept_id  LIMIT 1);
+              END IF; #--3
+
+
+
+            ELSE
+               SET @dispensing_without_pres_encounter_id = @dispensing_encounter_with_old_enc_id;
+               # create order
+            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+
+            IF NOT ISNULL(prescription_duration) THEN #--11
+              SET @auto_expire_date = NULL;
+              SET @auto_expire_date = (SELECT
+                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                   ELSE
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                   END AS prescription_duration_in_days);
+            ELSE
+              SET @auto_expire_date = NULL;
+            END IF; #--11
+
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+            VALUES (1, @dispensed_drug_name3_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+
             SET @equivalent_daily_dose38 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
 
           INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
@@ -1467,7 +1578,7 @@ BEGIN
 
             IF (@dispensed_drug_name3_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
               SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
-              
+
               #create arv_regimen_received_abstracted_construct obs
               INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
@@ -1482,7 +1593,10 @@ BEGIN
                                               AND max_weight >= @weight
                                               AND concept_id = @drug_concept_id  LIMIT 1);
               END IF; #--3
-                        
+
+            END IF;
+
+
               #--#create regimen_category
               #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
               #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
@@ -1570,7 +1684,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1585,13 +1699,13 @@ BEGIN
           
           SET @amount_dispensed_drug_4 = (SELECT UUID());
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, @amount_dispensed_drug_4);
            
           IF (@dispensed_drug_name4_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1620,7 +1734,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1635,13 +1749,13 @@ BEGIN
           VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity4);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name4_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1669,7 +1783,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1684,13 +1798,13 @@ BEGIN
           VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity4);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name4_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1719,7 +1833,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1733,13 +1847,13 @@ BEGIN
           VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity4);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name4_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);          
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -1767,7 +1881,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1781,13 +1895,13 @@ BEGIN
           VALUES (@pres_drug4_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage4, pres_frequency4, dispensed_quantity5);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name5_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             
@@ -1982,7 +2096,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -1998,13 +2112,13 @@ BEGIN
           
           SET @amount_dispensed_drug_5 = (SELECT UUID());
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, @amount_dispensed_drug_5);
            
           IF (@dispensed_drug_name5_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -2033,7 +2147,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -2048,13 +2162,13 @@ BEGIN
           VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity5);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name5_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -2082,7 +2196,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -2096,13 +2210,13 @@ BEGIN
           VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity5);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name5_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -2131,7 +2245,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -2145,13 +2259,13 @@ BEGIN
           VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity4);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity4, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name4_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);          
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
@@ -2179,7 +2293,7 @@ BEGIN
             SET @dispensing_encounter_type = (SELECT encounter_type_id FROM encounter_type
                                               WHERE name = "DISPENSING" LIMIT 1);
             
-            INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
             SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
@@ -2194,13 +2308,13 @@ BEGIN
           VALUES (@pres_drug5_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity5);
           
           #create amount dispensed observation
-          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5, @creator, date_created, (SELECT UUID()));
 
           IF (@dispensed_drug_name5_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
             #create arv_regimen_received_abstracted_construct obs
-            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
             
@@ -2329,12 +2443,12 @@ BEGIN
 
     SET @appointment_date_uuid = (SELECT uuid());
 
-    INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+    INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
     VALUES (@appointment_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @appointment_date_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id, voided = 0;
 
     SET @appointment_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @appointment_date_uuid);
 
-    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator, date_created, uuid)
+    INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator, date_created, uuid)
     VALUES (patient_id, @appointment_date_concept_id, @appointment_encounter_id, encounter_datetime, appointment_date, @creator, date_created, (SELECT UUID()));
 
   END IF;

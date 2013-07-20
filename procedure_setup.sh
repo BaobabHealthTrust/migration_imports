@@ -32,6 +32,7 @@ echo "loading defaults"
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/defaults.sql
 echo "loading user schema modifications"
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/malawi_regions.sql
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/temporary_tables.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/mysql_functions.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/drug_ingredient.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/pharmacy.sql
