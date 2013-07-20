@@ -62,7 +62,7 @@ BEGIN
     # Declare and initialise cursor for looping through the table
     DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`;
            #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` = in_patient_id; 
-           #--LIMIT 100;#--start_pos, end_pos;
+           #--LIMIT 2;#--start_pos, end_pos;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -327,10 +327,6 @@ BEGIN
     SET FOREIGN_KEY_CHECKS = 1;
     COMMIT;
     SET AUTOCOMMIT = 1;
-
-  CALL proc_import_from_temp();
-
-  DROP TABLE IF EXISTS temp_encounter,temp_obs;
 
 END$$
 
