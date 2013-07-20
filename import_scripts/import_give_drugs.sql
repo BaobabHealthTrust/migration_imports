@@ -362,7 +362,7 @@ BEGIN
           INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
-          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           SET @equivalent_daily_dose1 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id LIMIT 1);
           #create drug_order with quantity
           INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
@@ -406,7 +406,7 @@ BEGIN
           INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
-          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           SET @equivalent_daily_dose2 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id LIMIT 1);
           
           #create drug_order with quantity
@@ -449,7 +449,7 @@ BEGIN
           INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
-          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           SET @equivalent_daily_dose3 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
           
           #create drug_order with quantity
@@ -492,7 +492,7 @@ BEGIN
           INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
-          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           SET @equivalent_daily_dose4 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
           
           #create drug_order with quantity
@@ -535,7 +535,7 @@ BEGIN
           INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
           VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
          
-          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+          SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           SET @equivalent_daily_dose5 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
           
           #create drug_order with quantity
@@ -731,6 +731,7 @@ BEGIN
         END IF;
       END IF; #--1
 #--------------------------------------------------------------------------------------------------------------------------------------------------
+
       #Check if the field is not empty
       IF NOT ISNULL(pres_drug_name2) THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
@@ -811,7 +812,7 @@ BEGIN
             
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -859,7 +860,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -908,7 +909,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -957,7 +958,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1005,7 +1006,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1079,7 +1080,7 @@ BEGIN
               INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
               VALUES (@dispensing_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid)  ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
                  
-              SET @dispensing_without_pres_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid);
+              SET @dispensing_without_pres_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @dispensing_encounter_without_pres_uuid);
             ELSE
                SET @dispensing_without_pres_encounter_id = @dispensing_encounter_with_old_enc_id;
             END IF;
@@ -1222,7 +1223,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1273,7 +1274,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1312,7 +1313,7 @@ BEGIN
         SET @dispensed_drug_name_3 = (SELECT "drug_2");
         
         ELSEIF (pres_drug_name3 = dispensed_drug_name3) THEN
-          SET @new_dispensing_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = @new_dispensed_encounter_id), 0);
+          SET @new_dispensing_encounter_id = COALESCE((SELECT encounter_id FROM temp_encounter WHERE encounter_id = @new_dispensed_encounter_id), 0);
 
           IF (@new_dispensing_encounter_id = 0) THEN
             SET @new_dispensed_encounter_id_uuid = (SELECT UUID());
@@ -1372,7 +1373,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1420,7 +1421,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1493,8 +1494,10 @@ BEGIN
               INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
               VALUES (@dispensing_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid)  ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
                  
-              SET @dispensing_without_pres_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid);
-
+              SET @dispensing_without_pres_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @dispensing_encounter_without_pres_uuid);
+            ELSE
+               SET @dispensing_without_pres_encounter_id = @dispensing_encounter_with_old_enc_id;
+            END IF;
 
               # create order
             SET @dispensed_without_pres_order_uuid = (SELECT UUID());
@@ -1544,12 +1547,6 @@ BEGIN
               END IF; #--3
 
 
-
-            ELSE
-               SET @dispensing_without_pres_encounter_id = @dispensing_encounter_with_old_enc_id;
-               # create order
-            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
-
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
               SET @auto_expire_date = (SELECT
@@ -1595,8 +1592,6 @@ BEGIN
               END IF; #--3
 
             END IF;
-
-
               #--#create regimen_category
               #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
               #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
@@ -1687,7 +1682,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1737,7 +1732,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1786,7 +1781,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1836,7 +1831,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -1884,7 +1879,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -2099,7 +2094,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -2150,7 +2145,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -2199,7 +2194,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -2248,7 +2243,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -2296,7 +2291,7 @@ BEGIN
             INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
             VALUES (@dispensing_encounter_type, patient_id, @creator, encounter_datetime, @creator, date_created, @new_dispensed_encounter_id_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
            
-            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
+            SET @new_dispensed_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @new_dispensed_encounter_id_uuid);
           ELSE
             SET @new_dispensed_encounter_id = @new_dispensing_encounter_id;
           END IF;
@@ -2347,7 +2342,7 @@ BEGIN
         #--implement dispensation without prescription
         IF NOT ISNULL(dispensed_drug_name5) THEN
            IF ( dispensed_drug_name5 = pres_drug_name5 ) THEN
-              select dispensed_drug_name5, old_enc_id;
+              select dispensed_drug_name5, old_enc_idbbc news;
            ELSEIF ( dispensed_drug_name5 = pres_drug_name4 ) THEN
                 select dispensed_drug_name5, old_enc_id;
            ELSEIF ( dispensed_drug_name5 = pres_drug_name5 ) THEN
@@ -2430,13 +2425,8 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
-      
-      #--create regimen_category observation
-      SET @regimen_category_order_id = (SELECT order_id FROM orders WHERE encounter_id = old_enc_id LIMIT 1);
-      
-      INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-      VALUES (patient_id, @regimen_category_concept_id, old_enc_id, @regimen_category_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
-      #--------------------------------------------------------------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------
   IF NOT ISNULL(appointment_date) THEN
     SET @appointment_date_concept_id = (SELECT concept_id FROM concept_name WHERE name = 'Appointment date' LIMIT 1);
     SET @appointment_encounter_type_id = (SELECT encounter_type_id FROM encounter_type WHERE name = 'APPOINTMENT' LIMIT 1);
@@ -2446,7 +2436,7 @@ BEGIN
     INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
     VALUES (@appointment_encounter_type_id, patient_id, @creator, encounter_datetime, @creator, date_created, @appointment_date_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id, voided = 0;
 
-    SET @appointment_encounter_id = (SELECT encounter_id FROM encounter WHERE uuid = @appointment_date_uuid);
+    SET @appointment_encounter_id = (SELECT encounter_id FROM temp_encounter WHERE uuid = @appointment_date_uuid);
 
     INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator, date_created, uuid)
     VALUES (patient_id, @appointment_date_concept_id, @appointment_encounter_id, encounter_datetime, appointment_date, @creator, date_created, (SELECT UUID()));

@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS `temp_obs`;
 
-CREATE TABLE `temp_obs` (
+CREATE TABLE  `temp_obs` (
   `obs_id` int(11) NOT NULL AUTO_INCREMENT,
   `person_id` int(11) NOT NULL,
   `concept_id` int(11) NOT NULL DEFAULT '0',
@@ -30,33 +30,8 @@ CREATE TABLE `temp_obs` (
   `void_reason` varchar(255) DEFAULT NULL,
   `value_complex` varchar(255) DEFAULT NULL,
   `uuid` char(38) NOT NULL,
-  PRIMARY KEY (`obs_id`),
-  UNIQUE KEY `obs_uuid_index` (`uuid`),
-  KEY `answer_concept` (`value_coded`),
-  KEY `encounter_observations` (`encounter_id`),
-  KEY `obs_concept` (`concept_id`),
-  KEY `obs_enterer` (`creator`),
-  KEY `obs_location` (`location_id`),
-  KEY `obs_order` (`order_id`),
-  KEY `patient_obs` (`person_id`),
-  KEY `user_who_voided_obs` (`voided_by`),
-  KEY `answer_concept_drug` (`value_drug`),
-  KEY `obs_grouping_id` (`obs_group_id`),
-  KEY `obs_name_of_coded_value` (`value_coded_name_id`),
-  KEY `obs_datetime_idx` (`obs_datetime`),
-  CONSTRAINT `answer_concept` FOREIGN KEY (`value_coded`) REFERENCES `concept` (`concept_id`),
-  CONSTRAINT `answer_concept_drug` FOREIGN KEY (`value_drug`) REFERENCES `drug` (`drug_id`),
-  CONSTRAINT `encounter_observations` FOREIGN KEY (`encounter_id`) REFERENCES `temp_encounter` (`encounter_id`),
-  CONSTRAINT `obs_concept` FOREIGN KEY (`concept_id`) REFERENCES `concept` (`concept_id`),
-  CONSTRAINT `obs_enterer` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
-  CONSTRAINT `obs_grouping_id` FOREIGN KEY (`obs_group_id`) REFERENCES `obs` (`obs_id`),
-  CONSTRAINT `obs_location` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`),
-  CONSTRAINT `obs_name_of_coded_value` FOREIGN KEY (`value_coded_name_id`) REFERENCES `concept_name` (`concept_name_id`),
-  CONSTRAINT `obs_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
-  CONSTRAINT `person_obs` FOREIGN KEY (`person_id`) REFERENCES `person` (`person_id`) ON UPDATE CASCADE,
-  CONSTRAINT `user_who_voided_obs` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
-
+  PRIMARY KEY (`obs_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1703 DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `temp_encounter`;
@@ -78,26 +53,5 @@ CREATE TABLE `temp_encounter` (
   `uuid` char(38) NOT NULL,
   `changed_by` int(11) DEFAULT NULL,
   `date_changed` datetime DEFAULT NULL,
-  PRIMARY KEY (`encounter_id`),
-  UNIQUE KEY `encounter_uuid_index` (`uuid`),
-  KEY `encounter_location` (`location_id`),
-  KEY `encounter_patient` (`patient_id`),
-  KEY `encounter_provider` (`provider_id`),
-  KEY `encounter_type_id` (`encounter_type`),
-  KEY `encounter_creator` (`creator`),
-  KEY `encounter_form` (`form_id`),
-  KEY `user_who_voided_encounter` (`voided_by`),
-  KEY `encounter_changed_by` (`changed_by`),
-  KEY `encounter_datetime_idx` (`encounter_datetime`),
-  CONSTRAINT `encounter_changed_by` FOREIGN KEY (`changed_by`) REFERENCES `users` (`user_id`),
-  CONSTRAINT `encounter_form` FOREIGN KEY (`form_id`) REFERENCES `form` (`form_id`),
-  CONSTRAINT `encounter_ibfk_1` FOREIGN KEY (`creator`) REFERENCES `users` (`user_id`),
-  CONSTRAINT `encounter_location` FOREIGN KEY (`location_id`) REFERENCES `location` (`location_id`),
-  CONSTRAINT `encounter_patient` FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`) ON UPDATE CASCADE,
-  CONSTRAINT `encounter_provider` FOREIGN KEY (`provider_id`) REFERENCES `person` (`person_id`),
-  CONSTRAINT `encounter_type_id` FOREIGN KEY (`encounter_type`) REFERENCES `encounter_type` (`encounter_type_id`),
-  CONSTRAINT `user_who_voided_encounter` FOREIGN KEY (`voided_by`) REFERENCES `users` (`user_id`)
+  PRIMARY KEY (`encounter_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1302965 DEFAULT CHARSET=utf8;
-
-
-
