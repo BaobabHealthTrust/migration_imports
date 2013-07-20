@@ -64,9 +64,9 @@ BEGIN
     END IF;
 
       INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
-      VALUES (var_encounter_type, var_patient_id, var_creator, var_encounter_datetime, var_creator, var_date_created, var_uuid)
+      VALUES (var_encounter_type, var_patient_id, var_creator, var_encounter_datetime, var_creator, var_date_created, var_uuid);
 
-      CALL proc_import_obs_from_temp(var_id, last_insert_id())
+      CALL proc_import_obs_from_temp(var_id, last_insert_id());
 
     END LOOP;
 
