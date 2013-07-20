@@ -32,7 +32,6 @@ echo "loading defaults"
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/defaults.sql
 echo "loading user schema modifications"
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/malawi_regions.sql
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/temporary_tables.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/mysql_functions.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/drug_ingredient.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/pharmacy.sql
@@ -45,9 +44,10 @@ mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/retrospective_station
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/create_dde_server_connection.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migration_imports/create_weight_height_for_ages.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migration_imports/insert_weight_for_ages.sql
+
 echo "loading up-to-date concepts"
 mysql  --user=$USERNAME --password=$PASSWORD $DATABASE < db/openmrs_metadata_1_7.sql
-
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/temporary_tables.sql
 #FILES=schema/*.sql
 #for f in $FILES
 #do
@@ -100,6 +100,12 @@ EOFMYSQL
 echo "importing data......................................."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_patients;
+EOFMYSQL
+
+
+echo "creating dispensation and appointment encounters......................................."
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+CALL proc_import_from_temp;
 EOFMYSQL
 
 echo "calculating adherence................................"
