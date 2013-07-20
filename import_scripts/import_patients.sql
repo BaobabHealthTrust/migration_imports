@@ -328,6 +328,10 @@ BEGIN
     COMMIT;
     SET AUTOCOMMIT = 1;
 
+  CALL proc_import_from_temp();
+
+  DROP TABLE IF EXISTS temp_encounter,temp_obs;
+
 END$$
 
 DELIMITER ;
