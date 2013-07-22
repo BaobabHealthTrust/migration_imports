@@ -102,7 +102,7 @@ mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_patients;
 EOFMYSQL
 
-echo "creating dispensation and appointment encounters......................................."
+echo "creating dispensation, appointment and exit from HIV care encounters....."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_from_temp;
 EOFMYSQL
@@ -111,6 +111,13 @@ echo "calculating adherence................................"
 
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
+EOFMYSQL
+
+echo "deleting temp_encounter and temp_obs tables..........."
+
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+DROP table temp_encounter;
+DROP table temp_obs;
 EOFMYSQL
 
 later=$(date +"%T")
