@@ -2428,6 +2428,12 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
+#--------------------------------------------------------------------------------------------------------------------------------------------------     
+      #--create regimen_category observation
+      SET @regimen_category_order_id = (SELECT order_id FROM orders WHERE encounter_id = old_enc_id LIMIT 1);
+
+      INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
+      VALUES (patient_id, @regimen_category_concept_id, old_enc_id, @regimen_category_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------
   IF NOT ISNULL(appointment_date) THEN
