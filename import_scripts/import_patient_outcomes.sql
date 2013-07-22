@@ -113,13 +113,13 @@ BEGIN
             
             ELSEIF outcome_state = 'ART Stop' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
                         VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id,outcome_date,outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -131,7 +131,7 @@ BEGIN
                                               WHERE name = 'Treatment stopped' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
                
               #create state                                                       
@@ -140,13 +140,13 @@ BEGIN
 
             ELSEIF outcome_state = 'Died' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
                         VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -158,7 +158,7 @@ BEGIN
                                               WHERE name = 'Patient died' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
 
               #update person table with status died
@@ -170,13 +170,13 @@ BEGIN
             
             ELSEIF outcome_state = 'Transfer out' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -188,7 +188,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
@@ -197,13 +197,13 @@ BEGIN
             
             ELSEIF outcome_state = 'Transfer Out(With Transfer Note)' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -215,7 +215,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
@@ -224,13 +224,13 @@ BEGIN
             
             ELSEIF outcome_state = 'Transfer Out(Without Transfer Note)' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -242,7 +242,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
@@ -286,13 +286,13 @@ BEGIN
             
             ELSEIF outcome_state = 'ART Stop' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
                         VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id,outcome_date,outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -304,7 +304,7 @@ BEGIN
                                               WHERE name = 'Treatment stopped' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
                
               #create state                                                       
@@ -313,13 +313,13 @@ BEGIN
 
             ELSEIF outcome_state = 'Died' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
                         VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -331,7 +331,7 @@ BEGIN
                                               WHERE name = 'Patient died' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
 
               #update person table with status died
@@ -343,13 +343,13 @@ BEGIN
             
             ELSEIF outcome_state = 'Transfer out' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -361,7 +361,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
@@ -370,13 +370,13 @@ BEGIN
             
             ELSEIF outcome_state = 'Transfer Out(With Transfer Note)' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -388,7 +388,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
@@ -397,13 +397,13 @@ BEGIN
             
             ELSEIF outcome_state = 'Transfer Out(Without Transfer Note)' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -415,7 +415,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
@@ -469,13 +469,13 @@ BEGIN
             	END IF;
             ELSEIF outcome_state = 'ART Stop' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
                         VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id,outcome_date,outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -487,7 +487,7 @@ BEGIN
                                               WHERE name = 'Treatment stopped' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
                
               #create state                     
@@ -499,13 +499,13 @@ BEGIN
 							END IF;
             ELSEIF outcome_state = 'Died' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
                         VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -517,7 +517,7 @@ BEGIN
                                               WHERE name = 'Patient died' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
 
               #update person table with status died
@@ -532,13 +532,13 @@ BEGIN
             	END IF;
             ELSEIF outcome_state = 'Transfer out' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -550,7 +550,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
@@ -563,13 +563,13 @@ BEGIN
 							            
             ELSEIF outcome_state = 'Transfer Out(With Transfer Note)' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -581,7 +581,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                        
@@ -594,13 +594,13 @@ BEGIN
             
             ELSEIF outcome_state = 'Transfer Out(Without Transfer Note)' THEN
               #create exit_from_care_encounter
-              INSERT INTO encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
+              INSERT INTO temp_encounter (patient_id, provider_id, encounter_type, encounter_datetime, creator, uuid)
               VALUES (patient_id, 1, @terminal_state_encounter_type_id, outcome_date, 1, (SELECT UUID()));
 
               SET @new_encounter_id = (SELECT LAST_INSERT_ID());
 
               #insert Date of exiting from care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_datetime, creator,uuid)
               VALUES (patient_id, @date_of_exiting_care_concept, @new_encounter_id, outcome_date, outcome_date, 1,(SELECT UUID()));
 
               SET @reason_value_coded = (SELECT concept_name.concept_id FROM concept_name
@@ -612,7 +612,7 @@ BEGIN
                                               WHERE name = 'Patient transferred out' AND voided = 0 AND retired = 0 LIMIT 1);
 
               #insert reason for exiting care observation
-              INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, obs_datetime, value_coded, value_coded_name_id, creator, uuid)
               VALUES (patient_id, @reason_for_existing_care_concept_id, @new_encounter_id, outcome_date, @reason_value_coded, @reason_value_coded_name_id, 1,(SELECT UUID()));
               
               #create patient_state                                  
