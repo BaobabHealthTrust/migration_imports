@@ -102,7 +102,6 @@ mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_patients;
 EOFMYSQL
 
-
 echo "creating dispensation and appointment encounters......................................."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_from_temp;
