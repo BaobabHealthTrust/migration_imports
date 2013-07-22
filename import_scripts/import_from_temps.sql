@@ -31,6 +31,9 @@ BEGIN
 
     DECLARE cur CURSOR FOR SELECT * FROM temp_encounter;
 
+    # Declare loop position check
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
      # Open cursor
     OPEN cur;
 
@@ -63,8 +66,10 @@ BEGIN
 
     END IF;
 
+      SET @provider_id = COALESCE((SELECT person_id FROM users WHERE user_id = var_provider_id), 1);
+      
       INSERT INTO encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
-      VALUES (var_encounter_type, var_patient_id, var_provider_id, var_encounter_datetime, var_creator, var_date_created, var_uuid);
+      VALUES (var_encounter_type, var_patient_id, @provider_id, var_encounter_datetime, var_creator, var_date_created, var_uuid);
 
       CALL proc_import_obs_from_temp(var_id, last_insert_id());
 

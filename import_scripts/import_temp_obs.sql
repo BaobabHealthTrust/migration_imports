@@ -44,6 +44,9 @@ BEGIN
 
     DECLARE cur CURSOR FOR SELECT * FROM temp_obs WHERE encounter_id = temp_enc_id;
 
+    # Declare loop position check
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
      # Open cursor
     OPEN cur;
 
