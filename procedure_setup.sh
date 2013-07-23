@@ -12,6 +12,13 @@ USERNAME=$2
 PASSWORD=$3
 SITE=$4
 
+echo "Creating intermediary storage"
+ rake db:create
+ rake db:migrate
+
+echo "Exporting to the intermediary storage"
+ script/runner script/migrator.rb
+
 if [ -z "$DATABASE" ] || [ -z "$USERNAME" ] || [ -z "$PASSWORD" ] || [ -z "$SITE" ] ; then
     usage
     exit
