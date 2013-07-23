@@ -372,6 +372,7 @@ BEGIN
           VALUES (@pres_drug1_order_id, @dispensed_drug_name1_concept_id, dispensed_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity1);
           
           SET @amount_dispensed_drug_1 = (SELECT UUID());
+          
           #create amount dispensed observation
           INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
           VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @dispensed_drug_name1_concept_id, dispensed_quantity1, @creator, date_created, @amount_dispensed_drug_1);
@@ -822,12 +823,12 @@ BEGIN
           SET @equivalent_daily_dose7 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id LIMIT 1);
           #create drug_order with quantity
           INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
-          VALUES (@pres_drug2_order_id, @dispensed_drug_name2_concept_id, pres_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity2);
+          VALUES (@pres_drug2_order_id, @dispensed_drug_name1_concept_id, pres_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity2);
           
           SET @amount_dispensed_drug_2 = (SELECT UUID());
           #create amount dispensed observation
           INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
-          VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @dispensed_drug_name2_concept_id, dispensed_quantity2, @creator, date_created, @amount_dispensed_drug_2);
+          VALUES (patient_id, @amount_dispensed_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @dispensed_drug_name1_concept_id, dispensed_quantity2, @creator, date_created, @amount_dispensed_drug_2);
            
           IF (@dispensed_drug_name2_bart2_name <> "Cotrimoxazole (480mg tablet)") THEN  #--7
             SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
