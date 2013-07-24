@@ -142,9 +142,11 @@ def start
 			if ordered_encs[enc.encounter_datetime.to_date].blank?
 				ordered_encs[enc.encounter_datetime.to_date] = []				
 			end
-			
-			ordered_encs[enc.encounter_datetime.to_date] << enc
-			
+			 if enc.encounter_type.blank?
+         $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
+			 else
+         ordered_encs[enc.encounter_datetime.to_date] << enc
+			 end
 		end
 
     #check if patient does not have update outcome encounter
