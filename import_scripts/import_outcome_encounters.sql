@@ -75,10 +75,16 @@ BEGIN
 
         # Map destination user to source user
         SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+        
+        # Map destination user to source user
+        SET @provider = COALESCE((SELECT person_id FROM users WHERE user_id = @creator), 1);
+        
         # Map destination user to source voided_by
         SET @voided_by = (SELECT user_id FROM users WHERE user_id = voided_by LIMIT 1);
+        
         # Map location to source location
         SET @location_id = COALESCE((SELECT location_id FROM location WHERE name = location LIMIT 1), 1);
+        
         # Map encounter_id to source
         SET @encounter_type_id =(SELECT encounter_type_id
                                             FROM encounter_type
@@ -91,7 +97,7 @@ BEGIN
         # Create outcome encounter object in destination
 
         INSERT INTO encounter (encounter_id, patient_id, provider_id, encounter_type,location_id, encounter_datetime, creator, voided, voided_by, date_voided, void_reason, uuid)
-        VALUES (old_enc_id, patient_id, 1, @encounter_type_id, @location_id, date_created, @creator, voided, @voided_by, date_voided, void_reason,(SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+        VALUES (old_enc_id, patient_id, @provider, @encounter_type_id, @location_id, date_created, @creator, voided, @voided_by, date_voided, void_reason,(SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
         # Get the latest encounter created
      SET @encounter_id = (SELECT LAST_INSERT_ID());
@@ -173,7 +179,7 @@ BEGIN
             OR state = 'Transfer Out(Without Transfer Note)') THEN
     
             INSERT INTO encounter (patient_id, provider_id, encounter_type,location_id, encounter_datetime, creator, voided, voided_by, date_voided, void_reason, uuid)
-            VALUES (patient_id,1, @terminal_state_encounter_type_id, @location_id, date_created, @creator,
+            VALUES (patient_id,@provider, @terminal_state_encounter_type_id, @location_id, date_created, @creator,
                             voided, @voided_by, date_voided, void_reason,(SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
 
             SET @new_encounter_id = (SELECT LAST_INSERT_ID());

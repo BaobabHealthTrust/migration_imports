@@ -295,7 +295,7 @@ BEGIN
         select "vitals_encounter";
         CALL proc_import_vitals_encounters(@person_id);               # good
         
-        select "first_visit_encounter";
+        select "art_visit_encounter";
         CALL proc_import_art_visit_encounters(@person_id);            # good
         
         select "pre_art_visit_encounter";

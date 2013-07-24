@@ -142,9 +142,15 @@ def start
 			if ordered_encs[enc.encounter_datetime.to_date].blank?
 				ordered_encs[enc.encounter_datetime.to_date] = []				
 			end
-			
-			ordered_encs[enc.encounter_datetime.to_date] << enc
-			
+			 if enc.encounter_type.blank?
+         $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
+			 else
+			   if enc.encounter_type = 57
+			    $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
+			   else
+          ordered_encs[enc.encounter_datetime.to_date] << enc
+			   end
+			 end
 		end
 
     #check if patient does not have update outcome encounter
@@ -159,7 +165,7 @@ def start
 		    visit_encounter_id = self.check_for_visitdate("#{patient.id}", enc.encounter_datetime.to_date)
 		    if !enc.encounter_type.blank?
 		    	self.create_record(visit_encounter_id, enc)
-		    else 
+		    else
 		    	$failed_encs << "#{enc.encounter_id} : Missing encounter  type"
 		    end
      	end
