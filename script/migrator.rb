@@ -145,7 +145,7 @@ def start
 			 if enc.encounter_type.blank?
          $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
 			 else
-			   if enc.encounter_type = 57
+			   if enc.encounter_type == 57
 			    $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
 			   else
           ordered_encs[enc.encounter_datetime.to_date] << enc
