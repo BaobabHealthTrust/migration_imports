@@ -3,3 +3,4 @@ tools/output
 *~
 *.txt
 *.sql
+*.log

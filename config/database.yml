@@ -1,7 +1,7 @@
 
 development:
   adapter: mysql
-  database: bart1_intermediate_bare_bones
+  database: intermediate_bare_bones
   username: root
   password: t1m0
   host: localhost

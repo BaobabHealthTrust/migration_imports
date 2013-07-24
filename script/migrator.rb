@@ -59,13 +59,13 @@ def start
 	
   started_at = Time.now.strftime("%Y-%m-%d-%H%M%S")
 
-	$duplicates_outfile = File.open("./#{started_at}-duplicates.txt", "w")
-	$failed_encs = File.open("./#{started_at}-Failed_encounters.txt", "w")
+	$duplicates_outfile = File.open("./migration_output/#{started_at}-duplicates.txt", "w")
+	$failed_encs = File.open("./migration_output/#{started_at}-Failed_encounters.txt", "w")
 
 
   if Output_sql == 1
-    $visits_outfile = File.open("./migration_export_visits-" + started_at + ".sql", "w")
-    $pat_encounters_outfile = File.open("./migration_export_pat_encounters-" + started_at + ".sql", "w")
+    $visits_outfile = File.open("./migration_output/migration_export_visits-" + started_at + ".sql", "w")
+    $pat_encounters_outfile = File.open("./migration_output/migration_export_pat_encounters-" + started_at + ".sql", "w")
     
   end
 
@@ -79,7 +79,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 limit 2")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
   
@@ -118,8 +118,8 @@ def start
   started_at = Time.now.strftime("%Y-%m-%d-%H%M%S")
 
   if Output_sql == 1
-    $visits_outfile = File.open("./migration_export_visits-" + started_at + ".sql", "w")
-    $pat_encounters_outfile = File.open("./migration_export_pat_encounters-" + started_at + ".sql", "w")
+    $visits_outfile = File.open("./migration_output/migration_export_visits-" + started_at + ".sql", "w")
+    $pat_encounters_outfile = File.open("./migration_output/migration_export_pat_encounters-" + started_at + ".sql", "w")
   end
 
   patients.each do |patient|
