@@ -315,20 +315,7 @@ BEGIN
 
           SET @pres_drug1_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
         ELSE #--2
-          SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-          IF NOT ISNULL(@weight) THEN #--3
-            SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name1_concept_id  LIMIT 1);
-         END IF; #--3
-
-         #-- create regimen category observation
-         #--INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-         #--VALUES (patient_id, @regimen_category_concept_id, @encounter_id, encounter_datetime, regimen_category, @creator, date_created,(SELECT UUID()));
+          
          # Create observation
          SET @arv_regimen_type_uuid = (SELECT UUID());
 
@@ -381,21 +368,7 @@ BEGIN
             #create arv_regimen_received_abstracted_construct obs
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name1_concept_id  LIMIT 1);
-            END IF; #--3
-            
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
           
           SET @dispensed_drug_name_1 = (SELECT encounter_id FROM obs WHERE uuid = @amount_dispensed_drug_1);
@@ -425,21 +398,7 @@ BEGIN
             #create arv_regimen_received_abstracted_construct obs
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name1_concept_id  LIMIT 1);
-            END IF; #--3
-
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
          END IF;
         SET @dispensed_drug_name_2 = (SELECT "drug_2");
         
@@ -468,21 +427,7 @@ BEGIN
             #create arv_regimen_received_abstracted_construct obs
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name1_concept_id  LIMIT 1);
-           END IF; #--3
-
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
          SET @dispensed_drug_name_3 = (SELECT dispensed_drug_name3);
         
@@ -511,21 +456,7 @@ BEGIN
             #create arv_regimen_received_abstracted_construct obs
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                    WHERE vts.patient_id = patient_id
-                                    AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name1_concept_id  LIMIT 1);
-            END IF; #--3     
-                   
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-           #-- VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;    #--7         
           SET @dispensed_drug_name_4 = (SELECT dispensed_drug_name4);
         
@@ -554,22 +485,7 @@ BEGIN
             #create arv_regimen_received_abstracted_construct obs
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
-            
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name1_concept_id  LIMIT 1);
-            END IF; #--3
-            
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug1_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
+           
           END IF; #--7
           SET @dispensed_drug_name_5 = (SELECT dispensed_drug_name5);
 
@@ -648,20 +564,6 @@ BEGIN
               INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
 
-              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                       WHERE vts.patient_id = patient_id
-                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-              IF NOT ISNULL(@weight) THEN #--3
-                SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                              WHERE min_weight <= @weight
-                                              AND max_weight >= @weight
-                                              AND concept_id = @drug_concept_id  LIMIT 1);
-              END IF; #--3
-
-              #create regimen_category
-              #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-              #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
             END IF; #--7
 
             ELSE
@@ -709,20 +611,6 @@ BEGIN
               INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
 
-              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                       WHERE vts.patient_id = patient_id
-                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-              IF NOT ISNULL(@weight) THEN #--3
-                SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                              WHERE min_weight <= @weight
-                                              AND max_weight >= @weight
-                                              AND concept_id = @drug_concept_id  LIMIT 1);
-              END IF; #--3
-
-              #create regimen_category
-              #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-              #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
             END IF; #--7
 
 
@@ -762,20 +650,7 @@ BEGIN
 
           SET @pres_drug2_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
         ELSE #--2
-          SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-          IF NOT ISNULL(@weight) THEN #--3
-            SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name2_concept_id  LIMIT 1);
-         END IF; #--3
-
-         # create regimen category observation
-         #--INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-         #--VALUES (patient_id, @regimen_category_concept_id, @encounter_id, encounter_datetime, regimen_category, @creator, date_created,(SELECT UUID()));
          # Create observation
          SET @arv_regimen_type_uuid = (SELECT UUID());
 
@@ -834,20 +709,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name2_concept_id  LIMIT 1);
-            END IF; #--3
-            
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
           
           SET @dispensed_drug_name_2 = (SELECT encounter_id FROM obs WHERE uuid = @amount_dispensed_drug_2);
@@ -883,22 +744,9 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name2_concept_id  LIMIT 1);
-            END IF; #--3
-
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
          END IF;
-        SET @dispensed_drug_name_2 = (SELECT "drug_2");
+
+         SET @dispensed_drug_name_2 = (SELECT "drug_2");
         
         ELSEIF (pres_drug_name2 = dispensed_drug_name3) THEN
           SET @new_dispensing_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = @new_dispensed_encounter_id), 0);
@@ -931,21 +779,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name2_concept_id  LIMIT 1);
-           END IF; #--3
-              
-            
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
          SET @dispensed_drug_name_3 = (SELECT dispensed_drug_name3);
         
@@ -980,20 +813,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                    WHERE vts.patient_id = patient_id
-                                    AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name2_concept_id  LIMIT 1);
-            END IF; #--3     
-                   
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;    #--7         
           SET @dispensed_drug_name_4 = (SELECT dispensed_drug_name4);
         
@@ -1029,21 +848,7 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name2_concept_id  LIMIT 1);
-            END IF; #--3
-            
-            #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug2_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF; #--7
           SET @dispensed_drug_name_5 = (SELECT dispensed_drug_name5);
 
@@ -1124,20 +929,7 @@ BEGIN
               INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
 
-              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                       WHERE vts.patient_id = patient_id
-                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-              IF NOT ISNULL(@weight) THEN #--3
-                SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                              WHERE min_weight <= @weight
-                                              AND max_weight >= @weight
-                                              AND concept_id = @drug_concept_id  LIMIT 1);
-              END IF; #--3
-                        
-              #create regimen_category
-              #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-              #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
+ 
             END IF; #--7
            END IF;
         END IF;
@@ -1171,20 +963,7 @@ BEGIN
 
           SET @pres_drug3_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
         ELSE #--2
-          SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-          IF NOT ISNULL(@weight) THEN #--3
-            SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name3_concept_id  LIMIT 1);
-         END IF; #--3
-
-         # create regimen category observation
-         #--INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-         #--VALUES (patient_id, @regimen_category_concept_id, @encounter_id, encounter_datetime, regimen_category, @creator, date_created,(SELECT UUID()));
          # Create observation
          SET @arv_regimen_type_uuid = (SELECT UUID());
 
@@ -1247,20 +1026,7 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name3_concept_id  LIMIT 1);
-            END IF; #--3
-            
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
           
           SET @dispensed_drug_name_3 = (SELECT encounter_id FROM obs WHERE uuid = @amount_dispensed_drug_3);
@@ -1297,20 +1063,7 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name3_concept_id  LIMIT 1);
-            END IF; #--3
-
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
          END IF;
         SET @dispensed_drug_name_3 = (SELECT "drug_2");
         
@@ -1346,21 +1099,7 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name3_concept_id  LIMIT 1);
-           END IF; #--3
-              
-            
-            #--#create regimen_category
-           #-- INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
          SET @dispensed_drug_name_3 = (SELECT dispensed_drug_name3);
         
@@ -1395,20 +1134,7 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                    WHERE vts.patient_id = patient_id
-                                    AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name3_concept_id  LIMIT 1);
-            END IF; #--3     
-                   
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;    #--7         
           SET @dispensed_drug_name_4 = (SELECT dispensed_drug_name4);
         
@@ -1443,21 +1169,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name3_concept_id  LIMIT 1);
-            END IF; #--3
-            
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug3_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF; #--7
           SET @dispensed_drug_name_5 = (SELECT dispensed_drug_name5);
 
@@ -1537,18 +1248,6 @@ BEGIN
               INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
 
-              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                       WHERE vts.patient_id = patient_id
-                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-              IF NOT ISNULL(@weight) THEN #--3
-                SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                              WHERE min_weight <= @weight
-                                              AND max_weight >= @weight
-                                              AND concept_id = @drug_concept_id  LIMIT 1);
-              END IF; #--3
-
-
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
               SET @auto_expire_date = (SELECT
@@ -1581,17 +1280,6 @@ BEGIN
               #create arv_regimen_received_abstracted_construct obs
               INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
-
-              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                       WHERE vts.patient_id = patient_id
-                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-              IF NOT ISNULL(@weight) THEN #--3
-                SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                              WHERE min_weight <= @weight
-                                              AND max_weight >= @weight
-                                              AND concept_id = @drug_concept_id  LIMIT 1);
-              END IF; #--3
 
             END IF;
               #--#create regimen_category
@@ -1630,20 +1318,7 @@ BEGIN
 
           SET @pres_drug4_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
         ELSE #--2
-          SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-          IF NOT ISNULL(@weight) THEN #--3
-            SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name4_concept_id  LIMIT 1);
-         END IF; #--3
-
-         # create regimen category observation
-         #--INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-        #-- VALUES (patient_id, @regimen_category_concept_id, @encounter_id, encounter_datetime, regimen_category, @creator, date_created,(SELECT UUID()));
          # Create observation
          SET @arv_regimen_type_uuid = (SELECT UUID());
 
@@ -1705,20 +1380,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name4_concept_id  LIMIT 1);
-            END IF; #--3
-            
-           #-- #create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
           
           SET @dispensed_drug_name_4 = (SELECT encounter_id FROM obs WHERE uuid = @amount_dispensed_drug_4);
@@ -1755,20 +1416,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name4_concept_id  LIMIT 1);
-            END IF; #--3
-
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
          END IF;
         SET @dispensed_drug_name_4 = (SELECT "drug_2");
         
@@ -1804,21 +1451,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name4_concept_id  LIMIT 1);
-           END IF; #--3
-              
-            
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
          SET @dispensed_drug_name_4 = (SELECT dispensed_drug_name3);
         
@@ -1853,20 +1485,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                    WHERE vts.patient_id = patient_id
-                                    AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name4_concept_id  LIMIT 1);
-            END IF; #--3     
-                   
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;    #--7         
           SET @dispensed_drug_name_4 = (SELECT dispensed_drug_name4);
         
@@ -1901,21 +1519,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name4_concept_id  LIMIT 1);
-            END IF; #--3
-            
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug4_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF; #--7
           SET @dispensed_drug_name_5 = (SELECT dispensed_drug_name5);
 
@@ -1995,20 +1598,6 @@ BEGIN
               INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
 
-              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                       WHERE vts.patient_id = patient_id
-                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-              IF NOT ISNULL(@weight) THEN #--3
-                SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                              WHERE min_weight <= @weight
-                                              AND max_weight >= @weight
-                                              AND concept_id = @drug_concept_id  LIMIT 1);
-              END IF; #--3
-                        
-              #--#create regimen_category
-              #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-              #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
             END IF; #--7
            END IF;
         END IF;
@@ -2042,20 +1631,7 @@ BEGIN
 
           SET @pres_drug5_obs_id = (SELECT obs_id FROM obs WHERE uuid = @cpt_started_uuid);
         ELSE #--2
-          SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
 
-          IF NOT ISNULL(@weight) THEN #--3
-            SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name5_concept_id  LIMIT 1);
-         END IF; #--3
-
-         #--# create regimen category observation
-         #--INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, value_text, creator, date_created, uuid)
-         #--VALUES (patient_id, @regimen_category_concept_id, @encounter_id, encounter_datetime, regimen_category, @creator, date_created,(SELECT UUID()));
          # Create observation
          SET @arv_regimen_type_uuid = (SELECT UUID());
 
@@ -2118,20 +1694,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name5_concept_id  LIMIT 1);
-            END IF; #--3
-            
-           #-- #create regimen_category
-           #-- INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
           
           SET @dispensed_drug_name_5 = (SELECT encounter_id FROM obs WHERE uuid = @amount_dispensed_drug_5);
@@ -2168,20 +1730,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name5_concept_id  LIMIT 1);
-            END IF; #--3
-
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
          END IF;
         SET @dispensed_drug_name_5 = (SELECT "drug_2");
         
@@ -2216,21 +1764,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name5_concept_id  LIMIT 1);
-           END IF; #--3
-              
-            
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;
          SET @dispensed_drug_name_5 = (SELECT dispensed_drug_name3);
         
@@ -2265,20 +1798,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                    WHERE vts.patient_id = patient_id
-                                    AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                      WHERE min_weight <= @weight
-                                      AND max_weight >= @weight
-                                      AND concept_id = @pres_drug_name5_concept_id  LIMIT 1);
-            END IF; #--3     
-                   
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF;    #--7         
           SET @dispensed_drug_name_4 = (SELECT dispensed_drug_name4);
         
@@ -2314,21 +1833,6 @@ BEGIN
             INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
             VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
             
-            
-            SET @weight = COALESCE((SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                  WHERE vts.patient_id = patient_id
-                                  AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-            IF NOT ISNULL(@weight) THEN #--3
-              SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                        WHERE min_weight <= @weight
-                                        AND max_weight >= @weight
-                                        AND concept_id = @pres_drug_name5_concept_id  LIMIT 1);
-            END IF; #--3
-            
-            #--#create regimen_category
-            #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-            #--VALUES (patient_id, @regimen_category_concept_id, @new_dispensed_encounter_id, @pres_drug5_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
           END IF; #--7
           SET @dispensed_drug_name_5 = (SELECT dispensed_drug_name5);
 
@@ -2409,20 +1913,6 @@ BEGIN
               INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
               VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
 
-              SET @weight = COALESCE(( SELECT weight FROM bart1_intermediate_bare_bones.vitals_encounters vts
-                                       WHERE vts.patient_id = patient_id
-                                       AND vts.visit_encounter_id = visit_encounter_id),NULL);
-
-              IF NOT ISNULL(@weight) THEN #--3
-                SET @regimen_category = ( SELECT regimen_index FROM regimen
-                                              WHERE min_weight <= @weight
-                                              AND max_weight >= @weight
-                                              AND concept_id = @drug_concept_id  LIMIT 1);
-              END IF; #--3
-                        
-              #create regimen_category
-              #--INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_text, creator, date_created, uuid)
-              #--VALUES (patient_id, @regimen_category_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, regimen_category, @creator, date_created, (SELECT UUID()));
             END IF; #--7
            END IF;
         END IF;
