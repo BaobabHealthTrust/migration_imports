@@ -337,9 +337,6 @@ BEGIN
          SET @pres_drug1_obs_id = (SELECT obs_id FROM obs WHERE uuid = @arv_regimen_type_uuid);
         END IF;  #--2
         
-        # create order
-        SET @pres_drug_name1_uuid = (SELECT UUID());
-               
         IF NOT ISNULL(prescription_duration) THEN #--4
           SET @auto_expire_date = NULL;
           SET @auto_expire_date = (SELECT 
@@ -351,7 +348,9 @@ BEGIN
         ELSE
           SET @auto_expire_date = NULL;
         END IF; #--11
-              
+                # create order
+        SET @pres_drug_name1_uuid = (SELECT UUID());
+        
         INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
         VALUES (1, @pres_drug_name1_concept_id, 1, @encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @pres_drug_name1_uuid);
         SET @pres_drug1_order_id = (SELECT order_id FROM orders WHERE uuid = @pres_drug_name1_uuid);
@@ -611,9 +610,6 @@ BEGIN
 
               SET @dispensing_without_pres_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid),0);
 
-            # create order
-            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
-
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
               SET @auto_expire_date = (SELECT
@@ -625,7 +621,9 @@ BEGIN
             ELSE
               SET @auto_expire_date = NULL;
             END IF; #--11
-
+            # create order
+            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+            
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
             VALUES (1, @dispensed_drug_name1_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
 
@@ -673,7 +671,7 @@ BEGIN
               SET @dispensing_without_pres_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE uuid = @dispensing_encounter_without_pres_uuid),0);
 
             # create order
-            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+            SET @dispensed_without_pres_order_uuid1 = (SELECT UUID());
 
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
@@ -688,9 +686,9 @@ BEGIN
             END IF; #--11
 
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name1_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name1_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid1);
 
-            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid1);
 
             SET @prescription_without_dispensation = (SELECT pres_drug_name1);
             SET @equivalent_daily_dose76 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id LIMIT 1);
@@ -1090,7 +1088,7 @@ BEGIN
             END IF;
 
             # create order
-            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+            SET @dispensed_without_pres_order_uuid3 = (SELECT UUID());
 
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
@@ -1105,9 +1103,9 @@ BEGIN
             END IF; #--11
             
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name2_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name2_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid3);
               
-            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid3);
               
             #create drug_order with quantity
           SET @equivalent_daily_dose31 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id LIMIT 1);                  
@@ -1504,7 +1502,7 @@ BEGIN
             END IF;
 
               # create order
-            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+            SET @dispensed_without_pres_order_uuid5 = (SELECT UUID());
 
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
@@ -1519,9 +1517,9 @@ BEGIN
             END IF; #--11
 
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name3_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name3_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid5);
 
-            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid5);
 
             SET @equivalent_daily_dose38 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
 
@@ -1562,11 +1560,11 @@ BEGIN
             ELSE
               SET @auto_expire_date = NULL;
             END IF; #--11
-
+            SET @dispensed_without_pres_order_uuid6 = (SELECT UUID());
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name3_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name3_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid6);
 
-            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid6);
 
             SET @equivalent_daily_dose38 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id LIMIT 1);
 
@@ -1962,7 +1960,7 @@ BEGIN
             END IF;
 
             # create order
-            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+            SET @dispensed_without_pres_order_uuid7 = (SELECT UUID());
 
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
@@ -1977,9 +1975,9 @@ BEGIN
             END IF; #--11
             
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name4_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name4_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid7);
               
-            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid7);
               
             
             SET @equivalent_daily_dose44 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id LIMIT 1);
@@ -2375,7 +2373,7 @@ BEGIN
             END IF;
 
             # create order
-            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+            SET @dispensed_without_pres_order_uuid8 = (SELECT UUID());
 
             IF NOT ISNULL(prescription_duration) THEN #--11
               SET @auto_expire_date = NULL;
@@ -2390,9 +2388,9 @@ BEGIN
             END IF; #--11
             
             INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
-            VALUES (1, @dispensed_drug_name5_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+            VALUES (1, @dispensed_drug_name5_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid8);
               
-            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid8);
               
             
             SET @equivalent_daily_dose53 = (SELECT dose_strength FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
