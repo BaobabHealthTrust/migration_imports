@@ -20,6 +20,10 @@ BEGIN
     SET @pregnant = (SELECT concept_name.concept_id FROM concept_name 
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
                         WHERE name = "Is patient pregnant?" AND voided = 0 AND retired = 0 LIMIT 1);
+    
+    SET @pregnant2 = (SELECT concept_name.concept_id FROM concept_name 
+                        LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                        WHERE name = "patient pregnant" AND voided = 0 AND retired = 0 LIMIT 1);
                         
     SET @breast_feeding = (SELECT concept_name.concept_id FROM concept_name 
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
@@ -287,6 +291,19 @@ BEGIN
                 visit_id,
                 encounter_id
             );
+    
+        WHEN @pregnant2 THEN
+            
+                CALL proc_insert_pregnant(
+                    patient_id, 
+                    value_date, 
+                    field_concept, 
+                    field_value_coded, 
+                    field_value_coded_name_id, 
+                    NULL,
+                    visit_id,
+                    encounter_id
+                );
     
         WHEN @currently_using_family_planning_method THEN
         
