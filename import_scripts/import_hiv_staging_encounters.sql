@@ -824,7 +824,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get concept_id
             SET @pulmonary_tuberculosis_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'pulmonary tuberculosis' AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Pulmonary tuberculosis (current)' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Get value_coded id
             SET @pulmonary_tuberculosis_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
