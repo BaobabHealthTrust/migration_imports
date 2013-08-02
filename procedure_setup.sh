@@ -44,44 +44,45 @@ mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/retrospective_station
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/create_dde_server_connection.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migration_imports/create_weight_height_for_ages.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/migration_imports/insert_weight_for_ages.sql
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/age_in_months.sql
 
 echo "loading up-to-date concepts"
 mysql  --user=$USERNAME --password=$PASSWORD $DATABASE < db/openmrs_metadata_1_7.sql
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE < db/temporary_tables.sql
-#FILES=schema/*.sql
-#for f in $FILES
-#do
-#	echo "Installing $f..."
-#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-#done
+#-- FILES=schema/*.sql
+#-- for f in $FILES
+#-- do
+#-- 	echo "Installing $f..."
+#-- 	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#-- done
 
-#FILES=triggers/*.sql
-#for f in $FILES
-#do
-#	echo "Installing $f..."
-#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-#done
+#-- FILES=triggers/*.sql
+#-- for f in $FILES
+#-- do
+#-- 	echo "Installing $f..."
+#-- 	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#-- done
 
-#FILES=procedures/*.sql
-#for f in $FILES
-#do
-#	echo "Installing $f..."
-#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-#done
+#-- FILES=procedures/*.sql
+#-- for f in $FILES
+#-- do
+#-- 	echo "Installing $f..."
+#-- 	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#-- done
 
-#FILES=procedures/sub-procedures/inserts/*.sql
-#for f in $FILES
-#do
-#	echo "Installing $f..."
-#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-#done
+#-- FILES=procedures/sub-procedures/inserts/*.sql
+#-- for f in $FILES
+#-- do
+#-- 	echo "Installing $f..."
+#-- 	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#-- done
 
-#FILES=procedures/sub-procedures/updates/*.sql
-#for f in $FILES
-#do
-#	echo "Installing $f..."
-#	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
-#done
+#-- FILES=procedures/sub-procedures/updates/*.sql
+#-- for f in $FILES
+#-- do
+#-- 	echo "Installing $f..."
+#-- 	mysql --user=$USERNAME --password=$PASSWORD $DATABASE < $f
+#-- done
 
 echo "loading import scripts.............................."
 
