@@ -1,8 +1,8 @@
 #!/bin/bash
 usage(){
-  echo "Usage: $0 ENVIRONMENT SITE"
+  echo "Usage: $0 ENVIRONMENT"
   echo
-  echo "ENVIRONMENT should be: development|test|production"
+  echo "ENVIRONMENT should be: development|production"
 } 
 
 ENV=$1

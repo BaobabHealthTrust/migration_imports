@@ -1,21 +1,31 @@
 #!/bin/bash
-
 usage(){
-    echo "Usage: $0 DATABASE USERNAME PASSWORD SITE"
-    echo
-    echo "Available SITES:"
-    ls -1 db/data
-}
+  echo "Usage: $0 SITE"
+  echo
+  echo "ENVIRONMENT should be: bart2"
+  echo "Available SITES:"
+  ls -1 db/data
+} 
 
-DATABASE=$1
-USERNAME=$2
-PASSWORD=$3
-SITE=$4
+SITE=$1
 
-if [ -z "$DATABASE" ] || [ -z "$USERNAME" ] || [ -z "$PASSWORD" ] || [ -z "$SITE" ] ; then
+if [ -z "$SITE" ] ; then
     usage
     exit
 fi
+
+set -x # turns on stacktrace mode which gives useful debug information
+
+if [ ! -x config/database.yml ] ; then
+  cp config/database.yml.example config/database.yml
+fi
+
+USERNAME=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['username']"`
+PASSWORD=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['password']"`
+DATABASE=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['database']"`
+HOST=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['host']"`
+
+
 now=$(date +"%T")
 echo "start time : $now"
 
@@ -98,28 +108,28 @@ mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
 CALL proc_import_users;
 EOFMYSQL
 
-echo "importing data......................................."
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
-CALL proc_import_patients;
-EOFMYSQL
+#echo "importing data......................................."
+#mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+#CALL proc_import_patients;
+#EOFMYSQL
 
-echo "creating dispensation, appointment and exit from HIV care encounters....."
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
-CALL proc_import_from_temp;
-EOFMYSQL
+#echo "creating dispensation, appointment and exit from HIV care encounters....."
+#mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+#CALL proc_import_from_temp;
+#EOFMYSQL
 
-echo "calculating adherence................................"
+#echo "calculating adherence................................"
 
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
-CALL proc_update_obs_order_id;
-EOFMYSQL
+#mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+#CALL proc_update_obs_order_id;
+#EOFMYSQL
 
-echo "deleting temp_encounter and temp_obs tables..........."
+#echo "deleting temp_encounter and temp_obs tables..........."
 
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
-DROP table temp_encounter;
-DROP table temp_obs;
-EOFMYSQL
+#mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+#DROP table temp_encounter;
+#DROP table temp_obs;
+#EOFMYSQL
 
 later=$(date +"%T")
 echo "start time : $now"
