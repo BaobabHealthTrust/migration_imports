@@ -28,7 +28,7 @@ now=$(date +"%T")
 echo "start time : $now"
 
 echo "importing data......................................."
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
 CALL proc_import_patients($LOWER_LIMIT,$UPPER_LIMIT);
 EOFMYSQL
 
