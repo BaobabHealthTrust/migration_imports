@@ -23,19 +23,19 @@ now=$(date +"%T")
 echo "start time : $now"
 
 echo "creating dispensation, appointment and exit from HIV care encounters....."
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
 CALL proc_import_from_temp;
 EOFMYSQL
 
 echo "calculating adherence................................"
 
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
 EOFMYSQL
 
 echo "deleting temp_encounter and temp_obs tables..........."
 
-mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
 DROP table temp_encounter;
 DROP table temp_obs;
 EOFMYSQL
