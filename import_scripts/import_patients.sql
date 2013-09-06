@@ -15,8 +15,8 @@ DROP PROCEDURE IF EXISTS `proc_import_patients`$$
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_patients`(
-  IN start_pos INT(11),
-  IN end_pos INT(11)
+  #--IN start_pos INT(11),
+  #--IN end_pos INT(11)
   #--IN in_patient_id INT(11)
 	)
 BEGIN
@@ -60,8 +60,8 @@ BEGIN
     DECLARE creator varchar(255);
 
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`
-           WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` BETWEEN start_pos AND end_pos; 
+    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`;
+           #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` BETWEEN start_pos AND end_pos; 
            #--LIMIT start_pos, end_pos;
 
     # Declare loop position check
