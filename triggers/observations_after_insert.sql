@@ -5,7 +5,8 @@ ON `obs`
 FOR EACH ROW
 BEGIN
 
-   SET @visit = (SELECT COALESCE((SELECT id FROM flat_table2 WHERE patient_id = new.person_id AND DATE(visit_date) = DATE(new.obs_datetime)), 0));
+   SET @visit = COALESCE((SELECT ID FROM flat_table2 WHERE patient_id = new.person_id AND DATE(visit_date) = DATE(new.obs_datetime)), 0);
+
    SET @encounter_type = COALESCE(( SELECT encounter_type FROM encounter
                             WHERE patient_id = new.person_id 
                             AND DATE(encounter_datetime) = DATE(new.obs_datetime)
