@@ -7,6 +7,7 @@ CREATE PROCEDURE `proc_update_other_field`(
     IN in_concept_id INT, 
     IN encounter_id INT
 )
+
 BEGIN
 
     SET @ever_received_art = (SELECT concept_name.concept_id FROM concept_name concept_name 

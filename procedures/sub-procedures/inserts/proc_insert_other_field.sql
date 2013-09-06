@@ -500,23 +500,23 @@ BEGIN
                 
                     WHEN @what_was_the_patient_adherence_for_this_drug1 = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug1, what_was_the_patient_adherence_for_this_drug1_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug1, what_was_the_patient_adherence_for_this_drug1_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                        
                     WHEN @what_was_the_patient_adherence_for_this_drug2 = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug2, what_was_the_patient_adherence_for_this_drug2_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug2, what_was_the_patient_adherence_for_this_drug2_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                         
                     WHEN @what_was_the_patient_adherence_for_this_drug3 = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug3, what_was_the_patient_adherence_for_this_drug3_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug3, what_was_the_patient_adherence_for_this_drug3_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                       
                     WHEN @what_was_the_patient_adherence_for_this_drug4 = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug4, what_was_the_patient_adherence_for_this_drug4_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug4, what_was_the_patient_adherence_for_this_drug4_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                        
                     WHEN @what_was_the_patient_adherence_for_this_drug5 = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug5, what_was_the_patient_adherence_for_this_drug5_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, what_was_the_patient_adherence_for_this_drug5, what_was_the_patient_adherence_for_this_drug5_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                                     
                     ELSE
                     
@@ -530,23 +530,23 @@ BEGIN
                 
                     WHEN @what_was_the_patient_adherence_for_this_drug1 = "" THEN
                     
-                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug1 = in_field_value_text, what_was_the_patient_adherence_for_this_drug1_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug1 = in_field_value_numeric, what_was_the_patient_adherence_for_this_drug1_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                        
                     WHEN @what_was_the_patient_adherence_for_this_drug2 = "" THEN
                     
-                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug2 = in_field_value_text, what_was_the_patient_adherence_for_this_drug2_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug2 = in_field_value_numeric, what_was_the_patient_adherence_for_this_drug2_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                         
                     WHEN @what_was_the_patient_adherence_for_this_drug3 = "" THEN
                     
-                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug3 = in_field_value_text, what_was_the_patient_adherence_for_this_drug3_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug3 = in_field_value_numeric, what_was_the_patient_adherence_for_this_drug3_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                       
                     WHEN @what_was_the_patient_adherence_for_this_drug4 = "" THEN
                     
-                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug4 = in_field_value_text, what_was_the_patient_adherence_for_this_drug4_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug4 = in_field_value_numeric, what_was_the_patient_adherence_for_this_drug4_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                        
                     WHEN @what_was_the_patient_adherence_for_this_drug5 = "" THEN
                     
-                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug5 = in_field_value_text, what_was_the_patient_adherence_for_this_drug5_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET what_was_the_patient_adherence_for_this_drug5 = in_field_value_numeric, what_was_the_patient_adherence_for_this_drug5_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                                     
                     ELSE
                     
@@ -576,23 +576,23 @@ BEGIN
                 
                     WHEN @amount_of_drug1_remaining_at_home = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug1_remaining_at_home, amount_of_drug1_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug1_remaining_at_home, amount_of_drug1_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                        
                     WHEN @amount_of_drug2_remaining_at_home = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug2_remaining_at_home, amount_of_drug2_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug2_remaining_at_home, amount_of_drug2_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                         
                     WHEN @amount_of_drug3_remaining_at_home = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug3_remaining_at_home, amount_of_drug3_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug3_remaining_at_home, amount_of_drug3_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                       
                     WHEN @amount_of_drug4_remaining_at_home = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug4_remaining_at_home, amount_of_drug4_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug4_remaining_at_home, amount_of_drug4_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                        
                     WHEN @amount_of_drug5_remaining_at_home = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug5_remaining_at_home, amount_of_drug5_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug5_remaining_at_home, amount_of_drug5_remaining_at_home_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                                     
                     ELSE
                     
@@ -606,23 +606,23 @@ BEGIN
                 
                     WHEN @amount_of_drug1_remaining_at_home = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug1_remaining_at_home = in_field_value_text, amount_of_drug1_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug1_remaining_at_home = in_field_value_numeric, amount_of_drug1_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                        
                     WHEN @amount_of_drug2_remaining_at_home = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug2_remaining_at_home = in_field_value_text, amount_of_drug2_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug2_remaining_at_home = in_field_value_numeric, amount_of_drug2_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                         
                     WHEN @amount_of_drug3_remaining_at_home = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug3_remaining_at_home = in_field_value_text, amount_of_drug3_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug3_remaining_at_home = in_field_value_numeric, amount_of_drug3_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                       
                     WHEN @amount_of_drug4_remaining_at_home = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug4_remaining_at_home = in_field_value_text, amount_of_drug4_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug4_remaining_at_home = in_field_value_numeric, amount_of_drug4_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                        
                     WHEN @amount_of_drug5_remaining_at_home = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug5_remaining_at_home = in_field_value_text, amount_of_drug5_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug5_remaining_at_home = in_field_value_numeric, amount_of_drug5_remaining_at_home_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                                     
                     ELSE
                     
@@ -652,23 +652,23 @@ BEGIN
                 
                     WHEN @amount_of_drug1_brought_to_clinic = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug1_brought_to_clinic, amount_of_drug1_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug1_brought_to_clinic, amount_of_drug1_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                        
                     WHEN @amount_of_drug2_brought_to_clinic = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug2_brought_to_clinic, amount_of_drug2_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug2_brought_to_clinic, amount_of_drug2_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                         
                     WHEN @amount_of_drug3_brought_to_clinic = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug3_brought_to_clinic, amount_of_drug3_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug3_brought_to_clinic, amount_of_drug3_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                       
                     WHEN @amount_of_drug4_brought_to_clinic = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug4_brought_to_clinic, amount_of_drug4_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug4_brought_to_clinic, amount_of_drug4_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                        
                     WHEN @amount_of_drug5_brought_to_clinic = "" THEN
                     
-                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug5_brought_to_clinic, amount_of_drug5_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+                        INSERT INTO flat_table2 (patient_id, visit_date, amount_of_drug5_brought_to_clinic, amount_of_drug5_brought_to_clinic_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
                                    
                     ELSE
                     
@@ -682,23 +682,23 @@ BEGIN
                 
                     WHEN @amount_of_drug1_brought_to_clinic = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug1_brought_to_clinic = in_field_value_text, amount_of_drug1_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug1_brought_to_clinic = in_field_value_numeric, amount_of_drug1_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                        
                     WHEN @amount_of_drug2_brought_to_clinic = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug2_brought_to_clinic = in_field_value_text, amount_of_drug2_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug2_brought_to_clinic = in_field_value_numeric, amount_of_drug2_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                         
                     WHEN @amount_of_drug3_brought_to_clinic = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug3_brought_to_clinic = in_field_value_text, amount_of_drug3_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug3_brought_to_clinic = in_field_value_numeric, amount_of_drug3_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                       
                     WHEN @amount_of_drug4_brought_to_clinic = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug4_brought_to_clinic = in_field_value_text, amount_of_drug4_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug4_brought_to_clinic = in_field_value_numeric, amount_of_drug4_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                        
                     WHEN @amount_of_drug5_brought_to_clinic = "" THEN
                     
-                        UPDATE flat_table2 SET amount_of_drug5_brought_to_clinic = in_field_value_text, amount_of_drug5_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                        UPDATE flat_table2 SET amount_of_drug5_brought_to_clinic = in_field_value_numeric, amount_of_drug5_brought_to_clinic_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                                     
                     ELSE
                     
@@ -718,7 +718,7 @@ BEGIN
             
             ELSE 
             
-                UPDATE flat_table2 SET condoms = in_field_value_text, condoms_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+                UPDATE flat_table2 SET condoms = in_field_value_numeric, condoms_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
                 
             END IF; 
         
