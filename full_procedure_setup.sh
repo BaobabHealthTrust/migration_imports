@@ -25,21 +25,20 @@ PASSWORD=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['
 DATABASE=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['database']"`
 HOST=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['host']"`
 
-
 now=$(date +"%T")
 echo "start time : $now"
 
 echo "initializing $DATABASE (OpenMRS 1.7) destination database.............................."
 
-echo "DROP DATABASE $DATABASE;" | mysql --user=$USERNAME --host=$HOST --password=$PASSWORD
-echo "CREATE DATABASE $DATABASE;" | mysql --user=$USERNAME --host=$HOST --password=$PASSWORD
+echo "DROP DATABASE $DATABASE;" | mysql --user=$USERNAME  --host=$HOST --password=$PASSWORD
+echo "CREATE DATABASE $DATABASE;" | mysql --user=$USERNAME  --host=$HOST --password=$PASSWORD
 echo "loading concept_server_full_db"
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE < db/openmrs_1_7_2_concept_server_full_db.sql
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < db/openmrs_1_7_2_concept_server_full_db.sql
 echo "loading schema additions"
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE < db/schema_bart2_additions.sql
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE < db/bart2_views_schema_additions.sql
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < db/schema_bart2_additions.sql
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < db/bart2_views_schema_additions.sql
 echo "loading defaults"
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE < db/defaults.sql
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < db/defaults.sql
 echo "loading user schema modifications"
 mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < db/malawi_regions.sql
 mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < db/mysql_functions.sql
@@ -72,6 +71,31 @@ done
 echo "importing users......................................"
 mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
 CALL proc_import_users;
+EOFMYSQL
+
+echo "importing data......................................."
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
+CALL proc_import_patients;
+EOFMYSQL
+
+echo "creating dispensation, appointment and exit from HIV care encounters....."
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
+CALL proc_import_from_temp;
+EOFMYSQL
+
+echo "calculating adherence................................"
+
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
+CALL proc_update_obs_order_id;
+EOFMYSQL
+
+echo "formatting weight, height and BMI values.........."
+script/runner script/vitals_fix.rb
+
+echo "deleting temp_encounter and temp_obs tables..........."
+mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
+  DROP table temp_encounter;
+  DROP table temp_obs;
 EOFMYSQL
 
 later=$(date +"%T")
