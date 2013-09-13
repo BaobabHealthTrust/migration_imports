@@ -142,6 +142,7 @@ BEGIN
                 patient_id, 
                 value_date, 
                 field_concept, 
+                field_text,
                 field_value_coded, 
                 field_value_coded_name_id, 
                 NULL,
@@ -154,7 +155,8 @@ BEGIN
             CALL proc_insert_guardian_present(
                 patient_id, 
                 value_date, 
-                field_concept, 
+                field_concept,
+                field_text, 
                 field_value_coded, 
                 field_value_coded_name_id, 
                 NULL,

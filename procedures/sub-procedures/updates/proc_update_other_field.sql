@@ -4,7 +4,8 @@ DROP PROCEDURE IF EXISTS `proc_update_other_field`$$
 
 CREATE PROCEDURE `proc_update_other_field`(
     IN in_patient_id INT, 
-    IN in_concept_id INT, 
+    IN in_concept_id INT,
+    IN in_value_coded INT, 
     IN encounter_id INT
 )
 
@@ -89,7 +90,6 @@ BEGIN
     SET @pnuemocystis_pnuemonia = (SELECT concept_name.concept_id FROM concept_name concept_name 
                     LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
                     WHERE name = 'Pneumocystis pneumonia' AND voided = 0 AND retired = 0 LIMIT 1);  
-
 
     SET @lymphocyte_count_date = (SELECT concept_name.concept_id FROM concept_name concept_name 
                     LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
@@ -329,8 +329,18 @@ BEGIN
     SET @invasive_cancer_of_cervix = (SELECT concept_name.concept_id FROM concept_name concept_name 
                     LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
                     WHERE name = 'invasive cancer of cervix' AND voided = 0 AND retired = 0 LIMIT 1);
+                    
+    SET @who_crit_stage = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                    LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                    WHERE name = 'Who stages criteria present' AND voided = 0 AND retired = 0 LIMIT 1);
+                 
+    IF (@who_crit_stage = in_concept_id) THEN
+      SET @in_concept_id = in_value_coded;
+    ELSE
+      SET @in_concept_id = in_concept_id;
+    END IF;
 
-	CASE in_concept_id
+	CASE @in_concept_id
 		
         WHEN @ever_received_art THEN
            

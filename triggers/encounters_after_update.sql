@@ -1266,7 +1266,7 @@ BEGIN
                 
                     ELSE
                     
-                        CALL proc_update_other_field(var_person_id, var_concept_id, OLD.encounter_id);
+                        CALL proc_update_other_field(var_person_id, var_concept_id, var_value_coded, OLD.encounter_id);
                 
                 END CASE;
         

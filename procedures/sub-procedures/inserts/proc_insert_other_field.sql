@@ -403,7 +403,12 @@ BEGIN
 		                        
     SET @invasive_cancer_of_cervix = (SELECT concept_name.concept_id FROM concept_name concept_name 
                     LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
-                    WHERE name = 'invasive cancer of cervix' AND voided = 0 AND retired = 0 LIMIT 1);    
+                    WHERE name = 'invasive cancer of cervix' AND voided = 0 AND retired = 0 LIMIT 1);
+
+    SET @who_crit_stage = (SELECT concept_name.concept_id FROM concept_name concept_name 
+                    LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                    WHERE name = 'Who stages criteria present' AND voided = 0 AND retired = 0 LIMIT 1);
+
     CASE in_field_concept
     
         WHEN @missed_hiv_drug_construct THEN
@@ -1391,6 +1396,222 @@ BEGIN
                 WHERE  concept.concept_id = in_field_value_coded AND voided = 0 AND retired = 0 LIMIT 1);
 
             UPDATE flat_table1 SET invasive_cancer_of_cervix = @answer WHERE flat_table1.patient_id= in_patient_id;
+
+       WHEN @who_crit_stage THEN
+           SET @answer = (SELECT name from concept_name LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                           WHERE  concept.concept_id = in_field_value_coded AND voided = 0 AND retired = 0 LIMIT 1);
+
+            IF (@answer = 'Acute necrotizing ulcerative stomatitis, gingivitis or periodontitis') THEN
+              UPDATE flat_table1 SET acute_necrotizing_ulcerative_gingivitis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Anaemia, unexplained < 8 g/dl') THEN
+              UPDATE flat_table1 SET aneamia = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Angular cheilitis') THEN
+             UPDATE flat_table1 SET angular_chelitis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Asymptomatic HIV infection') THEN
+              UPDATE flat_table1 SET asymptomatic = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
+
+            IF (@answer = 'Bacterial infections, severe recurrent  (empyema, pyomyositis, meningitis, bone/joint infections but EXCLUDING pneumonia)') THEN
+              UPDATE flat_table1 SET bacterial_infections_severe_recurrent = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Bacterial pneumonia, severe recurrent') THEN
+              UPDATE flat_table1 SET bacterial_pnuemonia = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Candidiasis of oseophagus, trachea and bronchi or lungs') THEN
+              UPDATE flat_table1 SET candidiasis_of_oesophagus = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Cerebral or B-cell non Hodgkin lymphoma') THEN
+              UPDATE flat_table1 SET cerebral_non_hodgkin_lymphoma = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Chronic herpes simplex infection (orolabial, gential / anorectal >1 month or visceral at any site)') THEN
+              UPDATE flat_table1 SET chronic_herpes_simplex_infection = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Cryptococcal meningitis or other extrapulmonary cryptococcosis') THEN
+              UPDATE flat_table1 SET cryptococcal_meningitis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Cryptosporidiosis, chronic with diarroea') THEN
+              UPDATE flat_table1 SET cryptosporidiosis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
+
+            IF (@answer = 'Cytomegalovirus infection (retinitis or infection or other organs)') THEN
+              UPDATE flat_table1 SET cytomegalovirus_infection = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
+
+            IF (@answer = 'Diarrhoea, chronic (>1 month) unexplained') THEN
+              UPDATE flat_table1 SET diarhoea = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Diarrhoea, persistent unexplained (14 days or more)') THEN
+              UPDATE flat_table1 SET diarhoea = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Disseminated mycosis (coccidiomycosis or histoplasmosis)') THEN
+              UPDATE flat_table1 SET disseminated_mycosis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Disseminated non-tuberculosis mycobacterial infection') THEN
+              UPDATE flat_table1 SET disseminated_non_tuberculosis_mycobacterial_infection = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Extrapulmonary tuberculosis (EPTB)') THEN
+              UPDATE flat_table1 SET extrapulmonary_tuberculosis = 'Yes', extrapulmonary_tuberculosis_v_date = in_visit_date WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Fever, persistent unexplained, intermittent or constant, >1 month') THEN
+              UPDATE flat_table1 SET fever_persistent_unexplained = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Hepatosplenomegaly, persistent unexplained') THEN
+              UPDATE flat_table1 SET hepatosplenomegaly_unexplained = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Herpes zoster') THEN
+              UPDATE flat_table1 SET herpes_zoster = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'HIV encephalopathy') THEN
+              UPDATE flat_table1 SET hiv_encephalopathy = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'HIV wasting syndrome (severe weight loss + persistent fever or severe weight loss + chronic diarrhoea)') THEN
+              UPDATE flat_table1 SET severe_weight_loss = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Invasive cancer of cervix') THEN
+              UPDATE flat_table1 SET invasive_cancer_of_cervix = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Isosporiasis >1 month') THEN
+              UPDATE flat_table1 SET isosporiasis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Kaposis sarcoma') THEN
+              UPDATE flat_table1 SET kaposis_sarcoma = 'Yes', kaposis_sarcoma_v_date = in_visit_date WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Moderate unexplained wasting/malnutrition not responding to treatment (weight-for-height/ -age 70-79% or muac 11-12 cm)') THEN
+              UPDATE flat_table1 SET moderate_weight_loss_less_than_or_equal_to_10_percent_unexpl = 'Yes' WHERE flat_table1.patient_id= in_patient_id; 
+            END IF;
+
+            IF (@answer = 'Moderate weight loss less than or equal to 10 percent, unexplained') THEN
+              UPDATE flat_table1 SET moderate_weight_loss_less_than_or_equal_to_10_percent_unexpl = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
+
+            IF (@answer = 'Molluscum contagiosum, extensive') THEN
+              UPDATE flat_table1 SET molluscumm_contagiosum = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Neutropaenia, unexplained < 500 /mm(cubed)') THEN
+              UPDATE flat_table1 SET neutropaenia = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Oral candidiasis') THEN
+              UPDATE flat_table1 SET oral_candidiasis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Oral candidiasis') THEN
+              UPDATE flat_table1 SET oral_candidiasis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Oral candidiasis (from age 2 months)') THEN
+              UPDATE flat_table1 SET oral_candidiasis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Oral hairy leukoplakia') THEN
+              UPDATE flat_table1 SET oral_hairy_leukoplakia = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
+
+            IF (@answer = 'Oral ulcerations, recurrent') THEN
+              UPDATE flat_table1 SET oral_hairy_leukoplakia = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
+
+            IF (@answer = 'Papular pruritic eruptions / Fungal nail infections') THEN
+              UPDATE flat_table1 SET papular_pruritic_eruptions = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Parotid enlargement, persistent unexplained') THEN
+              UPDATE flat_table1 SET parotid_enlargement_persistent_unexplained = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Persistent generalized lymphadenopathy') THEN
+              UPDATE flat_table1 SET persistent_generalized_lymphadenopathy = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
+
+            IF (@answer = 'Pneumocystis pneumonia') THEN
+              UPDATE flat_table1 SET pnuemocystis_pnuemonia = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Progressive multifocal leukoencephalopathy') THEN
+              UPDATE flat_table1 SET progressive_multifocal_leukoencephalopathy = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Pulmonary tuberculosis (current)') THEN
+              UPDATE flat_table1 SET pulmonary_tuberculosis_last_2_years = 'Yes', pulmonary_tuberculosis_last_2_years_v_date = in_visit_date WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Respiratory tract infections, recurrent (sinusitis, tonsilitus, otitis media, pharyngitis)') THEN
+              UPDATE flat_table1 SET respiratory_tract_infections_recurrent = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Seborrhoeic dermatitis') THEN
+              UPDATE flat_table1 SET seborrhoeic_dermatitis = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Severe bacterial infections (pneumonia, empyema, pyomyositis, bone/joint, meningitis, bacteraemia)') THEN
+              UPDATE flat_table1 SET severe_bacterial_infection = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Severe unexplained wasting or malnutrition not responding to treatment (weight-for-height/ -age <70% or MUAC less than 11cm or oedema)') THEN
+             UPDATE flat_table1 SET severe_weight_loss = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Severe weight loss >10% and/or BMI <18.5kg/m^2, unexplained') THEN
+              UPDATE flat_table1 SET severe_weight_loss = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Symptomatic HIV-associated nephropathy or cardiomyopathy') THEN
+              UPDATE flat_table1 SET symptomatic_hiv_associated_nephropathy = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Thrombocytopaenia, chronic < 50,000 /mm(cubed)') THEN
+              UPDATE flat_table1 SET thrombocytopaenia_chronic = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Toxoplasmosis of the brain') THEN
+              UPDATE flat_table1 SET toxoplasmosis_of_the_brain  = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Tuberculosis (PTB or EPTB) within the last 2 years') THEN
+              UPDATE flat_table1 SET pulmonary_tuberculosis_last_2_years = 'Yes', pulmonary_tuberculosis_last_2_years_v_date = in_visit_date WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Unspecified stage I condition') THEN
+              UPDATE flat_table1 SET unspecified_stage_1_cond = 'Yes' WHERE flat_table1.patient_id= in_patient_id;    
+            END IF;
+
+            IF (@answer = 'Unspecified stage II condition') THEN
+              UPDATE flat_table1 SET unspecified_stage2_condition = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
+
+            IF (@answer = 'Unspecified stage III condition') THEN
+              UPDATE flat_table1 SET unspecified_stage3_condition = 'Yes' WHERE flat_table1.patient_id= in_patient_id;
+            END IF;
+
+            IF (@answer = 'Unspecified stage IV condition') THEN
+              UPDATE flat_table1 SET unspecified_stage_4_condition = 'Yes' WHERE flat_table1.patient_id= in_patient_id;  
+            END IF;
 
         ELSE
         

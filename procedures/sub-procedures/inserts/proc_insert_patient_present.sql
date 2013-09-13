@@ -6,6 +6,7 @@ CREATE PROCEDURE `proc_insert_patient_present`(
     IN in_patient_id INT, 
     IN in_visit_date DATE, 
     IN in_field_concept INT, 
+    IN in_field_text VARCHAR(25),
     IN in_field_value_coded INT,
     IN in_field_value_coded_name_id INT,
     IN in_field_other VARCHAR(25),
@@ -25,7 +26,13 @@ BEGIN
     
         WHEN @yes THEN
         
-            SET @value = (SELECT name FROM concept_name WHERE concept_name_id = in_field_value_coded_name_id);
+            SET @value = COALESCE((SELECT name FROM concept_name WHERE concept_name_id = in_field_value_coded_name_id),0);
+            
+            IF (@value = 0) THEN
+              IF (in_field_text = 'Yes') THEN
+                SET @value = 'Yes';
+              END IF;
+            END IF;
             
             IF in_visit_id = 0 THEN
             
@@ -39,7 +46,13 @@ BEGIN
         
         WHEN @no THEN
         
-            SET @value = (SELECT name FROM concept_name WHERE concept_name_id = in_field_value_coded_name_id);
+            SET @value = COALESCE((SELECT name FROM concept_name WHERE concept_name_id = in_field_value_coded_name_id),0);
+            
+            IF (@value = 0) THEN
+              IF (in_field_text = 'No') THEN
+                SET @value = 'No';
+              END IF;
+            END IF;
             
             IF in_visit_id = 0 THEN
             

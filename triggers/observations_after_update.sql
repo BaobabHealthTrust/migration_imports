@@ -34,7 +34,10 @@ BEGIN
     IF ISNULL(@current_hiv_program_state) THEN
       SET @patient_program_id = ( SELECT patient_program_id FROM patient_program
                                           WHERE patient_id = new.person_id
-                                          AND program_id = 1);
+                                          AND program_id = 1
+                                          AND voided = 0
+                                          ORDER BY date_enrolled DESC 
+                                          LIMIT 1);
 
       SET @latest_patient_hiv_state = ( SELECT state FROM patient_state
                                         WHERE patient_program_id = @patient_program_id
