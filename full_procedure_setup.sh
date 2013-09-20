@@ -68,6 +68,9 @@ do
 	mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < $f
 done
 
+echo "updating current_location_id"
+script/runner script/current_location_id.rb
+
 echo "importing users......................................"
 mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
 CALL proc_import_users;
@@ -91,6 +94,7 @@ EOFMYSQL
 
 echo "formatting weight, height and BMI values.........."
 script/runner script/vitals_fix.rb
+
 
 echo "deleting temp_encounter and temp_obs tables..........."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
