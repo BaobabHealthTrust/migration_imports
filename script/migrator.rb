@@ -47,6 +47,7 @@ Prescriptions = Hash.new(nil)
 Pre_art_visit_queue = Array.new
 Pre_art_visit_size = 1000
 Users_queue = Array.new
+
 Source_db= YAML.load(File.open(File.join(RAILS_ROOT, "config/database.yml"), "r"))['bart']["database"]
 
 CONN = ActiveRecord::Base.connection
@@ -132,8 +133,11 @@ def start
                                           inner join #{Source_db}.obs o on e.encounter_id = o.encounter_id
                                         where e.patient_id = #{patient.id}
                                         and o.voided = 0
-                                        group by e.encounter_id
-                                        order by e.encounter_datetime desc, e.date_created desc")
+                                        and e.date_created = (select max(date_created) 
+                                                              from encounter 
+                                                              where encounter_type = e.encounter_type
+                                                              and patient_id = e.patient_id)
+                                        group by e.encounter_id")
 
 		ordered_encs = {}
 		
