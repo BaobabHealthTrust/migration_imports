@@ -81,13 +81,13 @@ def start
   encounters_to_migrate = []
   staging = []
   art_visit = []
-  File.open('./hiv_staging_to_void.txt', 'r') do |file|
+  File.open('./hiv_staging_to_import.txt', 'r') do |file|
     while line = file.gets
       staging = line.split(",")
     end
   end
 
-  File.open('./art_visit_to_void.txt', 'r') do |file|
+  File.open('./art_visit_to_import.txt', 'r') do |file|
     while line = file.gets
       art_visit = line.split(",")
     end
