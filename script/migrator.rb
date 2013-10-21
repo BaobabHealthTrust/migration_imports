@@ -129,6 +129,27 @@ def start
     puts "Working on patient with ID: #{patient.id}"
     pt1 = Time.now
 
+    encounters = Encounter.find_by_sql("Select e.* from encounter e
+	                                        inner join obs o on e.encounter_id = o.encounter_id
+                                        where e.patient_id = #{patient.id}
+                                        and o.voided = 0
+                                        and e.date_created = (select max(date_created) 
+                                                              from encounter 
+                                                              where encounter_type = e.encounter_type
+                                                              and patient_id = e.patient_id)
+                                                              group by e.encounter_id
+                                        UNION ALL
+                                        select e.* from encounter e
+                                         inner join orders o on o.encounter_id = e.encounter_id
+                                         where e.encounter_type = 3
+                                         and e.patient_id = #{patient.id}
+                                         and e.encounter_id NOT IN (select DISTINCT encounter_id 
+                                                                    from obs 
+                                                                    where voided = 0 
+                                                                    and patient_id = #{patient.id})
+                                        group by e.encounter_id")
+=begin
+
     encounters = Encounter.find_by_sql("Select e.* from #{Source_db}.encounter e
                                           inner join #{Source_db}.obs o on e.encounter_id = o.encounter_id
                                         where e.patient_id = #{patient.id}
@@ -138,7 +159,7 @@ def start
                                                               where encounter_type = e.encounter_type
                                                               and patient_id = e.patient_id)
                                         group by e.encounter_id")
-
+=end
 		ordered_encs = {}
 		
 		encounters.each do |enc|
