@@ -766,24 +766,35 @@ BEGIN
         WHEN @Weight THEN
         
             IF in_visit_id = 0 THEN
-            
+              IF COALESCE(in_field_value_numeric, 0) = 0 THEN
+                INSERT INTO flat_table2 (patient_id, visit_date, Weight, Weight_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+              ELSE
                 INSERT INTO flat_table2 (patient_id, visit_date, Weight, Weight_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
-            
+              END IF;
             ELSE 
             
+               IF COALESCE(in_field_value_numeric, 0) = 0 THEN
+                UPDATE flat_table2 SET Weight = in_field_value_text, Weight_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+              ELSE
                 UPDATE flat_table2 SET Weight = in_field_value_numeric, Weight_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+              END IF;
                 
             END IF;       
     
         WHEN @Height THEN
         
             IF in_visit_id = 0 THEN
-            
+              IF COALESCE(in_field_value_numeric, 0) = 0 THEN
+                INSERT INTO flat_table2 (patient_id, visit_date, Height, Height_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+              ELSE
                 INSERT INTO flat_table2 (patient_id, visit_date, Height, Height_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
-            
+              END IF;
             ELSE 
-            
-                UPDATE flat_table2 SET Height = in_field_value_numeric, Height_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+             IF COALESCE(in_field_value_numeric, 0) = 0 THEN
+              UPDATE flat_table2 SET Height = in_field_value_text, Height_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+             ELSE
+              UPDATE flat_table2 SET Height = in_field_value_numeric, Height_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+             END IF;
                 
             END IF;         
     
@@ -802,13 +813,17 @@ BEGIN
         WHEN @BMI THEN
         
             IF in_visit_id = 0 THEN
-            
+             IF COALESCE(in_field_value_numeric, 0) = 0 THEN
+                INSERT INTO flat_table2 (patient_id, visit_date, BMI, BMI_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_text, encounter_id);
+              ELSE
                 INSERT INTO flat_table2 (patient_id, visit_date, BMI, BMI_enc_id) VALUES (in_patient_id, in_visit_date, in_field_value_numeric, encounter_id);
-            
+              END IF;
             ELSE 
-            
+              IF COALESCE(in_field_value_numeric, 0) = 0 THEN
+                UPDATE flat_table2 SET BMI = in_field_value_text, BMI_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
+              ELSE
                 UPDATE flat_table2 SET BMI = in_field_value_numeric, BMI_enc_id = encounter_id WHERE flat_table2.id = in_visit_id;
-                
+              END IF;  
             END IF;               
     
         WHEN @systolic_blood_pressure THEN
