@@ -293,6 +293,9 @@ BEGIN
                                            AND name = @dispensed_drug_name5_bart2_name LIMIT 1);
                                
 #-----------------------------------------------------------------------------------------------------------------------------------
+    SET @patient_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id), 0); 
+
+    IF (@patient_encounter_id = 0) THEN
       #Check if the field is not empty
       IF NOT ISNULL(pres_drug_name1) THEN #--1
         # Get id of encounter type
@@ -1952,6 +1955,9 @@ BEGIN
     VALUES (patient_id, @appointment_date_concept_id, @appointment_encounter_id, encounter_datetime, appointment_date, @creator, date_created, (SELECT UUID()));
 
   END IF;
+ELSE
+  select old_enc_id;
+END IF;
 #-----------------------------------------------------------------------------------------------------------------------------    
     END LOOP;
 
