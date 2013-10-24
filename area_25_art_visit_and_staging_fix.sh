@@ -43,6 +43,8 @@ echo "Importing ART visit and HIV staging encounters"
 mysql  --user=$BART2_USERNAME --password=$BART2_PASSWORD --host=$BART2_HOST  $BART2_DATABASE < import_scripts/import_art_and_hiv_staging_area_25_encounters.sql
 mysql  --user=$BART2_USERNAME --password=$BART2_PASSWORD --host=$BART2_HOST  $BART2_DATABASE < import_scripts/import_art_visit_encounters.sql
 mysql  --user=$BART2_USERNAME --password=$BART2_PASSWORD --host=$BART2_HOST  $BART2_DATABASE < import_scripts/import_hiv_staging_encounters.sql
+mysql  --user=$BART2_USERNAME --password=$BART2_PASSWORD --host=$BART2_HOST  $BART2_DATABASE < import_scripts/drup_map.sql
+
 
 mysql --user=$BART2_USERNAME --password=$BART2_PASSWORD --host=$BART2_HOST $BART2_DATABASE<<EOFMYSQL
 CALL proc_import_area_25_art_and_hiv_staging;
