@@ -351,7 +351,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
             # Get concept_id
             SET @date_of_art_initiation_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
-                        WHERE name = 'ART initiation date' AND voided = 0 AND retired = 0 LIMIT 1);
+                        WHERE name = 'Date antiretrovirals started' AND voided = 0 AND retired = 0 LIMIT 1);
 
             # Create observation
             INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_datetime, creator, date_created, uuid)
