@@ -80,7 +80,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 ")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
   
@@ -129,37 +129,27 @@ def start
     puts "Working on patient with ID: #{patient.id}"
     pt1 = Time.now
 
-    encounters = Encounter.find_by_sql("Select e.* from encounter e
-	                                        inner join obs o on e.encounter_id = o.encounter_id
-                                        where e.patient_id = #{patient.id}
-                                        and o.voided = 0
-                                        and e.date_created = (select max(date_created) 
-                                                              from encounter 
-                                                              where encounter_type = e.encounter_type
-                                                              and patient_id = e.patient_id)
-                                                              group by e.encounter_id
-                                        UNION ALL
-                                        select e.* from encounter e
-                                         inner join orders o on o.encounter_id = e.encounter_id
-                                         where e.encounter_type = 3
-                                         and e.patient_id = #{patient.id}
-                                         and e.encounter_id NOT IN (select DISTINCT encounter_id 
-                                                                    from obs 
-                                                                    where voided = 0 
-                                                                    and patient_id = #{patient.id})
-                                        group by e.encounter_id")
-=begin
-
-    encounters = Encounter.find_by_sql("Select e.* from #{Source_db}.encounter e
-                                          inner join #{Source_db}.obs o on e.encounter_id = o.encounter_id
-                                        where e.patient_id = #{patient.id}
-                                        and o.voided = 0
-                                        and e.date_created = (select max(date_created) 
-                                                              from encounter 
-                                                              where encounter_type = e.encounter_type
-                                                              and patient_id = e.patient_id)
-                                        group by e.encounter_id")
-=end
+    encounters = Encounter.find_by_sql("
+                              Select e.* from encounter e
+	                              inner join obs o on e.encounter_id = o.encounter_id
+                              where e.patient_id = #{patient.id}
+                              and o.voided = 0
+                              and e.date_created = (	SELECT MAX(enc.date_created)
+						                                          FROM encounter enc
+						                                          WHERE enc.patient_id = e.patient_id
+						                                          AND enc.encounter_type = e.encounter_type
+						                                          AND DATE(enc.encounter_datetime) = DATE(e.encounter_datetime))
+                              GROUP BY e.encounter_id
+                              UNION ALL
+                              select e.* from encounter e
+                                inner join orders o on o.encounter_id = e.encounter_id
+                              where e.encounter_type = 3
+                              and e.patient_id = #{patient.id}
+                              and e.encounter_id NOT IN ( select DISTINCT encounter_id
+                                                          from obs
+                                                          where voided = 0
+                                                          and patient_id = e.patient_id)
+                              GROUP BY e.encounter_id")
 		ordered_encs = {}
 		
 		encounters.each do |enc|
