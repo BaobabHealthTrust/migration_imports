@@ -92,10 +92,6 @@ mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
 EOFMYSQL
 
-echo "formatting weight, height and BMI values.........."
-script/runner script/vitals_fix.rb
-
-
 echo "deleting temp_encounter and temp_obs tables..........."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
   DROP table temp_encounter;
