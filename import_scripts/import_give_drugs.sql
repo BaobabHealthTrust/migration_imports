@@ -2051,12 +2051,12 @@ BEGIN
                                           WHERE e.encounter_datetime = encounter_datetime
                                           AND e.encounter_type = 54
                                           AND e.encounter_id = old_enc_id
-                                          AND e.patient_id = patient_id), 0);
+                                          AND e.patient_id = patient_id LIMIT 1), 0);
 
     SET @dispensing_encounter_in_temp = COALESCE(( SELECT e.encounter_id FROM temp_encounter e
                                           WHERE e.encounter_datetime = encounter_datetime
                                           AND e.encounter_type = 54
-                                          AND e.patient_id = patient_id), 0);
+                                          AND e.patient_id = patient_id LIMIT 1), 0);
 
    IF (@dispensing_encounter_in_enc = 0) THEN
       SET @dispense_encounter_id = (@dispensing_encounter_in_temp);
