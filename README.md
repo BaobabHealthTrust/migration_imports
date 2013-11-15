@@ -62,7 +62,7 @@ On migration_imports terminal, type the following command to map and import data
  		ruby partial_procedure_setup.sh site_code
 
     for example: ruby partial_procedure.sh mpc
-		Please note that the site code in the above command, is as in 8.1 			above
+		Please note that the site code in the above command, is as in 8.1 above
 
     After setting up the database and the procedures use the following command to start the process.
 
@@ -82,11 +82,6 @@ When the above process is complete, and all the data has been migrated, please r
 
 10. Change the BART 2 config/database.yml to point to the OpenMRS version 1.7 you specified on step 5 above under bart2 section. This is the database which has the migrated data. 
 
+11. Test the data by running some queries in both intermediary storage tables and also OpenMRS version 1.7. In this case the gold standard is the intermediary storage tables. 
 
-11. Under BART 2 terminal type the following command to run all after 	migration scripts:
-	
-	script/runner script/run_all_after_migration_scripts.sh
-
-12. Test the data by running some queries in both intermediary storage tables and also OpenMRS version 1.7. In this case the gold standard is the intermediary storage tables. 
-
-13. Can also test data by running cohort in both BART 1 and BART 2 and BART 1 cohort should be a gold standard in this case. You can also choose at random some patients in both BART version 1 and 2 and compare their master-cards.
+12. Can also test data by running cohort in both BART 1 and BART 2 and BART 1 cohort should be a gold standard in this case. You can also choose at random some patients in both BART version 1 and 2 and compare their master-cards.
