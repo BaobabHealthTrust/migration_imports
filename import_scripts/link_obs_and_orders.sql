@@ -41,7 +41,7 @@ DELIMITER $$
 			UPDATE obs SET order_id = @order_id WHERE obs_id = var_obs_id;
 		
 		END IF;
-		
+		select var_person_id, var_drug_id;
 		END LOOP;
 		
 		CLOSE obs;

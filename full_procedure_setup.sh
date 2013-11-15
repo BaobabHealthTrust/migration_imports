@@ -68,6 +68,10 @@ do
 	mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < $f
 done
 
+echo "loading recalculating adherence scripts"
+mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/adherence_calculation.sql
+mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/recalculate_adherence.sql
+
 echo "updating current_location_id"
 script/runner script/current_location_id.rb
 
@@ -92,6 +96,24 @@ mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
 EOFMYSQL
 
+echo "fixing retired drugs"
+script/runner script/all_after_migration_scripts/fix_program_locations.rb
+
+echo "fixing equivalent daily dose"
+script/runner script/all_after_migration_scripts/fix_for_equivalent_daily_dose.rb
+
+echo "adding the hanging pills"
+script/runner script/all_after_migration_scripts/include_hanging_pills_to_drug_orders.rb
+
+echo "recalculating adherence"
+script/runner script/all_after_migration_scripts/recalculate_adherence.rb
+
+echo "creating OPD program"
+script/runner script/all_after_migration_scripts/creating_patient_opd_program.rb
+
+echo "fixing earliest_start_date"
+script/runner script/all_after_migration_scripts/fix_earliest_start_date.rb
+
 echo "deleting temp_encounter and temp_obs tables..........."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
   DROP table temp_encounter;
@@ -101,3 +123,5 @@ EOFMYSQL
 later=$(date +"%T")
 echo "start time : $now"
 echo "end time : $later"
+
+echo "done"
