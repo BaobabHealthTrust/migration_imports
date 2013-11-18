@@ -65,7 +65,6 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.string   "drug_left_at_home4",                 :limit => 25
     t.string   "arv_regimen"
     t.string   "prescribe_cpt",                      :limit => 25
-    t.string   "prescribe_ipt",                      :limit => 25
     t.integer  "number_of_condoms_given"
     t.string   "depo_provera_given",                 :limit => 25
     t.string   "continue_treatment_at_clinic",       :limit => 25
@@ -77,7 +76,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.date     "date_voided"
     t.integer  "voided_by"
     t.datetime "date_created"
-    t.string   "creator"
+    t.integer  "creator"
   end
 
   create_table "first_visit_encounters", :force => true do |t|
@@ -110,7 +109,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.integer  "voided_by"
     t.datetime "encounter_datetime"
     t.datetime "date_created",                                                    :null => false
-    t.string   "creator"
+    t.integer  "creator"
   end
 
   create_table "general_reception_encounters", :force => true do |t|
@@ -125,7 +124,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.integer  "voided_by"
     t.datetime "encounter_datetime"
     t.datetime "date_created"
-    t.string   "creator"
+    t.integer  "creator"
   end
 
   create_table "give_drugs_encounters", :force => true do |t|
@@ -172,7 +171,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.integer  "voided_by"
     t.datetime "encounter_datetime"
     t.datetime "date_created",                             :null => false
-    t.string   "creator",                                  :null => false
+    t.integer  "creator",                                  :null => false
   end
 
   create_table "guardians", :force => true do |t|
@@ -187,7 +186,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.date    "date_voided"
     t.integer "voided_by"
     t.date    "date_created",                    :null => false
-    t.string  "creator",                         :null => false
+    t.integer "creator",                         :null => false
   end
 
   create_table "hiv_reception_encounters", :force => true do |t|
@@ -204,7 +203,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.integer  "voided_by"
     t.datetime "encounter_datetime"
     t.datetime "date_created"
-    t.string   "creator"
+    t.integer  "creator"
   end
 
   create_table "hiv_staging_encounters", :force => true do |t|
@@ -279,7 +278,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.integer  "voided_by"
     t.datetime "encounter_datetime"
     t.datetime "date_created"
-    t.string   "creator"
+    t.integer  "creator"
   end
 
   create_table "outcome_encounters", :force => true do |t|
@@ -296,7 +295,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.integer  "voided_by"
     t.datetime "encounter_datetime"
     t.datetime "date_created",                            :null => false
-    t.string   "creator",                                 :null => false
+    t.integer  "creator",                                 :null => false
   end
 
   create_table "outpatient_diagnosis_encounters", :force => true do |t|
@@ -314,7 +313,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.integer  "voided_by"
     t.datetime "encounter_datetime"
     t.datetime "date_created"
-    t.string   "creator"
+    t.integer  "creator"
   end
 
   create_table "patient_outcomes", :force => true do |t|
@@ -356,7 +355,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.date    "date_voided"
     t.integer "voided_by"
     t.date    "date_created",                                            :null => false
-    t.string  "creator",                                                 :null => false
+    t.integer "creator",                                                 :null => false
   end
 
   create_table "patients", :primary_key => "patient_id", :force => true do |t|
@@ -391,7 +390,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.date    "date_voided"
     t.integer "voided_by"
     t.date    "date_created",                                            :null => false
-    t.string  "creator",                                                 :null => false
+    t.integer "creator",                              :default => 1,     :null => false
   end
 
   create_table "pre_art_visit_encounters", :force => true do |t|
@@ -439,7 +438,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.datetime "encounter_datetime"
     t.datetime "date_created"
     t.string   "location"
-    t.string   "creator"
+    t.integer  "creator"
   end
 
   create_table "users", :force => true do |t|
@@ -464,7 +463,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.string  "void_reason"
     t.date    "date_voided"
     t.integer "voided_by"
-    t.string  "creator",                         :null => false
+    t.integer "creator",      :default => 1,     :null => false
   end
 
   create_table "visit_encounters", :force => true do |t|
@@ -489,7 +488,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.integer  "voided_by"
     t.datetime "encounter_datetime"
     t.datetime "date_created"
-    t.string   "creator"
+    t.integer  "creator"
   end
 
 end
