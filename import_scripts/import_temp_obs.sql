@@ -100,7 +100,7 @@ BEGIN
   var_value_numeric, var_value_modifier, var_value_text, var_date_started, var_date_stopped, var_comments,var_creator, var_date_created,
   var_voided, var_voided_by, var_date_voided, var_void_reason, var_value_complex, var_uuid);
 
-
+    select var_person_id, var_encounter_id;
     END LOOP;
 
 END$$
