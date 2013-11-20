@@ -11,21 +11,21 @@ def start
 	females_original = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 and gender = 'Female'").length
 	males_intermed = PatientRecord.find_all_by_gender('Male').length
 	females_intermed = Patient.find_all_by_gender('Female').length
-  hiv_clinic_enc_original = Encounter.find_by_sql("select count(*) from #{Source_db}.encounter where encounter_type = 1").length
+  hiv_clinic_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 1").length
   hiv_clinic_enc_intermed = FirstVisitEncounter.all.length
-  hiv_recp_enc_original = Encounter.find_by_sql("select count(*) from #{Source_db}.encounter where encounter_type = 5").length
+  hiv_recp_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 5").length
   hiv_recp_enc_intermed = HivReceptionEncounter.all.length
-  hiv_stage_enc_original = Encounter.find_by_sql("select count(*) from #{Source_db}.encounter where encounter_type = 1").length
+  hiv_stage_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 1").length
   hiv_stage_enc_intermed = HivStagingEncounter.all.length
-  treatment_enc_original = Encounter.find_by_sql("select count(*) from #{Source_db}.encounter where encounter_type = 3").length
+  treatment_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 3").length
   treatment_enc_intermed = GiveDrugsEncounter.all.length
-  hiv_consult_enc_original = Encounter.find_by_sql("select count(*) from #{Source_db}.encounter where encounter_type = 2").length
+  hiv_consult_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 2").length
   hiv_consult_enc_intermed = ArtVisitEncounter.all.length
-  opd_diag_enc_original = Encounter.find_by_sql("select count(*) from #{Source_db}.encounter where encounter_type = 18").length
+  opd_diag_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 18").length
   opd_diag_enc_intermed = OutpatientDiagnosisEncounter.all.length
-  opd_recp_enc_original = Encounter.find_by_sql("select count(*) from #{Source_db}.encounter where encounter_type = 17").length
+  opd_recp_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 17").length
   opd_recp_enc_intermed = GeneralReceptionEncounter.all.length
-  vitals_enc_original = Encounter.find_by_sql("select count(*) from #{Source_db}.encounter where encounter_type = 7").length
+  vitals_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 7").length
   vitals_enc_intermed = VitalsEncounter.all.length
 
   print "Category".ljust(30)
