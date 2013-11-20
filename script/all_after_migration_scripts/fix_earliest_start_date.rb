@@ -92,7 +92,7 @@ def date_antiretrovirals_started(patient)
   concept_id = Encounter.find_by_sql("SELECT concept_id FROM #{Source_db}.concept_name
                                       WHERE name = 'ART START DATE'").map(&:concept_id).first
   
-  start_date = Encounter.find_by_sql("SELECT value_numeric FROM #{Source_db}.obs
+  start_date = Encounter.find_by_sql("SELECT value_datetime FROM #{Source_db}.obs
                                       WHERE concept_id = #{concept_id}
                                       AND person_id = #{patient.id}").map(&:value_datetime).first
  
@@ -100,7 +100,7 @@ def date_antiretrovirals_started(patient)
     concept_id = Encounter.find_by_sql("SELECT concept_id FROM #{Source_db}.concept_name
                                         WHERE name = 'Date antiretrovirals started'").map(&:concept_id).first
       
-    start_date = Encounter.find_by_sql("SELECT value_text FROM #{Source_db}.obs
+    start_date = Encounter.find_by_sql("SELECT value_datetime FROM #{Source_db}.obs
                                         WHERE concept_id = #{concept_id}
                                         AND person_id = #{patient.id}").map(&:value_datetime).first      
       
