@@ -9,13 +9,13 @@ def start
 
   (art_patients || []).each do |patient|
 
-    enrolled_date = date_antiretrovirals_started(patient.patient)
+    enrolled_date = date_antiretrovirals_started(patient.patient) 
 
     first_dispense = get_first_dispensation(patient.patient_id)
 
 
     unless first_dispense.blank?
-      if enrolled_date != first_dispense
+      if enrolled_date != first_dispense && !enrolled_date.blank?
         puts "change dates"
         first_dispense = first_dispense.to_date if !first_dispense.blank?
         
@@ -26,9 +26,9 @@ def start
 				                                        AND patient_id = #{patient.patient_id}
 				                                        AND voided = 0").map(&:patient_program_id).first
 				                                        	
-				last_state = Encounter.find_by_sql("SELECT patient_program_id FROM #{Source_db}.patient_state
+				last_state = Encounter.find_by_sql("SELECT patient_state_id FROM #{Source_db}.patient_state
 				                                        WHERE patient_program_id = #{latest_program}
-				                                        AND state = 7").map(&:patient_program_id).first
+				                                        AND state = 7").map(&:patient_state_id).first
 
 			unless last_state.blank?
 			
@@ -40,8 +40,8 @@ EOF
 
         ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.patient_state
-SET start_date = '#{correct_start_date.to_date.strftime('%Y-%m-%d 00:00:00')}',
-date_created = '#{correct_start_date.to_date.strftime('%Y-%m-%d 00:00:00')}'
+SET start_date = '#{first_dispense.to_date.strftime('%Y-%m-%d 00:00:00')}',
+date_created = '#{first_dispense.to_date.strftime('%Y-%m-%d 00:00:00')}'
 WHERE patient_state_id = #{last_state}
 EOF
 
@@ -92,7 +92,7 @@ def date_antiretrovirals_started(patient)
   concept_id = Encounter.find_by_sql("SELECT concept_id FROM #{Source_db}.concept_name
                                       WHERE name = 'ART START DATE'").map(&:concept_id).first
   
-  start_date = Encounter.find_by_sql("SELECT value_numeric FROM #{Source_db}.obs
+  start_date = Encounter.find_by_sql("SELECT value_datetime FROM #{Source_db}.obs
                                       WHERE concept_id = #{concept_id}
                                       AND person_id = #{patient.id}").map(&:value_datetime).first
  
@@ -102,7 +102,7 @@ def date_antiretrovirals_started(patient)
       
     start_date = Encounter.find_by_sql("SELECT value_text FROM #{Source_db}.obs
                                         WHERE concept_id = #{concept_id}
-                                        AND person_id = #{patient.id}").map(&:value_datetime).first      
+                                        AND person_id = #{patient.id}").map(&:value_text).first      
       
     art_start_date = start_date
     if art_start_date.blank? || art_start_date == ""
