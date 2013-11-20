@@ -9,13 +9,13 @@ def start
 
   (art_patients || []).each do |patient|
 
-    enrolled_date = date_antiretrovirals_started(patient.patient)
+    enrolled_date = date_antiretrovirals_started(patient.patient) 
 
     first_dispense = get_first_dispensation(patient.patient_id)
 
 
     unless first_dispense.blank?
-      if enrolled_date != first_dispense
+      if enrolled_date != first_dispense && !enrolled_date.blank?
         puts "change dates"
         first_dispense = first_dispense.to_date if !first_dispense.blank?
         
