@@ -82,6 +82,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
     # SET FOREIGN_KEY_CHECKS = 0;
     # SET UNIQUE_CHECKS = 0;
     # SET AUTOCOMMIT = 0;
+      SET @max_patient_id = (SELECT MAX(patient_id) + 1 FROM `bart1_intermediate_bare_bones`.`patients`);
 
     # Open cursor
     OPEN cur;
@@ -129,11 +130,12 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         #create person
         SET @person_uuid = (SELECT UUID());
 
-        INSERT INTO person (date_created, date_changed, creator, uuid)
-        VALUES (date_created, date_created, @creator, @person_uuid);
+        INSERT INTO person (person_id,date_created, date_changed, creator, uuid)
+        VALUES (@max_patient_id,date_created, date_created, @creator, @person_uuid);
 
         #create person_names
         SET @person_id = (SELECT person_id FROM person WHERE uuid = @person_uuid);
+        SET @max_patient_id = @max_patient_id + 1;
 
         INSERT INTO person_name(person_id, given_name, middle_name, family_name, date_created, creator, uuid)
         VALUES (@person_id, last_name, middle_name, first_name, date_created, @creator, (SELECT UUID()));
