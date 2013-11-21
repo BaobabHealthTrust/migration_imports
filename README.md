@@ -47,7 +47,7 @@ Setup of Intermediate Tables
 
 		ruby export_setup.sh production 
 
-4. After successfully importing all data from OpenMRS version 1.1 into the intermediary storage. Verify data completeness by running some queries on both OpenMRS version 1.1 dataset and intermediary storage tables. OpenMRS version 1.1 is the gold standard in this case.
+4. After successfully exporting all data from OpenMRS version 1.1 into the intermediary storage. Verify data completeness by running some queries on both OpenMRS version 1.1 dataset and intermediary storage tables. OpenMRS version 1.1 is the gold standard in this case.
 
 5. After running the queries and you are sure that the data is as you expected, you are now ready to map and import data from the intermediary tables into OpenMRS version 1.7.
 
