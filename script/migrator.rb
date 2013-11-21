@@ -360,7 +360,7 @@ def self.create_patient(pat)
   patient.date_voided = pat.date_voided
   patient.voided_by = pat.voided_by
   patient.date_created = pat.date_created.to_date
-  patient.creator = User.find_by_user_id(pat.creator).username if !pat.creator.blank?
+  patient.creator = User.find_by_user_id(pat.creator).username rescue User.first.username
 
 	if pat.voided
 	  patient.voided = 1  	
@@ -396,7 +396,7 @@ def self.create_guardian(pat)
     guardian.name = temp.given_name rescue nil
     guardian.gender = temp_relative.gender rescue nil
     guardian.relationship = RelationshipType.find(relative.relationship).name
-    guardian.creator = User.find_by_user_id(temp_relative.creator).username if !temp_relative.creator.blank? 
+    guardian.creator = User.find_by_user_id(temp_relative.creator).username rescue User.first.username
     guardian.date_created = relative.date_created
     Guardian_queue << guardian
   end
@@ -484,7 +484,7 @@ def self.create_hiv_first_visit(visit_encounter_id, encounter)
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
   enc.old_enc_id = encounter.encounter_id
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
   (encounter.observations || []).each do |ob|
     case ob.concept.name.upcase
       when 'AGREES TO FOLLOWUP'
@@ -582,7 +582,7 @@ def self.create_give_drug_record(visit_encounter_id, encounter)
   patient_regimen_category = Encounter.find_by_sql("select category from #{Source_db}.patient_historical_regimens where patient_id = #{encounter.patient_id} AND (encounter_id = #{encounter.encounter_id} OR DATE(dispensed_date) = '#{@encounter_datetime}')").map{|p| p.category}
 
   enc.regimen_category = patient_regimen_category
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
   give_drugs_count = 1
   @quantity = 0
 
@@ -676,7 +676,7 @@ def self.create_update_outcome(visit_encounter_id, encounter)
   enc.old_enc_id = encounter.encounter_id
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
   (encounter.observations || []).each do |ob|
     case ob.concept.name.upcase
       when 'OUTCOME'
@@ -744,7 +744,7 @@ def self.create_vitals_record(visit_encounter_id, encounter)
   enc.old_enc_id = encounter.encounter_id
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
   details = WeightHeightForAge.new()
   details.patient_height_weight_values(Patient.find(encounter.patient_id))
   (encounter.observations || []).each do |ob|
@@ -797,7 +797,7 @@ def self.create_hiv_reception_record(visit_encounter_id, encounter)
   enc.location = Location.find(encounter.location_id).name
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
   (encounter.observations || []).each do |ob|
     case ob.concept.name.upcase
       when 'GUARDIAN PRESENT'
@@ -837,7 +837,7 @@ def self.create_pre_art_record(visit_encounter_id, encounter)
   enc.old_enc_id = encounter.encounter_id
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
   (encounter.observations || []).each do |ob|
     self.repeated_obs(enc, ob) rescue nil
   end
@@ -936,7 +936,7 @@ def self.create_art_encounter(visit_encounter_id, encounter)
   enc.old_enc_id = encounter.encounter_id
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
   enc.location = Location.find(encounter.location_id).name
   drug_name_brought_to_clinic_count = 1
   drug_name_not_brought_to_clinic_count = 1
@@ -1015,7 +1015,7 @@ def self.create_outpatient_diag_encounter(visit_encounter_id, encounter)
   enc.location = Location.find(encounter.location_id).name
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
 
   (encounter.observations || []).each do |ob|
     case ob.concept.name.upcase
@@ -1059,7 +1059,7 @@ def self.create_general_encounter(visit_encounter_id, encounter)
   enc.location = Location.find(encounter.location_id).name
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
 
   (encounter.observations || []).each do |ob|
     if ob.concept.name.upcase == 'PATIENT PRESENT'
@@ -1100,7 +1100,7 @@ def self.create_hiv_staging_encounter(visit_encounter_id, encounter)
   enc.location = Location.find(encounter.location_id).name
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
-  enc.creator = User.find_by_user_id(encounter.creator).username if !encounter.creator.blank?
+  enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
   enc.who_stage = "WHO stage "+PersonAttribute.find(:last, :conditions => ["person_id = ? 
     AND person_attribute_type_id = ?", encounter.patient_id, whostage]).value.to_s rescue nil
   enc.reason_for_starting_art = PersonAttribute.find(:last,

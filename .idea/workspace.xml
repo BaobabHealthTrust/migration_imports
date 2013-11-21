@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8edbfa60-dcdd-48f8-9590-8de870d3e668" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/migration_development_dump" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/moh_regimens_only.sql" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/import_scripts/drug_map.sql" afterPath="$PROJECT_DIR$/import_scripts/drug_map.sql" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/database.yml" afterPath="$PROJECT_DIR$/config/database.yml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/schema.rb" afterPath="$PROJECT_DIR$/db/schema.rb" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/script/export_verifier.rb" afterPath="$PROJECT_DIR$/script/export_verifier.rb" />
     </list>
     <ignored path="migration_imports.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -25,28 +25,6 @@
   <component name="FavoritesManager">
     <favorites_list name="migration_imports" />
   </component>
-  <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="bart1_to_bart2_drug_map.sql" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/db/bart1_to_bart2_drug_map.sql">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="21" selection-start="437" selection-end="437" vertical-scroll-proportion="0.3882545">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="import_give_drugs.sql" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/import_scripts/import_give_drugs.sql">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="160" column="77" selection-start="9510" selection-end="9517" vertical-scroll-proportion="-6.096774">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
   <component name="FindManager">
     <FindUsagesManager>
       <setting name="OPEN_NEW_TAB" value="false" />
@@ -65,12 +43,16 @@
         <option value="$PROJECT_DIR$/import_scripts/import_temp_obs.sql" />
         <option value="$PROJECT_DIR$/import_scripts/import_from_temps.sql" />
         <option value="$PROJECT_DIR$/import_scripts/drug_map.sql" />
+        <option value="$PROJECT_DIR$/script/encounter_exporter.rb" />
+        <option value="$PROJECT_DIR$/import_scripts/import_first_visit_encounters.sql" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/script/export_verifier.rb" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="24" />
-    <option name="width" value="1366" />
+    <option name="width" value="1360" />
     <option name="height" value="744" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -99,6 +81,16 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -127,7 +119,39 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="import_scripts" />
+              <option name="myItemId" value="script" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="migration_imports" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="migration_imports" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="models" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="migration_imports" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="migration_imports" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -139,16 +163,6 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="migration_imports" />
               <option name="myItemType" value="org.jetbrains.plugins.ruby.rails.projectView.v2.nodes.RailsProjectNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-      <pane id="Scope">
-        <subPane subId="Project Files">
-          <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
@@ -392,14 +406,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="24" width="1366" height="744" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="24" width="1360" height="744" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1762918" sideWeight="0.0" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.0" sideWeight="0.0" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -470,88 +484,84 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/procedure_setup.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="75" selection-start="1227" selection-end="1227" vertical-scroll-proportion="0.68189234" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/db/schema.rb">
+    <entry file="file://$PROJECT_DIR$/procedures/proc_insert_basics.sql">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/import_scripts/import_update_outcome_encounters.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="67" column="100" selection-start="2607" selection-end="2607" vertical-scroll-proportion="0.9479167" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/import_scripts/import_user.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="45" selection-start="800" selection-end="800" vertical-scroll-proportion="0.48939642" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/db/temporary_tables.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="0" selection-start="60" selection-end="1261" vertical-scroll-proportion="0.78303427" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/export_setup.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+        <state line="41" column="71" selection-start="1550" selection-end="1550" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/import_scripts/import_from_temps.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="50" selection-start="590" selection-end="590" vertical-scroll-proportion="0.02446982">
-          <folding />
-        </state>
+        <state line="81" column="60" selection-start="2287" selection-end="2287" vertical-scroll-proportion="0.948542" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/import_scripts/import_patients.sql">
+    <entry file="file://$PROJECT_DIR$/procedure_setup_with_trigger.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="296" column="57" selection-start="14991" selection-end="14991" vertical-scroll-proportion="0.025">
-          <folding />
-        </state>
+        <state line="36" column="36" selection-start="1099" selection-end="1099" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/database.yml">
+    <entry file="file://$PROJECT_DIR$/import_scripts/import_art_visit_encounters.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+        <state line="2317" column="61" selection-start="168415" selection-end="168415" vertical-scroll-proportion="0.47579297" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/import_scripts/import_temp_obs.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="96" column="135" selection-start="3053" selection-end="3053" vertical-scroll-proportion="0.5350734">
-          <folding />
-        </state>
+        <state line="95" column="2" selection-start="2882" selection-end="2882" vertical-scroll-proportion="0.50980395" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/db/defaults.sql">
+    <entry file="file://$PROJECT_DIR$/import_scripts/import_patients.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="80" column="59" selection-start="2840" selection-end="2840" vertical-scroll-proportion="0.95">
-          <folding />
-        </state>
+        <state line="299" column="109" selection-start="15115" selection-end="15124" vertical-scroll-proportion="0.025041737" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/import_scripts/import_give_drugs.sql">
+    <entry file="file://$PROJECT_DIR$/import_scripts/import_patients_in_batches.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="160" column="77" selection-start="9510" selection-end="9517" vertical-scroll-proportion="-6.096774">
-          <folding />
-        </state>
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/import_scripts/drug_map.sql">
+    <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="3514" selection-start="4926" selection-end="4926" vertical-scroll-proportion="0.6">
-          <folding />
-        </state>
+        <state line="78" column="30" selection-start="4261" selection-end="4261" vertical-scroll-proportion="0.34891486" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/db/bart1_to_bart2_drug_map.sql">
+    <entry file="file://$PROJECT_DIR$/export_setup.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="21" selection-start="437" selection-end="437" vertical-scroll-proportion="0.3882545">
-          <folding />
-        </state>
+        <state line="27" column="45" selection-start="749" selection-end="749" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/full_procedure_setup.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="99" column="27" selection-start="4523" selection-end="4523" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/import_patients.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="0" selection-start="1009" selection-end="1009" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/partial_procedure_setup.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="61" selection-start="3737" selection-end="3737" vertical-scroll-proportion="0.85294116" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/patient.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/patient_record.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/script/export_verifier.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="72" selection-start="1334" selection-end="1334" vertical-scroll-proportion="0.46568626" />
       </provider>
     </entry>
   </component>
