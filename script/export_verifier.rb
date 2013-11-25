@@ -10,7 +10,7 @@ def start
 	males_original = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 and gender = 'Male'").length
 	females_original = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 and gender = 'Female'").length
 	males_intermed = PatientRecord.find_all_by_gender('Male').length
-	females_intermed = Patient.find_all_by_gender('Female').length
+	females_intermed = PatientRecord.find_all_by_gender('Female').length
   hiv_clinic_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 1").length
   hiv_clinic_enc_intermed = FirstVisitEncounter.all.length
   pre_art_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 23").length
