@@ -84,7 +84,7 @@ def start
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
   
-  
+  puts "Transferring patient states to intermediate tables"
   patients.each do |patient|
     patient_historical_outcomes = PatientOutcome.find_by_sql("SELECT * FROM #{Source_db}.patient_historical_outcomes
                                                               WHERE patient_id = #{patient.patient_id}
@@ -241,7 +241,7 @@ def start
 		patients = PatientRecord.find_by_sql("select patient_id from #{enc_type} where patient_id not in (select patient_id from patients)")
 		puts "#{patients.length} will be created"
 		patients.each do |patient|
-			self.create_patient(Patient.find(patient))
+			self.create_patient(Patient.find(patient.patient_id))
 		end
 		
 	end
