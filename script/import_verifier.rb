@@ -63,7 +63,7 @@ def start
   print "HIV Clinic Registration".ljust(30)
   print hiv_clinic_enc_destination.to_s.ljust(20)
   print hiv_clinic_enc_intermed.to_s.ljust(20)
-  print ( hiv_clinic_enc_intermed.to_i hiv_clinic_enc_destination.to_i ).to_s
+  print ( hiv_clinic_enc_intermed.to_i - hiv_clinic_enc_destination.to_i ).to_s
   puts ""
   print "HIV Clinic Reception".ljust(30)
   print hiv_recp_enc_destination.to_s.ljust(20)
