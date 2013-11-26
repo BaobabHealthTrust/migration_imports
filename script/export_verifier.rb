@@ -29,9 +29,9 @@ def start
   opd_recp_enc_intermed = GeneralReceptionEncounter.all.length
   vitals_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 7").length
   vitals_enc_intermed = VitalsEncounter.all.length
-  users_original = User.find_by_sql("select * from #{Source_db}.users where voided = 0").length
+  users_original = User.find_by_sql("select * from #{Source_db}.users").length
   user_intermed = User.all.length
-  guardian_original = Relationship.find_by_sql("select * from #{Source_db}.relationship where voided = 0").length
+  guardian_original = Relationship.find_by_sql("select * from #{Source_db}.relationship").length
   guardian_intermed = Relationship.all.length
   pat_outcomes_original = PatientHistoricalOutcome.find_by_sql("select * from #{Source_db}.patient_historical_outcomes").length
   pat_outcomes_intermed = PatientOutcome.all.length
@@ -41,17 +41,17 @@ def start
   print "Intermediate DB".ljust(20)
   print "Differences"
   puts ""
-  print "Number of Patients".ljust(30)
+  print "Total Patients".ljust(30)
   print patient_original.to_s.ljust(20)
   print patient_intermed.to_s.ljust(20)
   print (patient_original.to_i - patient_intermed.to_i ).to_s
   puts ""
-  print "Number of Males".ljust(30)
+  print "Total Males".ljust(30)
   print males_original.to_s.ljust(20)
   print males_intermed.to_s.ljust(20)
   print (males_original.to_i - males_intermed.to_i ).to_s
   puts ""
-  print "Number of Females".ljust(30)
+  print "Total Females".ljust(30)
   print females_original.to_s.ljust(20)
   print females_intermed.to_s.ljust(20)
   print (females_original.to_i - females_intermed.to_i ).to_s
