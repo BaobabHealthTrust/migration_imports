@@ -47,7 +47,9 @@ Setup of Intermediate Tables
 
 		ruby export_setup.sh production 
 
-4. After successfully exporting all data from OpenMRS version 1.1 into the intermediary storage. Verify data completeness by running some queries on both OpenMRS version 1.1 dataset and intermediary storage tables. OpenMRS version 1.1 is the gold standard in this case.
+4. After successfully exporting all data from OpenMRS version 1.1 into the intermediary storage. Verify data completeness by running some queries on both OpenMRS version 1.1 dataset and intermediary storage tables. OpenMRS version 1.1 is the gold standard in this case. Run the following script to run the queries.
+    
+    script/runner script/export_verifier.rb
 
 5. After running the queries and you are sure that the data is as you expected, you are now ready to map and import data from the intermediary tables into OpenMRS version 1.7.
 
@@ -65,7 +67,7 @@ This method is also called the Full procedure setup. With this method, all patie
 
     Note: Site code in this case is the code for a particular site. Example is given below;
 
-			ruby full_procedure_setup.sh mpc
+		ruby full_procedure_setup.sh mpc
 
 2. Partial Import
 With this method  patients are mapped and  imported in batches. This method should be used if and only if the dataset is huge and if there are several servers reserved for the data migration process.
@@ -92,12 +94,16 @@ With this method  patients are mapped and  imported in batches. This method shou
 
 Phase Three: Testing Migrated Data
 
-1. After successfully mapping and importing all data, then switch to BART 2 application and make sure it is up-to-date.
+1. After successfully mapping and importing all data. Verify data completeness by running some queries on both OpenMRS version 1.7 dataset and intermediary storage tables. Run the following script to run the queries.
+    
+     script/runner script/import_verifier.rb
 
-2. Change the BART 2 config/database.yml to point to the OpenMRS version 1.7. This is the database which has the migrated data.
+2. Switch to BART 2 application and make sure it is up-to-date. 
 
-3. Test the data by running sampling some patients and comparing their records with BART 1. You could also run queries on
+3. Change the BART 2 config/database.yml to point to the OpenMRS version 1.7. This is the database which has the migrated data.
+
+4. Test the data by running sampling some patients and comparing their records with BART 1. You could also run queries on
    the 3 databases to verify the data
 
-4. Can also test data by running cohort in both BART 1 and BART 2 and BART 1 cohort should be a gold standard in this case.
+5. Can also test data by running cohort in both BART 1 and BART 2 and BART 1 cohort should be a gold standard in this case.
 
