@@ -12,19 +12,29 @@ def start
                                                      FROM #{Source_db}.location
                                                      WHERE location_id = #{@bart1_current_location_id}").map(&:name).first
 
+  @bart1_current_location_site_code = Patient.find_by_sql("SELECT SUBSTRING(description, (LOCATE(':',description) + 1)) AS description
+                                                     FROM #{Source_db}.location
+                                                     WHERE location_id = #{@bart1_current_location_id}").map(&:description).first
+
   @bart2_current_location_id = Location.find_by_name(@bart1_current_location_name).location_id
   
   update_current_location_id = "UPDATE #{Destination_db}.global_property
                   SET property_value = #{@bart2_current_location_id}
                   WHERE property = 'current_health_center_id'"
-                  
+
     CONN.execute update_current_location_id
-    
+
     update_current_location_name = "UPDATE #{Destination_db}.global_property
                   SET property_value = '#{@bart1_current_location_name}'
                   WHERE property = 'current_health_center_name'"
 
     CONN.execute update_current_location_name
+
+    update_site_code = "UPDATE #{Destination_db}.global_property
+                  SET property_value = '#{@bart1_current_location_site_code}'
+                  WHERE property = 'site_prefix'"
+
+    CONN.execute update_site_code
 end
 
 start
