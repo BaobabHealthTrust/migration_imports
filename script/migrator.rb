@@ -144,6 +144,7 @@ def start
                               select e.* from encounter e
                                 inner join orders o on o.encounter_id = e.encounter_id
                               where e.encounter_type = 3
+                              and o.voided = 0
                               and e.patient_id = #{patient.id}
                               and e.encounter_id NOT IN ( select DISTINCT encounter_id
                                                           from obs
@@ -1498,7 +1499,7 @@ end
 
 
 def self.create_users()
-  users = User.find_by_sql("Select* from  #{Source_db}.users")
+  users = User.find_by_sql("Select * from  #{Source_db}.users")
 
   users.each do |user|
     new_user = MigratedUsers.new()
