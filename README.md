@@ -1,6 +1,6 @@
 migration_imports application
 
-Migration imports application is used to migrate data from OpenMRS version 1.1 database platform to OpenMRS 1.7. database platform. The process of migrating data is divided into three main categories.
+Migration imports application is used to migrate data from OpenMRS version 1.1 database platform to OpenMRS 1.7. database platform. The process of migrating data is divided into three main phases.
 
 These are:
 1. Export data from OpenMRS version 1.1 into the intermediary storage (14 flat tables)
@@ -23,7 +23,7 @@ Bart 1 Data Preparation
 	
 	script/runner script/reset_views.rb
 	
-	The command above allows you  to reset the following; patient start dates,  	patient registration dates, patient adherence dates, patient adherence 	rates, patient prescription totals, patient whole tablets remaining and 	brought, patient historical outcomes, patient historical regimens, and person 	attribute. 
+	The command above allows you  to reset the following; patient start dates, patient registration dates, patient adherence dates, patient 	adherence rates, patient prescription totals, patient whole tablets remaining and brought, patient historical outcomes, patient historical 		regimens, and person 	attribute. 
 
 
 Setup of Intermediate Tables
@@ -33,11 +33,11 @@ Setup of Intermediate Tables
 
 2. Change database settings in config/database.yml of migration_imports application to your specifications as below.
 
-	Under bart1: enter the details of your Source database (the dataset you want to export. This is the OpenMRS version 1.1 dataset)
+	- Under bart1: enter the details of your Source database (the dataset you want to export. This is the OpenMRS version 1.1 dataset)
 
-	Under development or production: Use bart1_intermediate_bare_bones as the database name for this for consistency.
+	- Under development or production: Use bart1_intermediate_bare_bones as the database name for this for consistency.
 
-	Under bart2: enter the details of your destination database. (This is the OpenMRS version 1.7)
+	- Under bart2: enter the details of your destination database. (This is the OpenMRS version 1.7)
 
 3. Open the Console from migration_imports and enter the command below to create intermediary storage and export data from OpenMRS version 1.1 into the intermediary storage
 
@@ -47,14 +47,16 @@ Setup of Intermediate Tables
 
 		ruby export_setup.sh production 
 
-4. After successfully exporting all data from OpenMRS version 1.1 into the intermediary storage. Verify data completeness by running some queries on both OpenMRS version 1.1 dataset and intermediary storage tables. OpenMRS version 1.1 is the gold standard in this case.
+4. After successfully exporting all data from OpenMRS version 1.1 into the intermediary storage. Verify data completeness by running some queries on both OpenMRS version 1.1 dataset and intermediary storage tables. OpenMRS version 1.1 is the gold standard in this case. Run the following script to run the queries. In the same console window, run the following command;
+    
+    script/runner script/export_verifier.rb
 
 5. After running the queries and you are sure that the data is as you expected, you are now ready to map and import data from the intermediary tables into OpenMRS version 1.7.
 
 
 Phase Two: Import of From Intermediate Tables to Destination Database
 
-Importing of records can be done in two ways. The first is a complete importation of all patient records while the second is a partial importation of records. The partial importation transfers patients in a given range to the source database. The two approaches have different steps that are followed to accomplish them.
+Importing of records can be done in two ways. The first is a complete importation of all patient records while the second is a partial importation of records. The partial importation transfers patients within a given range to the destination database. The two approaches have different steps that are followed to accomplish them.
 
 1. Complete Import
 This method is also called the Full procedure setup. With this method, all patients with their associated encounters and observations are mapped and imported from the first patient to the last patients. This method is adopted when the size of the dataset is small and also if there are limited resources.
@@ -63,9 +65,9 @@ This method is also called the Full procedure setup. With this method, all patie
 
 		ruby full_procedure_setup.sh site_code
 
-    Note: Site code in this case is the code for a particular site. Example is given below;
+    Note: Site code in this case is the code for a particular site. Example is given below, and f not sure ask the helpdesk where to get the site code.
 
-			ruby full_procedure_setup.sh mpc
+		ruby full_procedure_setup.sh mpc
 
 2. Partial Import
 With this method  patients are mapped and  imported in batches. This method should be used if and only if the dataset is huge and if there are several servers reserved for the data migration process.
@@ -92,12 +94,16 @@ With this method  patients are mapped and  imported in batches. This method shou
 
 Phase Three: Testing Migrated Data
 
-1. After successfully mapping and importing all data, then switch to BART 2 application and make sure it is up-to-date.
+1. After successfully mapping and importing all data. Verify data completeness by running some queries on both OpenMRS version 1.7 dataset and intermediary storage tables. Run the following script to run the queries.
+    
+     script/runner script/import_verifier.rb
 
-2. Change the BART 2 config/database.yml to point to the OpenMRS version 1.7. This is the database which has the migrated data.
+2. Switch to BART 2 application and make sure it is up-to-date. 
 
-3. Test the data by running sampling some patients and comparing their records with BART 1. You could also run queries on
+3. Change the BART 2 config/database.yml to point to the OpenMRS version 1.7. This is the database which has the migrated data.
+
+4. Test the data by sampling some patients and comparing their records with BART 1. You could also run queries on
    the 3 databases to verify the data
 
-4. Can also test data by running cohort in both BART 1 and BART 2 and BART 1 cohort should be a gold standard in this case.
+5. One can also test the data by running cohort report in both BART 1 and BART 2. Please remember that BART 1 cohort should be a gold standard in this case.
 

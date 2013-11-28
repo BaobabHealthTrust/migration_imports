@@ -29,23 +29,29 @@ def start
   opd_recp_enc_intermed = GeneralReceptionEncounter.all.length
   vitals_enc_original = Encounter.find_by_sql("select * from #{Source_db}.encounter where encounter_type = 7").length
   vitals_enc_intermed = VitalsEncounter.all.length
+  users_original = User.find_by_sql("select * from #{Source_db}.users").length
+  user_intermed = User.all.length
+  guardian_original = Relationship.find_by_sql("select * from #{Source_db}.relationship").length
+  guardian_intermed = Relationship.all.length
+  pat_outcomes_original = PatientHistoricalOutcome.find_by_sql("select * from #{Source_db}.patient_historical_outcomes").length
+  pat_outcomes_intermed = PatientOutcome.all.length
 
   print "Category".ljust(30)
   print "Source DB".ljust(20)
   print "Intermediate DB".ljust(20)
   print "Differences"
   puts ""
-  print "Number of Patients".ljust(30)
+  print "Total Patients".ljust(30)
   print patient_original.to_s.ljust(20)
   print patient_intermed.to_s.ljust(20)
   print (patient_original.to_i - patient_intermed.to_i ).to_s
   puts ""
-  print "Number of Males".ljust(30)
+  print "Total Males".ljust(30)
   print males_original.to_s.ljust(20)
   print males_intermed.to_s.ljust(20)
   print (males_original.to_i - males_intermed.to_i ).to_s
   puts ""
-  print "Number of Females".ljust(30)
+  print "Total Females".ljust(30)
   print females_original.to_s.ljust(20)
   print females_intermed.to_s.ljust(20)
   print (females_original.to_i - females_intermed.to_i ).to_s
@@ -95,7 +101,21 @@ def start
   print vitals_enc_intermed.to_s.ljust(20)
   print (vitals_enc_original.to_i - vitals_enc_intermed.to_i ).to_s
   puts ""
-
+  print "Users".ljust(30)
+  print users_original.to_s.ljust(20)
+  print user_intermed.to_s.ljust(20)
+  print (users_original.to_i - user_intermed.to_i ).to_s
+  puts ""
+  print "Guardians".ljust(30)
+  print guardian_original.to_s.ljust(20)
+  print guardian_intermed.to_s.ljust(20)
+  print (guardian_original.to_i - guardian_intermed.to_i ).to_s
+  puts ""
+  print "Patient outcomes".ljust(30)
+  print pat_outcomes_original.to_s.ljust(20)
+  print pat_outcomes_intermed.to_s.ljust(20)
+  print (pat_outcomes_original.to_i - pat_outcomes_intermed.to_i ).to_s
+  puts ""
 end
 
 start
