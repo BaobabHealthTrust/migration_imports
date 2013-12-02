@@ -114,6 +114,9 @@ script/runner script/all_after_migration_scripts/creating_patient_opd_program.rb
 echo "fixing earliest_start_date"
 script/runner script/all_after_migration_scripts/fix_earliest_start_date.rb
 
+echo "fixing arv numbers"
+script/runner script/arv_format_fix.rb 
+
 echo "deleting temp_encounter and temp_obs tables..........."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
   DROP table temp_encounter;
