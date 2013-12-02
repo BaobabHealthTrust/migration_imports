@@ -24,7 +24,11 @@ BEGIN
 	DECLARE refer_to_anotha_hosp varchar(255);
 	DECLARE pri_diagnosis varchar(255);
 	DECLARE sec_diagnosis varchar(255);
-	DECLARE treatment varchar(255);
+	DECLARE treatment1 varchar(255);
+	DECLARE treatment2 varchar(255);
+	DECLARE treatment3 varchar(255);
+	DECLARE treatment4 varchar(255);
+	DECLARE treatment5 varchar(255);
 	DECLARE location varchar(255);
 	DECLARE voided tinyint(1);
 	DECLARE void_reason varchar(255);
@@ -36,7 +40,11 @@ BEGIN
 	DECLARE visit_date DATE;
 
 	# Declare and initialise cursor for looping through the table
-DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`refer_to_anotha_hosp`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`pri_diagnosis`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`sec_diagnosis`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`treatment`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`location`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`voided`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`voided_by`,
+DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`visit_encounter_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`old_enc_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`patient_id`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`refer_to_anotha_hosp`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`pri_diagnosis`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`sec_diagnosis`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`treatment1`,
+`bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`treatment2`,
+`bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`treatment3`,
+`bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`treatment4`,
+`bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`treatment5`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`location`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`voided`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`void_reason`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`date_voided`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`voided_by`,
 `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`encounter_datetime`, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`date_created`,   `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`creator`, COALESCE(`bart1_intermediate_bare_bones`.`visit_encounters`.visit_date, `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.date_created) FROM `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters` LEFT OUTER JOIN `bart1_intermediate_bare_bones`.`visit_encounters` ON
         visit_encounter_id = `bart1_intermediate_bare_bones`.`visit_encounters`.`id`
        WHERE `bart1_intermediate_bare_bones`.`outpatient_diagnosis_encounters`.`patient_id` = in_patient_id;
@@ -59,7 +67,11 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 			refer_to_anotha_hosp,
 			pri_diagnosis,
 			sec_diagnosis,
-			treatment,
+			treatment1,
+			treatment2,
+			treatment3,
+			treatment4,
+			treatment5,						
 			location,
 			voided,
 			void_reason,
@@ -297,7 +309,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
   #-----------------------------------------------------------------------------------------------------------------------------
 
           # Check if the field is not empty
-          IF NOT ISNULL(treatment) THEN
+          IF NOT ISNULL(treatment1) THEN
 
               # Get concept_id
               SET @treatment_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
@@ -305,10 +317,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                           WHERE name = 'Drugs dispensed' AND voided = 0 AND retired = 0 LIMIT 1);
 
               # get the correct drug_name spelling 
-              SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment LIMIT 1);
+              SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment1 LIMIT 1);
 
               IF ISNULL(@bart2_drug_name) THEN
-                SET @bart2_drug_concept_name = (treatment);
+                SET @bart2_drug_concept_name = (treatment1);
               ELSE
                 SET @bart2_drug_concept_name = (@bart2_drug_name);
               END IF;
@@ -338,7 +350,183 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               SET @treatment_id = (SELECT LAST_INSERT_ID());
 
           END IF;
+#--------------------------------------------------------------------------------------------------------------------------
 
+          # Check if the field is not empty
+          IF NOT ISNULL(treatment2) THEN
+
+              # Get concept_id
+              SET @treatment_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = 'Drugs dispensed' AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # get the correct drug_name spelling 
+              SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment2 LIMIT 1);
+
+              IF ISNULL(@bart2_drug_name) THEN
+                SET @bart2_drug_concept_name = (treatment2);
+              ELSE
+                SET @bart2_drug_concept_name = (@bart2_drug_name);
+              END IF;
+
+              # Get value_coded id
+              SET @treatment_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # Get value_coded_name_id
+              SET @treatment_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
+              
+              IF ISNULL(@treatment_value_coded) THEN
+                # Create observation
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @bart2_drug_concept_name,  @creator, date_created, (SELECT UUID()));
+              ELSE
+                # Create observation
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+                VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @treatment_value_coded, @treatment_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+              END IF;
+              
+
+              # Get last obs id for association later to other records
+              SET @treatment_id = (SELECT LAST_INSERT_ID());
+
+          END IF;
+#---------------------------------------------------------------------------------------------------------------------------
+
+          # Check if the field is not empty
+          IF NOT ISNULL(treatment3) THEN
+
+              # Get concept_id
+              SET @treatment_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = 'Drugs dispensed' AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # get the correct drug_name spelling 
+              SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment3 LIMIT 1);
+
+              IF ISNULL(@bart2_drug_name) THEN
+                SET @bart2_drug_concept_name = (treatment3);
+              ELSE
+                SET @bart2_drug_concept_name = (@bart2_drug_name);
+              END IF;
+
+              # Get value_coded id
+              SET @treatment_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # Get value_coded_name_id
+              SET @treatment_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
+              
+              IF ISNULL(@treatment_value_coded) THEN
+                # Create observation
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @bart2_drug_concept_name,  @creator, date_created, (SELECT UUID()));
+              ELSE
+                # Create observation
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+                VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @treatment_value_coded, @treatment_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+              END IF;
+              
+
+              # Get last obs id for association later to other records
+              SET @treatment_id = (SELECT LAST_INSERT_ID());
+
+          END IF;
+#----------------------------------------------------------------------------------------------------------------------------
+
+          # Check if the field is not empty
+          IF NOT ISNULL(treatment4) THEN
+
+              # Get concept_id
+              SET @treatment_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = 'Drugs dispensed' AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # get the correct drug_name spelling 
+              SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment4 LIMIT 1);
+
+              IF ISNULL(@bart2_drug_name) THEN
+                SET @bart2_drug_concept_name = (treatment4);
+              ELSE
+                SET @bart2_drug_concept_name = (@bart2_drug_name);
+              END IF;
+
+              # Get value_coded id
+              SET @treatment_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # Get value_coded_name_id
+              SET @treatment_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
+              
+              IF ISNULL(@treatment_value_coded) THEN
+                # Create observation
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @bart2_drug_concept_name,  @creator, date_created, (SELECT UUID()));
+              ELSE
+                # Create observation
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+                VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @treatment_value_coded, @treatment_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+              END IF;
+              
+
+              # Get last obs id for association later to other records
+              SET @treatment_id = (SELECT LAST_INSERT_ID());
+
+          END IF;
+#----------------------------------------------------------------------------------------------------------------------------
+
+          # Check if the field is not empty
+          IF NOT ISNULL(treatment5) THEN
+
+              # Get concept_id
+              SET @treatment_concept_id = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = 'Drugs dispensed' AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # get the correct drug_name spelling 
+              SET @bart2_drug_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = treatment5 LIMIT 1);
+
+              IF ISNULL(@bart2_drug_name) THEN
+                SET @bart2_drug_concept_name = (treatment5);
+              ELSE
+                SET @bart2_drug_concept_name = (@bart2_drug_name);
+              END IF;
+
+              # Get value_coded id
+              SET @treatment_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
+
+              # Get value_coded_name_id
+              SET @treatment_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
+                          LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
+                          WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
+              
+              IF ISNULL(@treatment_value_coded) THEN
+                # Create observation
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @bart2_drug_concept_name,  @creator, date_created, (SELECT UUID()));
+              ELSE
+                # Create observation
+                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
+                VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @treatment_value_coded, @treatment_value_coded_name_id, @creator, date_created, (SELECT UUID()));
+              END IF;
+              
+
+              # Get last obs id for association later to other records
+              SET @treatment_id = (SELECT LAST_INSERT_ID());
+
+          END IF;
+#----------------------------------------------------------------------------------------------------------------------------
 	END LOOP;
 
 END$$
