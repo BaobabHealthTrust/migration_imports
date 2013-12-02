@@ -80,7 +80,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 ")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
   
@@ -631,7 +631,6 @@ def self.create_give_drug_record(visit_encounter_id, encounter)
 
 end
 
-
 def self.assign_drugs_dispensed(encounter, drug_order, count, quantity, dosage)
   case count
     when 1
@@ -899,6 +898,47 @@ def self.assign_drugs_prescribed(id,enc, prescribed_drug_name_hash, prescribed_d
   end
 end
 
+def self.assign_outpatient_diag_treatment(encounter, obs, count)
+  case count
+    when 1
+      treatment = self.get_concept(obs.value_coded)
+        if treatment = 'Missing' && !obs.value_text.blank?
+          encounter.treatment1 = obs.value_text
+        else
+          encounter.treatment1 = treatment
+        end
+    when 2
+      treatment = self.get_concept(obs.value_coded)
+        if treatment = 'Missing' && !obs.value_text.blank?
+          encounter.treatment2 = obs.value_text
+        else
+          encounter.treatment2 = treatment
+        end
+    when 3
+      treatment = self.get_concept(obs.value_coded)
+        if treatment = 'Missing' && !obs.value_text.blank?
+          encounter.treatment3 = obs.value_text
+        else
+          encounter.treatment3 = treatment
+        end
+    when 4
+      treatment = self.get_concept(obs.value_coded)
+        if treatment = 'Missing' && !obs.value_text.blank?
+          encounter.treatment4 = obs.value_text
+        else
+          encounter.treatment4 = treatment
+        end
+    when 5
+      treatment = self.get_concept(obs.value_coded)
+        if treatment = 'Missing' && !obs.value_text.blank?
+          encounter.treatment5 = obs.value_text
+        else
+          encounter.treatment5 = treatment
+        end
+  end
+end
+
+
 def self.assign_drugs_counted(encounter, obs, count)
   case count
     when 1
@@ -1016,6 +1056,7 @@ def self.create_outpatient_diag_encounter(visit_encounter_id, encounter)
   enc.location = Location.find(encounter.location_id).name
   enc.date_created = encounter.date_created
   enc.encounter_datetime = encounter.encounter_datetime
+  count = 1
   enc.creator = User.find_by_user_id(encounter.creator).username rescue User.first.username
 
   (encounter.observations || []).each do |ob|
@@ -1025,7 +1066,8 @@ def self.create_outpatient_diag_encounter(visit_encounter_id, encounter)
       when 'PRIMARY DIAGNOSIS'
         enc.pri_diagnosis = self.get_concept(ob.value_coded)
       when 'DRUGS GIVEN'
-      enc.treatment = self.get_concept(ob.value_coded)
+        self.assign_outpatient_diag_treatment(enc, ob, count)
+        count += 1
     end
 	end
 
@@ -1365,7 +1407,7 @@ def self.get_concept(id)
     end
   rescue
     $missing_concept_errors += 1
-    Concept.find_by_name('Missing').id
+    Concept.find_by_name('Missing').name
   end
 
 end
@@ -1414,7 +1456,7 @@ end
 
 def flush_outpatient_diag()
 
-	flush_queue(Outpatient_diagnosis_queue,'outpatient_diagnosis_encounters',['visit_encounter_id','old_enc_id', 'patient_id','pri_diagnosis','sec_diagnosis','treatment','location', 'voided', 'void_reason', 'encounter_datetime', 'date_voided', 'voided_by', 'date_created', 'creator'])
+	flush_queue(Outpatient_diagnosis_queue,'outpatient_diagnosis_encounters',['visit_encounter_id','old_enc_id', 'patient_id','pri_diagnosis','sec_diagnosis','treatment1','treatment2','treatment3','treatment4','treatment5','location', 'voided', 'void_reason', 'encounter_datetime', 'date_voided', 'voided_by', 'date_created', 'creator'])
 	
 end
 
