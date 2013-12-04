@@ -92,20 +92,221 @@ BEGIN
         
         # Map destination user to source user
         SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+        IF ISNULL(dob_estimated) THEN
+          SET @date_of_birth_estimated = (false);
+        ELSE
+          SET @date_of_birth_estimated = (dob_estimated);
+        END IF;
+
+        IF ISNULL(dead) THEN
+          SET @patient_dead = (0);
+        ELSE
+          SET @patient_dead = (dead);
+        END IF;
 
         # Get last person id for association later to other records
         SET @person_id = (patient_id);
-        
-        select patient_id;
-        
-        select "general_reception_encounter";        
-        CALL proc_import_general_reception_encounters(@person_id);    # good
-        
-        select "outpatient_diagnosis_encounter";        
-        CALL proc_import_outpatient_diagnosis_encounters(@person_id); # good
 
-        select patient_id;
+        SET @old_patient = COALESCE((SELECT patient_id FROM patient WHERE patient_id = @person_id), 0);
+        
+        IF (@old_patient = 0) THEN
+        
+            # Create person object in destination
+            INSERT INTO person (person_id, gender, birthdate, birthdate_estimated, dead, creator, date_created, uuid)
+            VALUES (patient_id,SUBSTRING(gender, 1, 1), dob, @date_of_birth_estimated, @patient_dead, @creator, date_created, (SELECT UUID()))  ON DUPLICATE KEY UPDATE person_id = patient_id;
+        
+            # Create person name details
+            INSERT INTO person_name (person_id, given_name, middle_name, family_name, creator, date_created, uuid)
+            VALUES (patient_id, given_name, middle_name, family_name, @creator, date_created, (SELECT UUID()));
+            
+            SET @person_name_id = (SELECT LAST_INSERT_ID());
+            
+            #create person_name_coded
+            INSERT INTO person_name_code (person_name_id, given_name_code, middle_name_code, family_name_code)
+            VALUES (@person_name_id, soundex(given_name), soundex(middle_name), soundex(family_name));
 
+            # Check variables for several person attribute type ids
+            SET @cellphone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Cell Phone Number");
+            SET @home_phone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Home Phone Number");
+            SET @office_phone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Office Phone Number");
+            SET @occupation_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Occupation");
+            SET @traditional_authority_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Ancestral Traditional Authority");
+            SET @current_address_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Current Place Of Residence");
+            SET @landmark_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Landmark Or Plot Number");
+        
+            # Create associated person attributes
+            IF COALESCE(traditional_authority, "") != "" THEN
+            
+                INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
+                VALUES (patient_id, traditional_authority, @traditional_authority_type_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF COALESCE(current_address, "") != "" THEN
+                SET @person_address_uuid = (SELECT UUID());
+
+                INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
+                VALUES (patient_id, current_address, @current_address_type_id, @creator, date_created, (SELECT UUID()));
+                
+                INSERT INTO person_address (person_id, city_village, creator, date_created, uuid)
+                VALUES (patient_id, current_address, @creator, date_created, @person_address_uuid);
+
+                SET @person_address_id = (SELECT person_address_id FROM person_address WHERE uuid = @person_address_uuid);
+
+              IF COALESCE(landmark, "") != "" THEN
+
+                INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
+                VALUES (patient_id, landmark, @landmark_type_id, @creator, date_created, @person_address_uuid);
+
+                UPDATE person_address SET address1 = landmark
+                WHERE uuid = @person_address_uuid;
+
+              END IF;
+
+            END IF;
+        
+            IF COALESCE(occupation, "") != "" THEN
+            
+                INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
+                VALUES (patient_id, occupation, @occupation_type_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF COALESCE(office_phone_number, "") != "" THEN
+            
+                INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
+                VALUES (patient_id, office_phone_number, @office_phone_number_type_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF COALESCE(cellphone_number, "") != "" THEN
+            
+                INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
+                VALUES (patient_id, cellphone_number, @cellphone_number_type_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF COALESCE(home_phone_number, "") != "" THEN
+            
+                INSERT INTO person_attribute (person_id, value, person_attribute_type_id, creator, date_created, uuid)
+                VALUES (patient_id, home_phone_number, @home_phone_number_type_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+      #--  
+            # Create a patient
+            INSERT INTO patient (patient_id, creator, date_created)
+            VALUES (patient_id, @creator, date_created)  ON DUPLICATE KEY UPDATE patient_id = patient_id;
+        
+            # Set patient identifier types
+            SET @art_number = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "ARV Number");
+            SET @tb_number = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "District TB Number");
+            SET @legacy_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Old Identification Number");
+            SET @new_nat_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "National id");
+            SET @nat_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "National id");
+            SET @archived_filing_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Archived filing number");
+            SET @filing_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Filing number");
+            SET @pre_art_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "Pre-ART number");
+            SET @prev_art_number_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "z_deprecated Pre ART Number (Old format)");
+        
+            # Location id defaulted to "Unknown" since the source database version 
+            # did not capture this field
+            SET @location_id = (SELECT location_id FROM location WHERE name = "Unknown");
+        
+            # Create patient identifiers            
+            IF NOT ISNULL(prev_art_number) AND NOT ISNULL(@pre_art_number_id) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, prev_art_number, @prev_art_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+                                             
+            IF NOT ISNULL(pre_art_number) AND NOT ISNULL(@pre_art_number_id) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, pre_art_number, @pre_art_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+                                      
+            IF NOT ISNULL(filing_number) AND NOT ISNULL(@filing_number_id) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, filing_number, @filing_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+                              
+            IF NOT ISNULL(archived_filing_number) AND NOT ISNULL(@archived_filing_number_id) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, archived_filing_number, @archived_filing_number_id, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+                      
+            IF NOT ISNULL(nat_id) AND NOT ISNULL(@nat_id) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, nat_id, (CASE WHEN ISNULL(new_nat_id) THEN @nat_id ELSE @legacy_id END), @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+              
+            IF NOT ISNULL(new_nat_id) AND NOT ISNULL(@new_nat_id) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, new_nat_id, @new_nat_id, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF NOT ISNULL(art_number) AND NOT ISNULL(@art_number) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, art_number, @art_number, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF NOT ISNULL(tb_number) AND NOT ISNULL(@tb_number) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, tb_number, @tb_number, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF NOT ISNULL(legacy_id) AND NOT ISNULL(@legacy_id) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, legacy_id, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF NOT ISNULL(legacy_id2) AND NOT ISNULL(@legacy_id) THEN
+
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, legacy_id2, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+        
+            IF NOT ISNULL(legacy_id3) AND NOT ISNULL(@legacy_id) THEN
+            
+                INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
+                VALUES (patient_id, legacy_id3, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
+            
+            END IF;
+
+          select "general_reception_encounter";        
+          CALL proc_import_general_reception_encounters(@person_id);    # good
+          
+          select "outpatient_diagnosis_encounter";        
+          CALL proc_import_outpatient_diagnosis_encounters(@person_id); # good
+
+          select patient_id;
+        ELSE
+          Select patient_id
+          select "general_reception_encounter";        
+          CALL proc_import_general_reception_encounters(@person_id);    # good
+          
+          select "outpatient_diagnosis_encounter";        
+          CALL proc_import_outpatient_diagnosis_encounters(@person_id); # good
+
+          select patient_id;
+        END IF;
     END LOOP;
 
     SET UNIQUE_CHECKS = 1;
