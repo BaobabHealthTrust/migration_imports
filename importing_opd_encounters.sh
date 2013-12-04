@@ -18,7 +18,7 @@ PASSWORD=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['
 DATABASE=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['database']"`
 HOST=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['host']"`
 
-now=$(date +"%T")
+now=$(date +"%F %T")
 echo "start time : $now"
 
 echo "loading import scripts.............................."
@@ -38,7 +38,7 @@ EOFMYSQL
 echo "creating OPD program"
 script/runner script/all_after_migration_scripts/creating_patient_opd_program.rb
 
-later=$(date +"%T")
+later=$(date +"%F %T")
 echo "start time : $now"
 echo "end time : $later"
 

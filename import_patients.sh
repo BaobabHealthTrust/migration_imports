@@ -24,7 +24,7 @@ PASSWORD=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['
 DATABASE=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['database']"`
 HOST=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['host']"`
 
-now=$(date +"%T")
+now=$(date +"%F %T")
 echo "start time : $now"
 
 echo "importing data......................................."
@@ -32,6 +32,6 @@ mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
 CALL proc_import_patients_in_batches($LOWER_LIMIT,$UPPER_LIMIT);
 EOFMYSQL
 
-later=$(date +"%T")
+later=$(date +"%F %T")
 echo "start time : $now"
 echo "end time : $later"
