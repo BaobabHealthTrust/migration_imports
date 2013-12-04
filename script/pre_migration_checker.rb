@@ -6,6 +6,10 @@ def start
 
   started_at = Time.now.strftime("%Y-%m-%d-%H%M%S")
   $pre_migration = File.open("./migration_output/#{started_at}-Pre_migration_report.txt", "w")
+  concept_ids = Concept.find(:all, :conditions =>["retired = ?", 0]).collect{|x| x.concept_id}.uniq
+  retired_concepts = Concept.find(:all, :conditions =>["retired = ?", 1]).collect{|x| x.concept_id}.uniq
+  obs_with_voided_concepts = Observation.find_by_sql("SELECT * FROM obs WHERE value_coded IN (#{retired_concepts.join(',')})").length
+  obs_with_missing_concepts = Observation.find_by_sql("SELECT value_coded as concept_id FROM obs WHERE value_coded NOT IN (#{concept_ids.join(',')})").length
   encounters_without_obs = Encounter.find_by_sql("select count(*) as enc_count from #{Source_db}.encounter where encounter_id not in (select distinct encounter_id from #{Source_db}.obs where voided = 0)").first.enc_count
   encounters_without_creator = Encounter.find_by_sql("select * from #{Source_db}.encounter where creator = 0").length
   encounters = Encounter.find_by_sql("Select count(*) as enc_count from #{Source_db}.encounter").first.enc_count
@@ -23,10 +27,10 @@ def start
   orders = Order.find_by_sql("SELECT count(*) as order_count from #{Source_db}.orders").first.order_count
   unvoided_orders = Order.find_by_sql("SELECT count(*) as order_count from #{Source_db}.orders where COALESCE(voided,0) = 0").first.order_count
   voided_orders = Order.find_by_sql("SELECT count(*) as order_count from #{Source_db}.orders where COALESCE(voided,0) != 0").first.order_count
-  observation_without_enc_types = Observation.find_by_sql("select count(*) as obs_count from #{Source_db}.obs where encounter_id in (select encounter_id from #{Source_db}.encounter where encounter_type is null)").first.obs_count
   encounters_by_type = Encounter.find_by_sql("select t.name as enc_name,count(e.encounter_id) as enc_type_count from #{Source_db}.encounter as e inner join #{Source_db}.encounter_type as t on e.encounter_type = t.encounter_type_id group by t.name")
   drugs_ever_dispensed = Drug.find_by_sql("SELECT (SELECT name from #{Source_db}.drug where drug_id = value_drug) as drug_type, value_drug as drug_identifier ,count(*) as counts from #{Source_db}.obs where voided = 0 AND value_drug IS NOT NULL group by value_drug")
-
+  observation_without_enc_types = Observation.find_by_sql("select count(*) as obs_count from #{Source_db}.obs where encounter_id in (select encounter_id from #{Source_db}.encounter where encounter_type is null)").first.obs_count
+  concepts_used = Concept.find_by_sql("SELECT distinct value_coded as id, (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0 UNION SELECT distinct concept_id as id , (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0")
 
   $pre_migration << "Minimum patient ID: #{minimum_patient_id} \n"
   $pre_migration << "Maximum patient ID: #{maximum_patient_id} \n"
@@ -42,6 +46,9 @@ def start
   $pre_migration << "Total Observations : #{observations} \n"
   $pre_migration << "Unvoided Observations : #{unvoided_obs}\n"
   $pre_migration << "Voided Observations : #{voided_obs}\n"
+  $pre_migration << "Observations With voided concepts: #{obs_with_voided_concepts}"
+  $pre_migration << "Observations With missing concepts: #{obs_with_missing_concepts}"
+  $pre_migration << "Observations With without encounter types: #{observation_without_enc_types}"
   $pre_migration << "Total Orders : #{orders}\n"
   $pre_migration << "Unvoided Orders : #{unvoided_orders}\n"
   $pre_migration << "Voided Orders : #{voided_orders}\n"
@@ -61,6 +68,9 @@ def start
   puts"Total Observations : #{observations} \n"
   puts"Unvoided Observations : #{unvoided_obs}\n"
   puts"Voided Observations : #{voided_obs}\n"
+  puts"Observations With voided concepts: #{obs_with_voided_concepts}\n"
+  puts"Observations With missing concepts: #{obs_with_missing_concepts}\n"
+  puts"Observations With Encounters without encounter types: #{observation_without_enc_types}\n"
   puts"Total Orders : #{orders}\n"
   puts"Unvoided Orders : #{unvoided_orders}\n"
   puts"Voided Orders : #{voided_orders}\n"
@@ -82,6 +92,19 @@ def start
     end
 
   end
+
+  CSV.open("./migration_output/#{started_at}-pre_migration_concepts_used.csv", "wb") do |csv|
+
+    csv << ["Concept Name","Concept ID"]
+
+    (concepts_used || []).each do |concept|
+
+      csv <<  [concept.name, concept.id]
+
+    end
+
+  end
+
 
   puts "\n\nList of all drugs ever used was created. Check in the migration_output folder\n\n"
 
