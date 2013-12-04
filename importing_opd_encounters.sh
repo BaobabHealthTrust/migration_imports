@@ -1,17 +1,11 @@
 #!/bin/bash
 usage(){
-  echo "Usage: $0 LOWER_LIMIT UPPER_LIMIT"
+  echo "Usage"
   echo
   echo "ENVIRONMENT should be: bart2"
+  echo "Available SITES:"
+  ls -1 db/data
 } 
-
-LOWER_LIMIT=$1
-UPPER_LIMIT=$2
-
-if  [ -z "$LOWER_LIMIT" ] || [ -z "$UPPER_LIMIT" ]; then
-  usage
-  exit
-fi
 
 set -x # turns on stacktrace mode which gives useful debug information
 
@@ -27,11 +21,25 @@ HOST=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['host
 now=$(date +"%F %T")
 echo "start time : $now"
 
-echo "importing data......................................."
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
-CALL proc_import_patients_in_batches($LOWER_LIMIT,$UPPER_LIMIT);
+echo "loading import scripts.............................."
+
+FILES=import_scripts/*.sql
+for f in $FILES
+do
+	echo "loading $f..."
+	mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE < $f
+done
+
+echo "importing OPD data......................................."
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
+CALL proc_opd_encounters;
 EOFMYSQL
+
+echo "creating OPD program"
+script/runner script/all_after_migration_scripts/creating_patient_opd_program.rb
 
 later=$(date +"%F %T")
 echo "start time : $now"
 echo "end time : $later"
+
+echo "done"

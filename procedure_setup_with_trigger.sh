@@ -26,7 +26,7 @@ DATABASE=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['
 HOST=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['host']"`
 
 
-now=$(date +"%T")
+now=$(date +"%F %T")
 echo "start time : $now"
 
 echo "initializing $DATABASE (OpenMRS 1.7) destination database.............................."
@@ -136,6 +136,6 @@ mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
   DROP table temp_obs;
 EOFMYSQL
 
-later=$(date +"%T")
+later=$(date +"%F %T")
 echo "start time : $now"
 echo "end time : $later"

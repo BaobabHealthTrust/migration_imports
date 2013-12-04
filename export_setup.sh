@@ -23,16 +23,17 @@ PASSWORD=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['${ENV}'][
 DATABASE=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['${ENV}']['database']"`
 HOST=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['${ENV}']['host']"`
 
-now=$(date +"%T")
+now=$(date +"%F %T")
 echo "start time : $now"
 
 echo "Creating intermediary storage"
+# rake db:drop
  rake db:create
  rake db:migrate
 
 echo "Exporting to the intermediary storage"
  script/runner script/migrator.rb
 
-later=$(date +"%T")
+later=$(date +"%F %T")
 echo "start time : $now"
 echo "end time : $later"
