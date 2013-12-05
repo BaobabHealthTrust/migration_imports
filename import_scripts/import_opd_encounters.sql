@@ -298,7 +298,7 @@ BEGIN
 
           select patient_id;
         ELSE
-          Select patient_id
+          Select patient_id;
           select "general_reception_encounter";        
           CALL proc_import_general_reception_encounters(@person_id);    # good
           
