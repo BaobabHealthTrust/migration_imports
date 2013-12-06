@@ -107,7 +107,7 @@ BEGIN
         # Get last person id for association later to other records
         SET @person_id = (patient_id);
 
-        SET @old_patient = COALESCE((SELECT patient_id FROM patient WHERE patient_id = @person_id limit 1), 0);
+        SET @old_patient = COALESCE((SELECT patient_id FROM patient WHERE patient.patient_id = @person_id limit 1), 0);
         
         IF (@old_patient = 0) THEN
         
