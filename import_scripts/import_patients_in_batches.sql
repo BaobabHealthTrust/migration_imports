@@ -106,7 +106,17 @@ BEGIN
 
         # Create person object in destination
         INSERT INTO person (person_id, gender, birthdate, birthdate_estimated, dead, creator, date_created, uuid)
-        VALUES (patient_id,SUBSTRING(gender, 1, 1), dob, @date_of_birth_estimated, @patient_dead, @creator, date_created, (SELECT UUID()))  ON DUPLICATE KEY UPDATE person_id = patient_id;
+        VALUES (patient_id,SUBSTRING(gender, 1, 1), dob, @date_of_birth_estimated, @patient_dead, @creator, date_created, (SELECT UUID()))  ON DUPLICATE KEY UPDATE person_id = patient_id, 
+                                          voided = 0,
+                                          gender = SUBSTRING(gender, 1, 1),
+                                          birthdate = dob,
+                                          birthdate_estimated = @date_of_birth_estimated,
+                                          dead = @patient_dead,
+                                          creator =  @creator,
+                                          date_created = date_created,
+                                          voided_by = NULL,
+                                          void_reason = NULL,
+                                          changed_by = NULL;
     
         # Get last person id for association later to other records
         SET @person_id = (patient_id);
