@@ -200,9 +200,18 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               IF (pri_diagnosis = "Diarrhoea disease(non-bloody)") THEN
                 # Create detailed_primary_diagnosis_observation
                 
-                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'non-bloody', @creator, date_created, (SELECT UUID()));
-              
+                  SET @detailed_pri_diag = (SELECT concept_name.concept_id FROM concept_name
+                            LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                            WHERE name = 'non-bloody' AND voided = 0 AND retired = 0 LIMIT 1);
+                  
+                  IF ISNULL (@detailed_pri_diag) THEN
+                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                    VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'non-bloody', @creator, date_created, (SELECT UUID()));
+                  ELSE
+                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                    VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @detailed_pri_diag, @creator, date_created, (SELECT UUID()));
+                  END IF;
+
               ELSEIF (pri_diagnosis = "Sprains (Joint Soft Tissue Injury)") THEN
                   SET @bart_two_sprains_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = "Sprains" LIMIT 1);
 
@@ -220,9 +229,19 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                
                ELSEIF (pri_diagnosis = "Soft Tissue Injury (Excluding Joints)") THEN
                    # Create detailed_primary_diagnosis_observation
-                    
-                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-                    VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Excluding Joints', @creator, date_created, (SELECT UUID()));
+                   
+                   SET @detailed_sec_diag3 = (SELECT concept_name.concept_id FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                            WHERE name = 'Excluding Joints' AND voided = 0 AND retired = 0 LIMIT 1);
+                  
+                    IF ISNULL (@detailed_sec_diag3) THEN
+                      INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                      VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Excluding Joints', @creator, date_created, (SELECT UUID()));
+                    ELSE
+                      INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                      VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @detailed_sec_diag3, @creator, date_created, (SELECT UUID()));
+                    END IF;
+
               END IF;
 
               # Get last obs id for association later to other records
@@ -276,8 +295,17 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               IF (sec_diagnosis = "Diarrhoea disease(non-bloody)") THEN
                 # Create detailed_secondary_diagnosis_observation
 
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-                VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'non-bloody', @creator, date_created, (SELECT UUID()));
+                  SET @detailed_sec_diag = (SELECT concept_name.concept_id FROM concept_name
+                            LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                            WHERE name = 'non-bloody' AND voided = 0 AND retired = 0 LIMIT 1);
+                  
+                  IF ISNULL (@detailed_sec_diag) THEN
+                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                    VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'non-bloody', @creator, date_created, (SELECT UUID()));
+                  ELSE
+                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                    VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @detailed_sec_diag, @creator, date_created, (SELECT UUID()));
+                  END IF;
              
               ELSEIF (sec_diagnosis = "Sprains (Joint Soft Tissue Injury)") THEN
                 SET @bart_two_sprains_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = "Sprains" LIMIT 1);
@@ -296,9 +324,18 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                 
               ELSEIF (sec_diagnosis = "Soft Tissue Injury (Excluding Joints)") THEN
                    # Create detailed_secondary_diagnosis_observation
-
-                INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
-                VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Excluding Joints', @creator, date_created, (SELECT UUID()));
+                SET @detailed_sec_diag2 = (SELECT concept_name.concept_id FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                            WHERE name = 'Excluding Joints' AND voided = 0 AND retired = 0 LIMIT 1);
+                  
+                  IF ISNULL (@detailed_sec_diag2) THEN
+                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                    VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Excluding Joints', @creator, date_created, (SELECT UUID()));
+                  ELSE
+                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                    VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @detailed_sec_diag2, @creator, date_created, (SELECT UUID()));
+                  END IF;
+                  
               END IF;
               
               # Get last obs id for association later to other records
@@ -510,7 +547,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
               SET @treatment_value_coded_name_id = (SELECT concept_name.concept_name_id FROM concept_name concept_name
                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                           WHERE name = @bart2_drug_concept_name AND voided = 0 AND retired = 0 LIMIT 1);
-              
+
               IF ISNULL(@treatment_value_coded) THEN
                 # Create observation
                 INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
@@ -520,7 +557,6 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                 INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
                 VALUES (patient_id, @treatment_concept_id, old_enc_id, encounter_datetime, @location_id , @treatment_value_coded, @treatment_value_coded_name_id, @creator, date_created, (SELECT UUID()));
               END IF;
-              
 
               # Get last obs id for association later to other records
               SET @treatment_id = (SELECT LAST_INSERT_ID());
