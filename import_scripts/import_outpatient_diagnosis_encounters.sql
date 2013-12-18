@@ -163,8 +163,37 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                           WHERE name = 'Primary diagnosis' AND voided = 0 AND retired = 0 LIMIT 1);
               
-              # Get the correct diagnosis
-              SET @pri_diagnosis_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = pri_diagnosis LIMIT 1);
+              IF (pri_diagnosis = 'Fractures Clavicle') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Malleoral') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Metacarpals') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Metatarsal') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Spine') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Pelvis') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Femur') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Humerus') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Phalanges') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Radius/ulna') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Tibia/Fibula') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Open Fracture') THEN
+                SET @pri_diagnosis_name = ('Fracture');
+              ELSE
+                # Get the correct diagnosis
+                SET @pri_diagnosis_name = (SELECT bart_two_concept_name
+                                           FROM concept_name_map
+                                           WHERE bart_one_concept_name = pri_diagnosis
+                                           LIMIT 1);
+              END IF;
 
               IF ISNULL(@pri_diagnosis_name) THEN
                 SET @bart2_primary_diagnosis_name = (pri_diagnosis);
@@ -242,6 +271,198 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                       VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @detailed_sec_diag3, @creator, date_created, (SELECT UUID()));
                     END IF;
 
+              ELSEIF (pri_diagnosis = 'Fractures Clavicle') THEN
+                SET @fracture_1_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Clavicle'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_1_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Clavicle', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_1_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Malleoral') THEN
+                SET @fracture_2_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Malleolar'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_2_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Malleolar', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_2_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Metacarpals') THEN
+                SET @fracture_3_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Metacarpal'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+               IF ISNULL (@fracture_3_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Metacarpal', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_3_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Metatarsal') THEN
+                SET @fracture_4_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Metatarsal'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_4_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Metatarsal', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_4_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Spine') THEN
+                SET @fracture_5_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Spine'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_5_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Spine', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_5_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Pelvis') THEN
+                SET @fracture_6_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Pelvis'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_6_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Pelvis', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_6_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Femur') THEN
+                SET @fracture_7_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Femur'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_7_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Femur', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_7_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Humerus') THEN
+                SET @fracture_8_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Humerus'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_8_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Humerus', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_8_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Phalanges') THEN
+                SET @fracture_9_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Phalanges'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_9_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Phalanges', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_9_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Radius/ulna') THEN
+                SET @fracture_10_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Radius/ulna'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+ 
+                IF ISNULL (@fracture_10_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Radius/ulna', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_10_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Fractures Tibia/Fibula') THEN
+                SET @fracture_11_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Tibia/Fibula'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_11_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Tibia/Fibula', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_11_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (pri_diagnosis = 'Open Fracture') THEN
+                SET @fracture_12_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Open Fracture'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_12_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Open Fracture', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_primary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_12_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
               END IF;
 
               # Get last obs id for association later to other records
@@ -258,8 +479,37 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                           LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                           WHERE name = 'Secondary diagnosis' AND voided = 0 AND retired = 0 LIMIT 1);
 
-              # Get the correct secondary diagnosis name
-              SET @sec_diagnosis_name = (SELECT bart_two_concept_name FROM concept_name_map WHERE bart_one_concept_name = sec_diagnosis LIMIT 1);
+              IF (sec_diagnosis = 'Fractures Clavicle') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Malleoral') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Metacarpals') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Metatarsal') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Spine') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Pelvis') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Femur') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Humerus') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Phalanges') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Radius/ulna') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Fractures Tibia/Fibula') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSEIF (pri_diagnosis = 'Open Fracture') THEN
+                SET @sec_diagnosis_name = ('Fracture');
+              ELSE
+                # Get the correct secondary diagnosis name
+                SET @sec_diagnosis_name = (SELECT bart_two_concept_name 
+                                           FROM concept_name_map 
+                                           WHERE bart_one_concept_name = sec_diagnosis 
+                                           LIMIT 1);
+              END IF;
 
               IF ISNULL(@sec_diagnosis_name) THEN
                 SET @bart2_secondary_diagnosis_name = (sec_diagnosis);
@@ -303,7 +553,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                     INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
                     VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'non-bloody', @creator, date_created, (SELECT UUID()));
                   ELSE
-                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                    INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
                     VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @detailed_sec_diag, @creator, date_created, (SELECT UUID()));
                   END IF;
              
@@ -335,7 +585,199 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                     INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
                     VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @detailed_sec_diag2, @creator, date_created, (SELECT UUID()));
                   END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Clavicle') THEN
+                SET @fracture_1_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Clavicle'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
                   
+                IF ISNULL (@fracture_1_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Clavicle', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_1_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Malleoral') THEN
+                SET @fracture_2_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Malleolar'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_2_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Malleolar', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_2_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Metacarpals') THEN
+                SET @fracture_3_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Metacarpal'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+               IF ISNULL (@fracture_3_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Metacarpal', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_3_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Metatarsal') THEN
+                SET @fracture_4_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Metatarsal'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_4_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Metatarsal', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_4_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Spine') THEN
+                SET @fracture_5_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Spine'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_5_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Spine', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_5_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Pelvis') THEN
+                SET @fracture_6_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Pelvis'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_6_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Pelvis', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_6_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+             
+              ELSEIF (sec_diagnosis = 'Fractures Femur') THEN
+                SET @fracture_7_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Femur'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_7_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Femur', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_7_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Humerus') THEN
+                SET @fracture_8_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Humerus'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_8_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Humerus', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_8_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Phalanges') THEN
+                SET @fracture_9_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Phalanges'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_9_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Phalanges', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_9_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Radius/ulna') THEN
+                SET @fracture_10_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Radius/ulna'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+ 
+                IF ISNULL (@fracture_10_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Radius/ulna', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_10_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Fractures Tibia/Fibula') THEN
+                SET @fracture_11_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Tibia/Fibula'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+
+                IF ISNULL (@fracture_11_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Tibia/Fibula', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_11_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
+              ELSEIF (sec_diagnosis = 'Open Fracture') THEN
+                SET @fracture_12_detailed = (SELECT concept_name.concept_id
+                              FROM concept_name
+                                LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
+                              WHERE name = 'Open Fracture'
+                              AND voided = 0
+                              AND retired = 0 LIMIT 1);
+                              
+                IF ISNULL (@fracture_12_detailed) THEN
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_text, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , 'Open Fracture', @creator, date_created, (SELECT UUID()));
+                ELSE
+                  INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, creator, date_created, uuid)
+                  VALUES (patient_id, @detailed_secondary_diagnosis_concept_id, old_enc_id, encounter_datetime, @location_id , @fracture_12_detailed, @creator, date_created, (SELECT UUID()));
+                END IF;
+
               END IF;
               
               # Get last obs id for association later to other records
