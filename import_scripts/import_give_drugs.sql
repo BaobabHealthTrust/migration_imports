@@ -297,6 +297,7 @@ BEGIN
        SET @dispensed_drug_name5_new_concept_id = (SELECT concept_id  FROM drug
                             WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
 #-----------------------------------------------------------------------------------------------------------------------------------
+    IF (pres_drug_name1 = 'Unknown ARV drug') THEN
       #Check if the field is not empty
       IF NOT ISNULL(pres_drug_name1) THEN #--1
         # Get id of encounter type
@@ -653,8 +654,9 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
+   END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------
-
+    IF (pres_drug_name2 = 'Unknown ARV drug') THEN
       #Check if the field is not empty
       IF NOT ISNULL(pres_drug_name2) THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
@@ -990,7 +992,9 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
+   END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------
+    IF (pres_drug_name3 = 'Unknown ARV drug') THEN  
       #Check if the field is not empty
       IF NOT ISNULL(pres_drug_name3) THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
@@ -1360,7 +1364,9 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
+    END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------
+    IF (pres_drug_name4 = 'Unknown ARV drug') THEN  
       #Check if the field is not empty
       IF NOT ISNULL(pres_drug_name4) THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
@@ -1695,7 +1701,9 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
+   END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------
+   IF (pres_drug_name5 = 'Unknown ARV drug') THEN  
       #Check if the field is not empty
       IF NOT ISNULL(pres_drug_name5) THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
@@ -2030,6 +2038,7 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
+   END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------     
      SET @arv_regimen_concept_id = ( SELECT concept_name.concept_id FROM concept_name
                                       LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
