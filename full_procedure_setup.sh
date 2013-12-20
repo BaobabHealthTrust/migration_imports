@@ -80,6 +80,9 @@ mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
 CALL proc_import_users;
 EOFMYSQL
 
+echo "fixing user with person_id 1........................."
+script/runner script/fix_user_with_person_id1.rb
+
 echo "importing data......................................."
 mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
 CALL proc_import_patients;

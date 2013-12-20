@@ -152,6 +152,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role1) THEN
           IF (user_role1 = 'Data Entry Clerk') THEN
            SET @user_role1 = 'Data Assistant';
+          ELSEIF (user_role1 = 'provider') THEN
+           SET @user_role1 = 'Provider';
+          ELSEIF (user_role1 = 'superuser') THEN
+           SET @user_role1 = 'Superuser';
           ELSE
            SET @user_role1 = user_role1;
           END IF;
@@ -163,6 +167,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role2) THEN
           IF (user_role2 = 'Data Entry Clerk') THEN
            SET @user_role2 = 'Data Assistant';
+          ELSEIF (user_role2 = 'provider') THEN
+           SET @user_role2 = 'Provider';
+          ELSEIF (user_role2 = 'superuser') THEN
+           SET @user_role2 = 'Superuser';
           ELSE
            SET @user_role2 = user_role2;
           END IF;
@@ -174,6 +182,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role3) THEN
           IF (user_role3 = 'Data Entry Clerk') THEN
            SET @user_role3 = 'Data Assistant';
+          ELSEIF (user_role3 = 'provider') THEN
+           SET @user_role3 = 'Provider';
+          ELSEIF (user_role3 = 'superuser') THEN
+           SET @user_role3 = 'Superuser';
           ELSE
            SET @user_role3 = user_role3;
           END IF;
@@ -185,6 +197,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role4) THEN
           IF (user_role4 = 'Data Entry Clerk') THEN
            SET @user_role4 = 'Data Assistant';
+          ELSEIF (user_role4 = 'provider') THEN
+           SET @user_role4 = 'Provider';
+          ELSEIF (user_role4 = 'superuser') THEN
+           SET @user_role4 = 'Superuser';
           ELSE
            SET @user_role4 = user_role4;
           END IF;
@@ -196,6 +212,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role5) THEN
           IF (user_role5 = 'Data Entry Clerk') THEN
            SET @user_role5 = 'Data Assistant';
+          ELSEIF (user_role5 = 'provider') THEN
+           SET @user_role5 = 'Provider';
+          ELSEIF (user_role5 = 'superuser') THEN
+           SET @user_role5 = 'Superuser';
           ELSE
            SET @user_role5 = user_role5;
           END IF;
@@ -207,6 +227,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role6) THEN
           IF (user_role6 = 'Data Entry Clerk') THEN
            SET @user_role6 = 'Data Assistant';
+          ELSEIF (user_role6 = 'provider') THEN
+           SET @user_role6 = 'Provider';
+          ELSEIF (user_role6 = 'superuser') THEN
+           SET @user_role6 = 'Superuser';
           ELSE
            SET @user_role6 = user_role6;
           END IF;
@@ -218,6 +242,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role7) THEN
           IF (user_role7 = 'Data Entry Clerk') THEN
            SET @user_role7 = 'Data Assistant';
+          ELSEIF (user_role7 = 'provider') THEN
+           SET @user_role7 = 'Provider';
+          ELSEIF (user_role7 = 'superuser') THEN
+           SET @user_role7 = 'Superuser';
           ELSE
            SET @user_role7 = user_role7;
           END IF;
@@ -229,6 +257,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role8) THEN
           IF (user_role8 = 'Data Entry Clerk') THEN
            SET @user_role8 = 'Data Assistant';
+          ELSEIF (user_role8 = 'provider') THEN
+           SET @user_role8 = 'Provider';
+          ELSEIF (user_role8 = 'superuser') THEN
+           SET @user_role8 = 'Superuser';
           ELSE
            SET @user_role8 = user_role8;
           END IF;
@@ -240,6 +272,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role9) THEN
           IF (user_role9 = 'Data Entry Clerk') THEN
            SET @user_role9 = 'Data Assistant';
+          ELSEIF (user_role9 = 'provider') THEN
+           SET @user_role9 = 'Provider';
+          ELSEIF (user_role9 = 'superuser') THEN
+           SET @user_role9 = 'Superuser';
           ELSE
            SET @user_role9 = user_role9;
           END IF;
@@ -251,6 +287,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
         IF NOT ISNULL(user_role10) THEN
           IF (user_role10 = 'Data Entry Clerk') THEN
            SET @user_role10 = 'Data Assistant';
+          ELSEIF (user_role10 = 'provider') THEN
+           SET @user_role10 = 'Provider';
+          ELSEIF (user_role10 = 'superuser') THEN
+           SET @user_role10 = 'Superuser';
           ELSE
            SET @user_role10 = user_role10;
           END IF;
