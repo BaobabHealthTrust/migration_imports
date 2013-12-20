@@ -18,7 +18,7 @@ def start
   patient_count = Patient.find_by_sql("Select count(*) as patient_count from #{Source_db}.patient").first.patient_count
   patients_unvoided = Patient.find_by_sql("Select count(*) as patient_count from #{Source_db}.patient where voided = 0").first.patient_count
   patients_voided = Patient.find_by_sql("Select count(*) as patient_count from #{Source_db}.patient where voided = 1").first.patient_count
-  dead_patients = Patient.find_by_sql("Select count(*) as patient_count from #{Source_db}.patient where voided = 0 AND dead = 0").first.patient_count
+  dead_patients = Patient.find_by_sql("Select count(*) as patient_count from #{Source_db}.patient where voided = 0 AND dead IS NOT NULL").first.patient_count
   art_patients = Patient.find_by_sql("select count(patient_id) as pat_count from #{Source_db}.patient where voided = 0 and patient_id in (SELECT distinct patient_id FROM #{Source_db}.patient_program where program_id = 1 and voided = 0)").first.pat_count
   opd_patients = Patient.find_by_sql("select count(patient_id) as pat_count from #{Source_db}.patient where voided = 0 and patient_id not in (SELECT distinct patient_id FROM #{Source_db}.patient_program where program_id = 1 and voided = 0)").first.pat_count
   observations = Observation.find_by_sql("SELECT count(*) as obs_count from #{Source_db}.obs").first.obs_count
@@ -30,7 +30,7 @@ def start
   encounters_by_type = Encounter.find_by_sql("select t.name as enc_name,count(e.encounter_id) as enc_type_count from #{Source_db}.encounter as e inner join #{Source_db}.encounter_type as t on e.encounter_type = t.encounter_type_id group by t.name")
   drugs_ever_dispensed = Drug.find_by_sql("SELECT (SELECT name from #{Source_db}.drug where drug_id = value_drug) as drug_type, value_drug as drug_identifier ,count(*) as counts from #{Source_db}.obs where voided = 0 AND value_drug IS NOT NULL group by value_drug")
   observation_without_enc_types = Observation.find_by_sql("select count(*) as obs_count from #{Source_db}.obs where encounter_id in (select encounter_id from #{Source_db}.encounter where encounter_type is null)").first.obs_count
-  concepts_used = Concept.find_by_sql("SELECT distinct value_coded as id, (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0 UNION SELECT distinct concept_id as id , (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0")
+  concepts_used = Concept.find_by_sql("SELECT distinct value_coded as concept_id, (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0 UNION SELECT distinct concept_id as concept_id , (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0")
 
   $pre_migration << "Minimum patient ID: #{minimum_patient_id} \n"
   $pre_migration << "Maximum patient ID: #{maximum_patient_id} \n"
@@ -46,9 +46,9 @@ def start
   $pre_migration << "Total Observations : #{observations} \n"
   $pre_migration << "Unvoided Observations : #{unvoided_obs}\n"
   $pre_migration << "Voided Observations : #{voided_obs}\n"
-  $pre_migration << "Observations With voided concepts: #{obs_with_voided_concepts}"
-  $pre_migration << "Observations With missing concepts: #{obs_with_missing_concepts}"
-  $pre_migration << "Observations With without encounter types: #{observation_without_enc_types}"
+  $pre_migration << "Observations With voided concepts: #{obs_with_voided_concepts}\n"
+  $pre_migration << "Observations With missing concepts: #{obs_with_missing_concepts}\n"
+  $pre_migration << "Observations With without encounter types: #{observation_without_enc_types}\n"
   $pre_migration << "Total Orders : #{orders}\n"
   $pre_migration << "Unvoided Orders : #{unvoided_orders}\n"
   $pre_migration << "Voided Orders : #{voided_orders}\n"
@@ -99,7 +99,7 @@ def start
 
     (concepts_used || []).each do |concept|
 
-      csv <<  [concept.name, concept.id]
+      csv <<  [concept.name, concept.concept_id]
 
     end
 
