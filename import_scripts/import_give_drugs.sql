@@ -297,9 +297,13 @@ BEGIN
        SET @dispensed_drug_name5_new_concept_id = (SELECT concept_id  FROM drug
                             WHERE drug_id = @dispensed_drug_name5_concept_id LIMIT 1);
 #-----------------------------------------------------------------------------------------------------------------------------------
-    IF (pres_drug_name1 != 'Unknown ARV drug') THEN
+      IF (pres_drug_name1 = 'Unknown ARV drug') THEN
+        SET @pres_drug_name1 = NULL;
+      ELSE
+        SET @pres_drug_name1 = pres_drug_name1; 
+      END IF;
       #Check if the field is not empty
-      IF NOT ISNULL(pres_drug_name1) THEN #--1
+      IF NOT ISNULL(@pres_drug_name1) THEN #-- AND (pres_drug_name1 != 'Unknown ARV drug') THEN #--1
         # Get id of encounter type
         SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = "TREATMENT"  LIMIT 1);
 
@@ -654,11 +658,16 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
-   END IF;
+   #--END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------
-    IF (pres_drug_name2 != 'Unknown ARV drug') THEN
+      IF (pres_drug_name2 = 'Unknown ARV drug') THEN
+        SET @pres_drug_name2 = NULL;
+      ELSE
+        SET @pres_drug_name2 = pres_drug_name2; 
+      END IF;
+
       #Check if the field is not empty
-      IF NOT ISNULL(pres_drug_name2) THEN #--1
+      IF NOT ISNULL(@pres_drug_name2) THEN #-- (pres_drug_name2 != 'Unknown ARV drug') THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
         
         IF (@treatment_encounter_id = 0) THEN
@@ -992,11 +1001,16 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
-   END IF;
+   #--END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------
-    IF (pres_drug_name3 != 'Unknown ARV drug') THEN  
+      IF (pres_drug_name3 = 'Unknown ARV drug') THEN
+        SET @pres_drug_name3 = NULL;
+      ELSE
+        SET @pres_drug_name3 = pres_drug_name3; 
+      END IF;
+
       #Check if the field is not empty
-      IF NOT ISNULL(pres_drug_name3) THEN #--1
+      IF NOT ISNULL(@pres_drug_name3) THEN #--(pres_drug_name3 != 'Unknown ARV drug') THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
         
         IF (@treatment_encounter_id = 0) THEN
@@ -1364,11 +1378,16 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
-    END IF;
+#--    END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------
-    IF (pres_drug_name4 != 'Unknown ARV drug') THEN  
+      IF (pres_drug_name4 = 'Unknown ARV drug') THEN
+        SET @pres_drug_name4 = NULL;
+      ELSE
+        SET @pres_drug_name4 = pres_drug_name4; 
+      END IF;
       #Check if the field is not empty
-      IF NOT ISNULL(pres_drug_name4) THEN #--1
+
+      IF NOT ISNULL(@pres_drug_name4) THEN #-- AND (pres_drug_name4 != 'Unknown ARV drug') THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
         
         IF (@treatment_encounter_id = 0) THEN
@@ -1701,11 +1720,17 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
-   END IF;
+   #--END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------
-   IF (pres_drug_name5 != 'Unknown ARV drug') THEN  
+      IF (pres_drug_name5 = 'Unknown ARV drug') THEN
+        SET @pres_drug_name5 = NULL;
+      ELSE
+        SET @pres_drug_name5 = pres_drug_name5; 
+      END IF;
+
       #Check if the field is not empty
-      IF NOT ISNULL(pres_drug_name5) THEN #--1
+
+      IF NOT ISNULL(@pres_drug_name5) THEN #-- AND (pres_drug_name5 != 'Unknown ARV drug') THEN #--1
         SET @treatment_encounter_id = COALESCE((SELECT encounter_id FROM encounter WHERE encounter_id = old_enc_id),0);
         
         IF (@treatment_encounter_id = 0) THEN
@@ -2038,7 +2063,7 @@ BEGIN
            END IF;
         END IF;
       END IF; #--1
-   END IF;
+#--   END IF;
 #--------------------------------------------------------------------------------------------------------------------------------------------------     
      SET @arv_regimen_concept_id = ( SELECT concept_name.concept_id FROM concept_name
                                       LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id 
