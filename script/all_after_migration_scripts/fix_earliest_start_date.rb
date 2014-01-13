@@ -5,11 +5,13 @@ CONN = ActiveRecord::Base.connection
 def start
   hiv_prog = Encounter.find_by_sql("SELECT program_id FROM #{Source_db}.program WHERE name = 'HIV Program'").map(&:program_id).first
 
-  art_patients = Encounter.find_by_sql("SELECT distinct patient_id, patient_program_id from #{Source_db}.patient_program where program_id = #{hiv_prog} and voided = 0")
+  art_patients = Encounter.find_by_sql("SELECT distinct patient_id, patient_program_id from #{Source_db}.patient_program where program_id = #{hiv_prog} and voided = 0 ")
 
   (art_patients || []).each do |patient|
+    patient_obj = Encounter.find_by_sql("SELECT * FROM #{Source_db}.patient
+                                         WHERE patient_id = #{patient.patient_id}")
 
-    enrolled_date = date_antiretrovirals_started(patient.patient) 
+    enrolled_date = date_antiretrovirals_started(patient) 
 
     first_dispense = get_first_dispensation(patient.patient_id)
 
@@ -89,26 +91,27 @@ def get_first_dispensation(patient_id)
 end
 
 def date_antiretrovirals_started(patient)
+
   concept_id = Encounter.find_by_sql("SELECT concept_id FROM #{Source_db}.concept_name
                                       WHERE name = 'ART START DATE'").map(&:concept_id).first
   
-  start_date = Encounter.find_by_sql("SELECT value_datetime FROM #{Source_db}.obs
+  start_date = Encounter.find_by_sql("SELECT value_datetime FROM obs
                                       WHERE concept_id = #{concept_id}
-                                      AND person_id = #{patient.id}").map(&:value_datetime).first
- 
+                                      AND person_id = #{patient.patient_id} ").map(&:value_datetime).first rescue ""
+
   if start_date.blank? || start_date == ""
     concept_id = Encounter.find_by_sql("SELECT concept_id FROM #{Source_db}.concept_name
                                         WHERE name = 'Date antiretrovirals started'").map(&:concept_id).first
       
     start_date = Encounter.find_by_sql("SELECT value_text FROM #{Source_db}.obs
                                         WHERE concept_id = #{concept_id}
-                                        AND person_id = #{patient.id}").map(&:value_text).first      
-      
+                                        AND person_id = #{patient.patient_id}").map(&:value_text).first  rescue ""    
+
     art_start_date = start_date
     if art_start_date.blank? || art_start_date == ""
       start_date = ActiveRecord::Base.connection.select_value "
         SELECT earliest_start_date FROM #{Source_db}.earliest_start_date
-        WHERE patient_id = #{patient.id} LIMIT 1"
+        WHERE patient_id = #{patient.patient_id} LIMIT 1"
     end
   end
 
