@@ -18,7 +18,6 @@ PASSWORD=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['
 DATABASE=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['database']"`
 HOST=`ruby -ryaml -e "puts YAML::load_file('config/database.yml')['bart2']['host']"`
 
-
 now=$(date +"%T")
 echo "start time : $now"
 
@@ -33,8 +32,26 @@ mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
 EOFMYSQL
 
-echo "formatting weight, height and BMI values.........."
-script/runner script/vitals_fix.rb
+echo "fixing retired drugs"
+script/runner script/all_after_migration_scripts/fix_program_locations.rb
+
+echo "fixing equivalent daily dose"
+script/runner script/all_after_migration_scripts/fix_for_equivalent_daily_dose.rb
+
+echo "adding the hanging pills"
+script/runner script/all_after_migration_scripts/include_hanging_pills_to_drug_orders.rb
+
+echo "recalculating adherence"
+script/runner script/all_after_migration_scripts/recalculate_adherence.rb
+
+echo "creating OPD program"
+script/runner script/all_after_migration_scripts/creating_patient_opd_program.rb
+
+echo "fixing earliest_start_date"
+script/runner script/all_after_migration_scripts/fix_earliest_start_date.rb
+
+echo "fixing arv numbers"
+script/runner script/arv_format_fix.rb
 
 echo "deleting temp_encounter and temp_obs tables..........."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
