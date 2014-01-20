@@ -28,9 +28,9 @@ def start
   unvoided_orders = Order.find_by_sql("SELECT count(*) as order_count from #{Source_db}.orders where COALESCE(voided,0) = 0").first.order_count
   voided_orders = Order.find_by_sql("SELECT count(*) as order_count from #{Source_db}.orders where COALESCE(voided,0) != 0").first.order_count
   encounters_by_type = Encounter.find_by_sql("select t.name as enc_name,count(e.encounter_id) as enc_type_count from #{Source_db}.encounter as e inner join #{Source_db}.encounter_type as t on e.encounter_type = t.encounter_type_id group by t.name")
-  drugs_ever_dispensed = Drug.find_by_sql("SELECT (SELECT name from #{Source_db}.drug where drug_id = value_drug) as drug_type, value_drug as drug_identifier ,count(*) as counts from #{Source_db}.obs where voided = 0 AND value_drug IS NOT NULL group by value_drug")
+  drugs_ever_dispensed = Drug.find_by_sql("SELECT (SELECT name from #{Source_db}.drug where drug_id = value_drug) as drug_type, value_drug as drug_identifier ,count(*) as counts from #{Source_db}.obs where voided = 0 AND value_drug IS NOT NULL group by value_drug order by drug_type ASC")
   observation_without_enc_types = Observation.find_by_sql("select count(*) as obs_count from #{Source_db}.obs where encounter_id in (select encounter_id from #{Source_db}.encounter where encounter_type is null)").first.obs_count
-  concepts_used = Concept.find_by_sql("SELECT distinct value_coded as concept_id, (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0 UNION SELECT distinct concept_id as concept_id , (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0")
+  concepts_used = Concept.find_by_sql("SELECT distinct value_coded as concept_id, (select name from concept where concept_id = value_coded limit 1) as name from obs where voided = 0 UNION SELECT distinct concept_id as v_concept_id , (select name from concept where concept_id = v_concept_id limit 1) as name from obs where voided = 0 order by name")
 
   $pre_migration << "Minimum patient ID: #{minimum_patient_id} \n"
   $pre_migration << "Maximum patient ID: #{maximum_patient_id} \n"
