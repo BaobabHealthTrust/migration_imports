@@ -97,14 +97,11 @@ def start
      self.create_patient_outcome(outcome.id,visit_encounter_id,outcome.patient_id,outcome.outcome_concept_id,outcome.outcome_date)
     end
    end
-                                                              
-  
+
   end
   
   #get all patient_historical_outcomes
   #patient_historical_outcomes = PatientOutcome.find_by_sql("select * from #{Source_db}.patient_historical_outcomes where patient_id IN (#{patient_ids.join(',')})")
-
-  
 
   count = patients.length
   puts "Number of patients to be exported to intermediary storage #{count}"
@@ -130,26 +127,27 @@ def start
     pt1 = Time.now
 
     encounters = Encounter.find_by_sql("
-                              Select e.* from encounter e
-	                              inner join obs o on e.encounter_id = o.encounter_id
-                              where e.patient_id = #{patient.id}
-                              and o.voided = 0
-                              and e.date_created = (	SELECT MAX(enc.date_created)
+                              SELECT e.* FROM encounter e
+	                              INNER JOIN obs o on e.encounter_id = o.encounter_id
+                              WHERE e.patient_id = #{patient.id}
+                              AND o.voided = 0
+                              AND o.concept_id != 0 
+                              AND e.date_created = (	SELECT MAX(enc.date_created)
 						                                          FROM encounter enc
 						                                          WHERE enc.patient_id = e.patient_id
 						                                          AND enc.encounter_type = e.encounter_type
 						                                          AND DATE(enc.encounter_datetime) = DATE(e.encounter_datetime))
                               GROUP BY e.encounter_id
                               UNION ALL
-                              select e.* from encounter e
-                                inner join orders o on o.encounter_id = e.encounter_id
-                              where e.encounter_type = 3
-                              and o.voided = 0
-                              and e.patient_id = #{patient.id}
-                              and e.encounter_id NOT IN ( select DISTINCT encounter_id
-                                                          from obs
-                                                          where voided = 0
-                                                          and patient_id = e.patient_id)
+                              SELECT e.* FROM encounter e
+                                INNER JOIN orders o on o.encounter_id = e.encounter_id
+                              WHERE e.encounter_type = 3
+                              AND o.voided = 0
+                              AND e.patient_id = #{patient.id}
+                              AND e.encounter_id NOT IN ( SELECT DISTINCT encounter_id
+                                                          FROM obs
+                                                          WHERE voided = 0
+                                                          AND patient_id = e.patient_id)
                               GROUP BY e.encounter_id")
 		ordered_encs = {}
 		
@@ -704,7 +702,7 @@ def self.create_update_outcome(visit_encounter_id, encounter)
 	else
 	    $duplicates_outfile << "Enc_id: #{encounter.id}, Pat_id: #{encounter.patient_id}, Enc_type: Update Outcome \n"
 	end
-	
+
 end
 
 def self.create_patient_outcome(outcome_id,visit_encounter_id, patient_id, outcome_concept_id, outcome_date)
@@ -1150,7 +1148,9 @@ def self.create_hiv_staging_encounter(visit_encounter_id, encounter)
                                                      :conditions => ["person_id = ? AND person_attribute_type_id = ?",
                                                                      encounter.patient_id, startreason]).value rescue nil
   (encounter.observations || []).each do |ob|
-    self.repeated_obs(enc, ob)
+    if ob.concept_id != 0
+      self.repeated_obs(enc, ob)
+    end
   end
 
 	if $migratedencs[visit_encounter_id.to_s+"hiv_staging"] == false
