@@ -306,7 +306,11 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.string   "refer_to_anotha_hosp"
     t.string   "pri_diagnosis"
     t.string   "sec_diagnosis"
-    t.string   "treatment"
+    t.string   "treatment1"
+    t.string   "treatment2"
+    t.string   "treatment3"
+    t.string   "treatment4"
+    t.string   "treatment5"
     t.string   "location"
     t.boolean  "voided",               :default => false, :null => false
     t.string   "void_reason"
