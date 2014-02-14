@@ -285,7 +285,7 @@ BEGIN
             VALUES (@person_id, legacy_id3, @legacy_id, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
-        select @patient_id, patient_id;
+        select @person_id, patient_id;
 
 
     END LOOP;
