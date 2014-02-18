@@ -18,7 +18,7 @@ end
 def fix_retired_drug
 
 	retired =  DrugOrder.find_by_sql("SELECT * FROM #{Source_db}.drug_order
-	                                  WHERE drug_inventory_id = 614")
+	                                  WHERE drug_inventory_id IN (614, 1610)")
 	
 	retired.each do |drug_order|
 	
