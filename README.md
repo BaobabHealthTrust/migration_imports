@@ -7,6 +7,8 @@ These are:
 2. Map and import data from the intermediary tables into OpenMRS version 1.7
 3. Run the after migration scripts.
 
+** Please note that the migration process requires enough hard disk space, depending on how large the dataset one is migrating is. For example, 2.3 GB of dataset (dump) may require approximately 15 GB of free Hard Disk Space. This is vital when importing data from intermediate tables into OpenMRS version 1.7. Refer to Phase two of the migration process. **
+
 Getting started 
 
 Steps on migrating data from OpenMRS 1.1 to OpenMRS 1.7
