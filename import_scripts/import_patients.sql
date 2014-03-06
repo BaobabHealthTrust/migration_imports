@@ -92,6 +92,9 @@ BEGIN
         
         # Map destination user to source user
         SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+
+        SET @site_code = COALESCE((select property_value from global_property where property = 'site_prefix'), 'MPC');
+
         IF ISNULL(dob_estimated) THEN
           SET @date_of_birth_estimated = (false);
         ELSE
@@ -262,9 +265,11 @@ BEGIN
         END IF;
     
         IF NOT ISNULL(art_number) AND NOT ISNULL(@art_number) THEN
-        
+            select art_number;
+            SET @arv_number = (SELECT CONCAT(@site_code, '-ARV-', TRIM(REPLACE(art_number,@site_code, ''))));
+
             INSERT INTO patient_identifier (patient_id, identifier, identifier_type, location_id, creator, date_created, uuid)
-            VALUES (patient_id, art_number, @art_number, @location_id, @creator, date_created, (SELECT UUID()));
+            VALUES (patient_id, @arv_number, @art_number, @location_id, @creator, date_created, (SELECT UUID()));
         
         END IF;
     
