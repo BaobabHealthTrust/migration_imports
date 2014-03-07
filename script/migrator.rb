@@ -144,10 +144,10 @@ def start
                               WHERE e.encounter_type = 3
                               AND o.voided = 0
                               AND e.patient_id = #{patient.id}
-                              AND e.encounter_id NOT IN ( SELECT DISTINCT encounter_id
-                                                          FROM obs
-                                                          WHERE voided = 0
-                                                          AND patient_id = e.patient_id)
+                              #AND e.encounter_id NOT IN ( SELECT DISTINCT encounter_id
+                              #                            FROM obs
+                              #                            WHERE voided = 0
+                              #                            AND patient_id = e.patient_id)
                               GROUP BY e.encounter_id")
 		ordered_encs = {}
 		
@@ -228,8 +228,6 @@ def start
   eps = total_enc / elapsed
   puts "#{total_enc} Encounters were processed in #{elapsed} seconds for #{eps} eps"
   puts "Encounters with missing concepts: " + $missing_concept_errors.to_s
-
-
 
 	puts "Verifying patients"
 		
