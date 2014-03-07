@@ -122,8 +122,8 @@ script/runner script/arv_format_fix.rb
 
 echo "deleting temp_encounter and temp_obs tables..........."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
-  DROP table temp_encounter;
   DROP table temp_obs;
+  DROP table temp_encounter;
 EOFMYSQL
 
 later=$(date +"%F %T")
