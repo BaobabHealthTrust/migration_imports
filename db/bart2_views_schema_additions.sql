@@ -143,9 +143,11 @@ CREATE OR REPLACE ALGORITHM=UNDEFINED  SQL SECURITY INVOKER
          `obs`.`value_complex` AS `value_complex`,
          `obs`.`uuid` AS `uuid` 
   FROM `obs`
+  INNER JOIN `person` ON ((`person`.`person_id` = `obs`.`person_id`))
   WHERE ((`obs`.`concept_id` IN (6131,1755)) AND
          (`obs`.`value_coded` = 1065) AND
-         (`obs`.`voided` = 0));
+         (`obs`.`voided` = 0) AND
+         (`person`.`gender` = 'F'));
 
 CREATE OR REPLACE ALGORITHM=UNDEFINED  SQL SECURITY INVOKER
   VIEW `patient_state_on_arvs` AS
@@ -481,19 +483,95 @@ DELIMITER ;;
 /*!50003 CREATE*/ /*!50020 */ /*!50003 FUNCTION `current_state_for_program`(my_patient_id INT, my_program_id INT, my_end_date DATETIME) RETURNS int(11)
 BEGIN
   SET @state_id = NULL;
-	SELECT  patient_program_id INTO @patient_program_id FROM patient_program 
-			WHERE patient_id = my_patient_id 
-				AND program_id = my_program_id 
-				AND voided = 0 
+  SET @new_state_id = NULL;
+	SELECT  patient_program_id INTO @patient_program_id FROM patient_program
+			WHERE patient_id = my_patient_id
+				AND program_id = my_program_id
+				AND voided = 0
 				ORDER BY patient_program_id DESC LIMIT 1;
 
-	SELECT state INTO @state_id FROM patient_state 
+  	SELECT start_date INTO @start_date FROM patient_state
 		WHERE patient_program_id = @patient_program_id
 			AND voided = 0
 			AND start_date <= my_end_date
 		ORDER BY start_date DESC, date_created DESC, patient_state_id DESC LIMIT 1;
 
+	SELECT state INTO @state_id FROM patient_state
+		WHERE patient_program_id = @patient_program_id
+			AND voided = 0
+			AND start_date <= my_end_date
+		ORDER BY start_date DESC, date_created DESC, patient_state_id DESC LIMIT 1;
+
+   IF ( @state_id != 3 ) THEN
+      SELECT state INTO @new_state_id FROM patient_state
+		   WHERE patient_program_id = @patient_program_id
+			AND voided = 0
+			AND start_date = @start_date
+         AND state = 3
+		ORDER BY start_date DESC, date_created DESC, patient_state_id DESC LIMIT 1;
+   END IF;
+
+    IF ( @new_state_id IS NOT NULL ) THEN
+        RETURN @new_state_id;
+    END IF;
+
 	RETURN @state_id;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+
+DROP FUNCTION IF EXISTS `current_state_for_patient_in_flat_tables`;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50020 */ /*!50003 FUNCTION `current_state_for_patient_in_flat_tables`(my_patient_id INT, my_end_date DATETIME) RETURNS varchar(255)
+BEGIN
+  SET @state_id = NULL;
+	SELECT current_hiv_program_state INTO @state_id FROM flat_table2
+    WHERE current_hiv_program_state IS NOT NULL and current_hiv_program_start_date IS NOT NULL
+      AND patient_id = my_patient_id
+      AND current_hiv_program_start_date <= my_end_date
+    ORDER BY patient_id, current_hiv_program_start_date DESC
+    LIMIT 1;
+
+	RETURN @state_id;
+END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+
+DROP FUNCTION IF EXISTS `current_hiv_program_start_date_max`;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50020 */ /*!50003 FUNCTION `current_hiv_program_start_date_max`(my_patient_id INT, my_end_date DATETIME) RETURNS varchar(10) CHARSET latin1
+    DETERMINISTIC
+BEGIN
+  SET @patient_id = NULL;
+	SELECT max(ft3.current_hiv_program_start_date) INTO @patient_id FROM flat_table2 ft3
+    WHERE ft3.patient_id = my_patient_id
+	    AND ft3.current_hiv_program_start_date <= my_end_date
+	    AND ft3.current_hiv_program_state = 'On antiretrovirals'
+	    AND ft3.current_hiv_program_start_date IS NOT NULL;
+
+	RETURN @patient_id;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -731,23 +809,39 @@ BEGIN
 	DECLARE my_daily_dose, my_quantity, my_pill_count, my_total_text, my_total_numeric DECIMAL;
 	DECLARE my_drug_id, flag INT;
 
-	DECLARE cur1 CURSOR FOR SELECT d.drug_inventory_id, o.start_date, d.equivalent_daily_dose daily_dose, d.quantity, o.start_date FROM drug_order d
-		INNER JOIN arv_drug ad ON d.drug_inventory_id = ad.drug_id		
-		INNER JOIN orders o ON d.order_id = o.order_id
-			AND d.quantity > 0
-			AND o.voided = 0
-			AND o.start_date <= my_end_date
-			AND o.patient_id = my_patient_id;
+	DECLARE cur1 CURSOR FOR SELECT d.drug_inventory_id, o.start_date, d.equivalent_daily_dose daily_dose, obs.value_numeric, o.start_date FROM obs
+                            INNER join encounter USING (encounter_id)
+                            INNER JOIN drug_order d ON obs.order_id = d.order_id
+                            INNER JOIN orders o ON o.order_id = d.order_id
+                            WHERE encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'DISPENSING')
+                            AND d.drug_inventory_id IN (SELECT drug_id FROM drug
+                            WHERE concept_id IN (SELECT concept_id
+                            FROM concept_set
+                            WHERE concept_set = 1085))
+                            AND obs.concept_id = 2834
+                            AND d.quantity > 0
+                            AND o.voided = 0
+                            AND obs.voided = 0
+                            AND DATE(o.start_date) <= my_end_date
+                            AND encounter.patient_id = my_patient_id;
 
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-	SELECT MAX(o.start_date) INTO @obs_datetime FROM drug_order d
-		INNER JOIN arv_drug ad ON d.drug_inventory_id = ad.drug_id		
-		INNER JOIN orders o ON d.order_id = o.order_id
-			AND d.quantity > 0
-			AND o.voided = 0
-			AND o.start_date <= my_end_date
-			AND o.patient_id = my_patient_id
+	SELECT MAX(o.start_date) INTO @obs_datetime  FROM obs
+                            INNER join encounter USING (encounter_id)
+                            INNER JOIN drug_order d ON obs.order_id = d.order_id
+                            INNER JOIN orders o ON o.order_id = d.order_id
+                            WHERE encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'DISPENSING')
+                            AND d.drug_inventory_id IN (SELECT drug_id FROM drug
+                            WHERE concept_id IN (SELECT concept_id
+                            FROM concept_set
+                            WHERE concept_set = 1085))
+                            AND obs.concept_id = 2834
+                            AND d.quantity > 0
+                            AND o.voided = 0
+                            AND obs.voided = 0
+                            AND DATE(o.start_date) <= my_end_date
+                            AND encounter.patient_id = my_patient_id
 		GROUP BY o.patient_id;
 
 	OPEN cur1;
@@ -799,3 +893,29 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = '' */ ;
 -- Dump completed on 2012-05-03 21:13:17
+
+DROP FUNCTION IF EXISTS date_antiretrovirals_started;                                          
+                                                                                
+DELIMITER $$                                                                     
+CREATE FUNCTION date_antiretrovirals_started(set_patient_id INT) RETURNS DATE
+BEGIN                                                                           
+                                                                                
+DECLARE date_started DATE;
+DECLARE start_date_concept_id INT;
+
+SET start_date_concept_id = (SELECT concept_id FROM concept_name WHERE name = 'ART START DATE' LIMIT 1);
+SET date_started = (SELECT value_datetime FROM obs WHERE concept_id = start_date_concept_id AND person_id = set_patient_id LIMIT 1);
+
+if date_started is null then
+SET start_date_concept_id = (SELECT concept_id FROM concept_name WHERE name = 'Date antiretrovirals started' LIMIT 1);
+SET date_started = (SELECT value_datetime FROM obs WHERE concept_id = start_date_concept_id AND person_id = set_patient_id LIMIT 1);
+end if;
+
+if date_started is NULL then 
+SET date_started = (SELECT earliest_start_date FROM earliest_start_date WHERE patient_id = set_patient_id LIMIT 1);
+end if;
+
+RETURN date_started;
+END$$                                                                           
+DELIMITER ;
+

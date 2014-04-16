@@ -120,6 +120,9 @@ script/runner script/all_after_migration_scripts/fix_earliest_start_date.rb
 echo "fixing arv numbers"
 script/runner script/arv_format_fix.rb 
 
+echo "fixing all patients on HIV program and on ARVs without any dispensing encounter"
+script/runner script/all_after_migration_scripts/patients_on_hiv_prog_without_disp_enc_fix.rb 
+
 echo "deleting temp_encounter and temp_obs tables..........."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
   DROP table temp_obs;
