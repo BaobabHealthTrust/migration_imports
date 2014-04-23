@@ -1,7 +1,8 @@
 In migration_imports application do the following to migrate all give_drugs encounters that were missed during the initial migration.
 
-Note: Make sure that bart1 database is the dump which was used during migration on 22/01/2014.
-      Also make sure bart2 database is the migrated database.
+Note: 1. Make sure that bart1 database is the dump which was used during migration.
+      2. Also make sure bart2 database is the migrated database.
+      3. Backup the bart2 database before this process.
 
 1. git pull
 
