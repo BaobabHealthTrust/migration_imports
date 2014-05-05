@@ -26,41 +26,41 @@ BEGIN
     
     # Declare fields to hold our values for our patients
     DECLARE patient_id INT(11);
-    DECLARE given_name VARCHAR(255);
-    DECLARE middle_name VARCHAR(255);
-    DECLARE family_name VARCHAR(255);
-    DECLARE gender VARCHAR(25);
-    DECLARE dob DATE;
-    DECLARE dob_estimated BIT(1);
-    DECLARE dead BIT(1);
-    DECLARE traditional_authority VARCHAR(255);
-    DECLARE current_address VARCHAR(255);
-    DECLARE landmark VARCHAR(255);
-    DECLARE cellphone_number VARCHAR(255);
-    DECLARE home_phone_number VARCHAR(255);
-    DECLARE office_phone_number VARCHAR(255);
-    DECLARE occupation VARCHAR(255);
-    DECLARE guardian_id INT(11);
-    DECLARE nat_id VARCHAR(255);
-    DECLARE art_number VARCHAR(255);
-    DECLARE pre_art_number VARCHAR(255);
-    DECLARE tb_number VARCHAR(255);
-    DECLARE legacy_id VARCHAR(255);
-    DECLARE legacy_id2 VARCHAR(255);
-    DECLARE legacy_id3 VARCHAR(255);
-    DECLARE new_nat_id VARCHAR(255);
-    DECLARE prev_art_number VARCHAR(255);
-    DECLARE filing_number VARCHAR(255);
-    DECLARE archived_filing_number VARCHAR(255);
-    DECLARE voided TINYINT(1);
-    DECLARE void_reason VARCHAR(255);
-    DECLARE date_voided DATE;
-    DECLARE voided_by INT(11);
-    DECLARE date_created DATE;
-    DECLARE creator varchar(255);
+    #--DECLARE given_name VARCHAR(255);
+    #--DECLARE middle_name VARCHAR(255);
+    #--DECLARE family_name VARCHAR(255);
+    #--DECLARE gender VARCHAR(25);
+    #--DECLARE dob DATE;
+    #--DECLARE dob_estimated BIT(1);
+    #--DECLARE dead BIT(1);
+    #--DECLARE traditional_authority VARCHAR(255);
+    #--DECLARE current_address VARCHAR(255);
+    #--DECLARE landmark VARCHAR(255);
+    #--DECLARE cellphone_number VARCHAR(255);
+    #--DECLARE home_phone_number VARCHAR(255);
+    #--DECLARE office_phone_number VARCHAR(255);
+    #--DECLARE occupation VARCHAR(255);
+    #--DECLARE guardian_id INT(11);
+    #--DECLARE nat_id VARCHAR(255);
+    #--DECLARE art_number VARCHAR(255);
+    #--DECLARE pre_art_number VARCHAR(255);
+    #--DECLARE tb_number VARCHAR(255);
+    #--DECLARE legacy_id VARCHAR(255);
+    #--DECLARE legacy_id2 VARCHAR(255);
+    #--DECLARE legacy_id3 VARCHAR(255);
+    #--DECLARE new_nat_id VARCHAR(255);
+    #--DECLARE prev_art_number VARCHAR(255);
+    #--DECLARE filing_number VARCHAR(255);
+    #--DECLARE archived_filing_number VARCHAR(255);
+    #--DECLARE voided TINYINT(1);
+    #--DECLARE void_reason VARCHAR(255);
+    #--DECLARE date_voided DATE;
+    #--DECLARE voided_by INT(11);
+    #--DECLARE date_created DATE;
+    #--DECLARE creator varchar(255);
 
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT * FROM `bart1_intermediate_bare_bones`.`patients`;
+    DECLARE cur CURSOR FOR SELECT distinct `patient_id` FROM `bart1_intermediate_bare_bones`.`give_drugs_encounters`;
     
            #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` BETWEEN start_pos AND end_pos; 
            #--LIMIT start_pos, end_pos;
@@ -80,7 +80,7 @@ BEGIN
     read_loop: LOOP
     
         # Get the fields into the variables declared earlier
-        FETCH cur INTO patient_id, given_name, middle_name, family_name, gender, dob, dob_estimated, dead, traditional_authority, current_address, landmark, cellphone_number, home_phone_number, office_phone_number, occupation, guardian_id, nat_id, art_number, pre_art_number, tb_number, legacy_id, legacy_id2, legacy_id3, new_nat_id, prev_art_number, filing_number, archived_filing_number, voided, void_reason, date_voided, voided_by, date_created, creator;
+        FETCH cur INTO patient_id;
     
         # Check if we are done and exit loop if done
         IF done THEN
@@ -92,27 +92,28 @@ BEGIN
         # Not done, process the parameters
         
         # Map destination user to source user
-        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
-        IF ISNULL(dob_estimated) THEN
-          SET @date_of_birth_estimated = (false);
-        ELSE
-          SET @date_of_birth_estimated = (dob_estimated);
-        END IF;
+       
+        #--SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+        #--IF ISNULL(dob_estimated) THEN
+        #--  SET @date_of_birth_estimated = (false);
+        #--ELSE
+        #--  SET @date_of_birth_estimated = (dob_estimated);
+        #--END IF;
 
-        IF ISNULL(dead) THEN
-          SET @patient_dead = (0);
-        ELSE
-          SET @patient_dead = (dead);
-        END IF;
+        #--IF ISNULL(dead) THEN
+        #--  SET @patient_dead = (0);
+        #--ELSE
+        #--  SET @patient_dead = (dead);
+        #--END IF;
 
         SET @person_id = (patient_id);
 
-        select patient_id;
+        #---select patient_id;
         
         select "give_drugs_encounter";        
         CALL proc_import_give_drugs_encounters_linked_to_orders_only(@person_id);                      # good
         
-        select patient_id;
+        #--select patient_id;
 
     END LOOP;
 
