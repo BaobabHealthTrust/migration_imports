@@ -24,13 +24,14 @@ def start
   count = 1
   (temps_obs || []).each do |obs|
 
-
+    encounter_value_datetime = obs.value_datetime.blank? ? 'NULL' : "'#{obs.value_datetime.to_s}'"
+    
     $temporary_outfile << "INSERT INTO obs (`person_id`,`concept_id`,`encounter_id`,`order_id`,`obs_datetime`,
                           `value_coded`,`value_drug`,`value_datetime`,`value_numeric`,
                           `value_text`, `creator`,`date_created`,`uuid`) VALUES (#{obs.person_id},#{obs.concept_id},
                           #{temp_keys[obs.encounter_id]},#{obs.order_id.blank? ? 'NULL' : obs.order_id      },'#{obs.obs_datetime}',
                           #{obs.value_coded.blank? ? 'NULL' : obs.value_coded },#{obs.value_drug.blank? ? 'NULL' : obs.value_drug},
-                          #{obs.value_datetime.blank? ? 'NULL' : obs.value_datetime.to_s },
+                          #{encounter_value_datetime},
                           #{obs.value_numeric.blank? ? 'NULL' : obs.value_numeric},#{obs.value_text.blank? ? 'NULL' : obs.value_text},
                           #{obs.creator},'#{obs.date_created}','#{obs.uuid}');"
 
