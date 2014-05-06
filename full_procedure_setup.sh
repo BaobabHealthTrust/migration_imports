@@ -123,6 +123,9 @@ script/runner script/arv_format_fix.rb
 echo "fixing all patients on HIV program and on ARVs without any dispensing encounter"
 script/runner script/all_after_migration_scripts/patients_on_hiv_prog_without_disp_enc_fix.rb 
 
+echo "fixing all patients with Pre-ART state but are not on HIV program"
+script/runner script/all_after_migration_script/pre_art_hiv_program_fix.rb
+
 echo "deleting temp_encounter and temp_obs tables..........."
 mysql --user=$USERNAME --password=$PASSWORD $DATABASE<<EOFMYSQL
   DROP table temp_obs;

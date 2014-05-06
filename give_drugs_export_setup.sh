@@ -31,8 +31,8 @@ echo "Creating intermediary storage"
  rake db:create
  rake db:migrate
 
-echo "creating drug_map table"
- script/runner script/create_drug_map.rb
+#--echo "creating drug_map table"
+#-- script/runner script/create_drug_map.rb
 
 echo "Exporting to the intermediary storage"
  script/runner script/give_drugs_orders_migrator.rb
