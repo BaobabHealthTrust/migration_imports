@@ -1,4 +1,4 @@
-# This procedure imports patients from intermediate tables to ART2 OpenMRS database
+# This procedure imports patients hiv_staging encounters from intermediate tables to ART2 OpenMRS database
 # ASSUMPTION
 # ==========
 # The assumption here is your source database name is `bart1_intermediate_bare_bones`
@@ -15,59 +15,22 @@ DROP PROCEDURE IF EXISTS `proc_import_patients_with_give_drugs_linked_to_orders_
 # Procedure does not take any parameters. It assumes fixed table names and database
 # names as working with flexible names is not supported as of writing in MySQL.
 CREATE PROCEDURE `proc_import_patients_with_give_drugs_linked_to_orders_only`(
-  #--IN start_pos INT(11),
-  #--IN end_pos INT(11)
-  #--IN in_patient_id INT(11)
-	)
+#--IN in_patient_id INT(11)
+)
+
 BEGIN
     
     # Declare condition for exiting loop
     DECLARE done INT DEFAULT FALSE;
-    
-    # Declare fields to hold our values for our patients
-    DECLARE patient_id INT(11);
-    #--DECLARE given_name VARCHAR(255);
-    #--DECLARE middle_name VARCHAR(255);
-    #--DECLARE family_name VARCHAR(255);
-    #--DECLARE gender VARCHAR(25);
-    #--DECLARE dob DATE;
-    #--DECLARE dob_estimated BIT(1);
-    #--DECLARE dead BIT(1);
-    #--DECLARE traditional_authority VARCHAR(255);
-    #--DECLARE current_address VARCHAR(255);
-    #--DECLARE landmark VARCHAR(255);
-    #--DECLARE cellphone_number VARCHAR(255);
-    #--DECLARE home_phone_number VARCHAR(255);
-    #--DECLARE office_phone_number VARCHAR(255);
-    #--DECLARE occupation VARCHAR(255);
-    #--DECLARE guardian_id INT(11);
-    #--DECLARE nat_id VARCHAR(255);
-    #--DECLARE art_number VARCHAR(255);
-    #--DECLARE pre_art_number VARCHAR(255);
-    #--DECLARE tb_number VARCHAR(255);
-    #--DECLARE legacy_id VARCHAR(255);
-    #--DECLARE legacy_id2 VARCHAR(255);
-    #--DECLARE legacy_id3 VARCHAR(255);
-    #--DECLARE new_nat_id VARCHAR(255);
-    #--DECLARE prev_art_number VARCHAR(255);
-    #--DECLARE filing_number VARCHAR(255);
-    #--DECLARE archived_filing_number VARCHAR(255);
-    #--DECLARE voided TINYINT(1);
-    #--DECLARE void_reason VARCHAR(255);
-    #--DECLARE date_voided DATE;
-    #--DECLARE voided_by INT(11);
-    #--DECLARE date_created DATE;
-    #--DECLARE creator varchar(255);
 
+    DECLARE  patient_id int(11);
+    
     # Declare and initialise cursor for looping through the table
-    DECLARE cur CURSOR FOR SELECT distinct `patient_id` FROM `bart1_intermediate_bare_bones`.`give_drugs_encounters`;
-    
-           #--WHERE `bart1_intermediate_bare_bones`.`patients`.`patient_id` BETWEEN start_pos AND end_pos; 
-           #--LIMIT start_pos, end_pos;
-
+    DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`give_drugs_encounters`.patient_id 
+    FROM `bart1_intermediate_bare_bones`.`give_drugs_encounters`;
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-    
+        
     # Disable system checks and indexing to speed up processing
     SET FOREIGN_KEY_CHECKS = 0;
     SET UNIQUE_CHECKS = 0;
@@ -108,12 +71,12 @@ BEGIN
 
         SET @person_id = (patient_id);
 
-        #---select patient_id;
+        select patient_id;
         
         select "give_drugs_encounter";        
         CALL proc_import_give_drugs_encounters_linked_to_orders_only(@person_id);                      # good
         
-        #--select patient_id;
+        select patient_id;
 
     END LOOP;
 
