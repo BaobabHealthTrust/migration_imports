@@ -152,21 +152,21 @@ def start
 		ordered_encs = {}
 		
 		encounters.each do |enc|
-		
-			if ordered_encs[enc.encounter_datetime.to_date].blank?
-				ordered_encs[enc.encounter_datetime.to_date] = []				
-			end
-			 if enc.encounter_type.blank?
-         $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
-			 else
-			   if enc.encounter_type == 57
-			    $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
+		  if !enc.encounter_datetime.nil?
+			  if ordered_encs[enc.encounter_datetime.to_date].blank?
+				  ordered_encs[enc.encounter_datetime.to_date] = []				
+			  end
+			   if enc.encounter_type.blank?
+           $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
 			   else
-          ordered_encs[enc.encounter_datetime.to_date] << enc
+			     if enc.encounter_type == 57
+			      $failed_encs << "#{enc.encounter_id} : Missing encounter  type"
+			     else
+            ordered_encs[enc.encounter_datetime.to_date] << enc
+			     end
 			   end
-			 end
-		end
-
+		  end
+    end
     #check if patient does not have update outcome encounter
     patient_encounter_types = encounters.map{|enc| enc.encounter_type}
 
