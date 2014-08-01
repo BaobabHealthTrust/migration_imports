@@ -74,10 +74,10 @@ BEGIN
         END IF;
 
         # Map destination user to source user
-        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator LIMIT 1), 1);
         
         # Map destination user to source user
-        SET @provider = COALESCE((SELECT person_id FROM users WHERE user_id = @creator), 1);
+        SET @provider = COALESCE((SELECT person_id FROM users WHERE user_id = @creator LIMIT 1), 1);
         
         # Map destination user to source voided_by
         SET @voided_by = (SELECT user_id FROM users WHERE user_id = voided_by LIMIT 1);
@@ -92,7 +92,7 @@ BEGIN
         # Get hiv program for the patient
         SET @patient_hiv_program = COALESCE((SELECT patient_program_id
                                                 FROM patient_program
-                                                WHERE patient_id = patient_program.patient_id), 0);
+                                                WHERE patient_id = patient_program.patient_id LIMIT 1), 0);
         
         # Create outcome encounter object in destination
 
