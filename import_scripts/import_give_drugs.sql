@@ -341,7 +341,7 @@ BEGIN
          END IF;
 
         END IF;  #--2
-        
+
         IF NOT ISNULL(prescription_duration) THEN #--4
           SET @auto_expire_date = NULL;
           SET @auto_expire_date = (SELECT 
@@ -353,7 +353,8 @@ BEGIN
         ELSE
           SET @auto_expire_date = NULL;
         END IF; #--11
-                # create order
+
+        # create order
         SET @pres_drug_name1_uuid = (SELECT UUID());
         
         INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
@@ -533,6 +534,129 @@ BEGIN
           #create drug_order without quantity
           INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency)
           VALUES (@pres_drug1_order_id, @pres_drug_name1_concept_id, pres_dosage1, pres_dosage1, pres_frequency1);
+          
+          
+          #--implement dispensation without prescription
+         IF NOT ISNULL(dispensed_drug_name1) THEN
+           IF ( dispensed_drug_name1 = pres_drug_name5 ) THEN
+              select dispensed_drug_name1, old_enc_id;
+           ELSEIF ( dispensed_drug_name1 = pres_drug_name4 ) THEN
+                select dispensed_drug_name1, old_enc_id;
+           ELSEIF ( dispensed_drug_name1 = pres_drug_name3 ) THEN
+                  select dispensed_drug_name3, old_enc_id;
+           ELSEIF ( dispensed_drug_name1 = pres_drug_name2 ) THEN
+                  select dispensed_drug_name1, old_enc_id;
+           ELSE
+            #create dispensing encounter
+            SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
+                                                 WHERE name = "DISPENSING"  LIMIT 1);
+
+            # Create encounter
+            SET @dispensing_encounter_without_pres_uuid = (SELECT UUID());
+            
+            SET @old_dispensing_encounter_id = COALESCE((SELECT encounter_id FROM encounter
+                                                         WHERE encounter_id = old_enc_id
+                                                         AND encounter_type = 25),0);
+            IF (@old_dispensing_encounter_id = 0) THEN
+              INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (old_enc_id, @dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+
+              SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+
+            IF NOT ISNULL(prescription_duration) THEN #--11
+              SET @auto_expire_date = NULL;
+              SET @auto_expire_date = (SELECT
+                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                   ELSE
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                   END AS prescription_duration_in_days);
+            ELSE
+              SET @auto_expire_date = NULL;
+            END IF; #--11
+            # create order
+            SET @dispensed_without_pres_order_uuid = (SELECT UUID());
+            
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+            VALUES (1, @dispensed_drug_name1_new_concept_id, 1, old_enc_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid);
+
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid);
+
+            SET @prescription_without_dispensation = (SELECT pres_drug_name1);
+
+            #create drug_order without quantity
+            INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+            VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name1_concept_id, dispensed_dosage1, pres_dosage1, pres_frequency1, dispensed_quantity1);
+
+            #create amount dispensed obs
+            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+            VALUES (patient_id, @amount_dispensed_concept_id, old_enc_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name1_concept_id, dispensed_quantity1,@creator, date_created, (SELECT UUID()));
+
+            SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id);
+
+            SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                              WHERE concept_set = @arv_regimen_concept_id
+                                              AND concept_id = @drug_concept_id), 0);
+
+            IF (@arv_drug_concept_id != 0) THEN  #--7
+              #create arv_regimen_received_abstracted_construct obs
+              INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+              VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+            END IF; #--7
+
+            ELSE
+              INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (@dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, @dispensing_encounter_without_pres_uuid) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+
+              SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+
+            # create order
+            SET @dispensed_without_pres_order_uuid1 = (SELECT UUID());
+
+            IF NOT ISNULL(prescription_duration) THEN #--11
+              SET @auto_expire_date = NULL;
+              SET @auto_expire_date = (SELECT
+                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                   ELSE
+                     ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                   END AS prescription_duration_in_days);
+            ELSE
+              SET @auto_expire_date = NULL;
+            END IF; #--11
+
+            INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+            VALUES (1, @dispensed_drug_name1_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, @dispensed_without_pres_order_uuid1);
+
+            SET @dispensed_without_pres_drug_order_id = (SELECT order_id FROM orders WHERE uuid = @dispensed_without_pres_order_uuid1);
+
+            SET @prescription_without_dispensation = (SELECT pres_drug_name1);
+
+            #create drug_order without quantity
+            INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+            VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name1_concept_id, dispensed_dosage1, dispensed_dosage1, pres_frequency1, dispensed_quantity1);
+
+            #create amount dispensed obs
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+            VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name1_concept_id, dispensed_quantity1,@creator, date_created, (SELECT UUID()));
+
+            SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name1_concept_id);
+
+            SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                              WHERE concept_set = @arv_regimen_concept_id
+                                              AND concept_id = @drug_concept_id), 0);
+
+            IF (@arv_drug_concept_id != 0) THEN  #--7
+              #create arv_regimen_received_abstracted_construct obs
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+              VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+
+            END IF; #--7
+           END IF;
+          END IF;
+        END IF;
+
+          
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
@@ -922,6 +1046,126 @@ BEGIN
         
           INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency)
           VALUES (@pres_drug2_order_id, @pres_drug_name2_concept_id, pres_dosage2, pres_dosage2, pres_frequency2);
+          
+          IF NOT ISNULL(dispensed_drug_name2) THEN #--if dispensed2 is not null
+        IF ( dispensed_drug_name2 = pres_drug_name5 ) THEN
+          select pres_drug_name5, old_enc_id;
+        ELSEIF ( dispensed_drug_name2 = pres_drug_name4 ) THEN
+          select pres_drug_name4, old_enc_id;
+        ELSEIF ( dispensed_drug_name2 = pres_drug_name3 ) THEN
+          select pres_drug_name3, old_enc_id;
+        ELSEIF ( dispensed_drug_name2 =  pres_drug_name2) THEN
+          select  pres_drug_name2, old_enc_id;
+        ELSEIF ( dispensed_drug_name2 =  pres_drug_name1) THEN
+          select pres_drug_name1, old_enc_id;
+        ELSE
+        
+        #create dispensing encounter
+        SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
+                                             WHERE name = "DISPENSING"  LIMIT 1);
+                                             
+        SET @old_dispensing_encounter_id = COALESCE((SELECT encounter_id FROM encounter
+                                                     WHERE encounter_id = old_enc_id
+                                                     AND encounter_type = 25),0);
+       
+        IF (@old_dispensing_encounter_id = 0) THEN #--onee
+          INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+          VALUES (old_enc_id, @dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+
+          SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+
+          IF NOT ISNULL(prescription_duration) THEN #--11
+            SET @auto_expire_date = NULL;
+            SET @auto_expire_date = (SELECT
+                  CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                    ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                  ELSE
+                    ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                  END AS prescription_duration_in_days);
+          ELSE
+            SET @auto_expire_date = NULL;
+          END IF; #--11
+          
+          INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+          VALUES (1, @dispensed_drug_name2_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, (SELECT UUID()));
+
+          SET @dispensed_without_pres_drug_order_id = (SELECT LAST_INSERT_ID());
+
+          #create drug_order without quantity
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name2_concept_id, dispensed_dosage2, pres_dosage2, pres_frequency2, dispensed_quantity2);
+
+          #create amount dispensed obs
+          INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name2_concept_id, dispensed_quantity2,@creator, date_created, (SELECT UUID()));
+        
+          SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                               WHERE concept_set = @arv_regimen_concept_id
+                                               AND concept_id = @drug_concept_id), 0);
+
+          IF (@arv_drug_concept_id != 0) THEN  #--7
+            #create arv_regimen_received_abstracted_construct obs
+            INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+         END IF; #--7
+        
+        ELSE #--onee
+          SET @old_temp_encounter_id = COALESCE((SELECT encounter_id FROM temp_encounter tnc
+                                                 WHERE tnc.patient_id = patient_id
+                                                 AND tnc.encounter_type = 54
+                                                 AND tnc.encounter_datetime = encounter_datetime
+                                                 LIMIT 1), 0 );
+          
+          IF (@old_temp_encounter_id = 0) THEN
+            INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+            VALUES (@dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, (SELECT UUID()));
+            SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+          ELSE
+            SET @dispensing_without_pres_encounter_id = (@old_temp_encounter_id);
+          END IF;
+
+          IF NOT ISNULL(prescription_duration) THEN #--11
+            SET @auto_expire_date = NULL;
+            SET @auto_expire_date = (SELECT
+                    CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                      ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                    ELSE
+                      ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                    END AS prescription_duration_in_days);
+          ELSE
+            SET @auto_expire_date = NULL;
+          END IF; #--11
+          
+          INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+          VALUES (1, @dispensed_drug_name2_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, (SELECT UUID()));
+          
+          SET @dispensed_without_pres_drug_order_id = (SELECT LAST_INSERT_ID());
+          
+          #create drug_order without quantity
+          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+          VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name2_concept_id, dispensed_dosage2, dispensed_dosage2, pres_frequency2, dispensed_quantity2);
+
+          #create amount dispensed obs
+          INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+          VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name2_concept_id, dispensed_quantity2,@creator, date_created, (SELECT UUID()));
+
+          SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name2_concept_id);
+
+          SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                               WHERE concept_set = @arv_regimen_concept_id
+                                               AND concept_id = @drug_concept_id), 0);
+
+          IF (@arv_drug_concept_id != 0) THEN  #--7
+            #create arv_regimen_received_abstracted_construct obs
+            INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+            VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+
+         END IF; #--7 
+        END IF; #--onee
+       END IF;
+      END IF;
+          
+          
         END IF;    #--5  
       ELSE #--1
       #--implement dispensation without prescription
@@ -1306,6 +1550,125 @@ BEGIN
           #create drug_order without quantity
           INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency)
           VALUES (@pres_drug3_order_id, @pres_drug_name3_concept_id, pres_dosage3, pres_dosage3, pres_frequency3);
+
+            #--implement dispensation without prescription
+            IF NOT ISNULL(dispensed_drug_name3) THEN
+               IF ( dispensed_drug_name3 = pres_drug_name5 ) THEN
+                  select dispensed_drug_name3, old_enc_id;
+               ELSEIF ( dispensed_drug_name3 = pres_drug_name4 ) THEN
+                    select dispensed_drug_name3, old_enc_id;
+               ELSEIF ( dispensed_drug_name3 = pres_drug_name3 ) THEN
+                      select dispensed_drug_name3, old_enc_id;
+               ELSEIF ( dispensed_drug_name3 =  pres_drug_name3) THEN
+                      select dispensed_drug_name3, old_enc_id;
+               ELSEIF ( dispensed_drug_name3 =  pres_drug_name1) THEN
+               select dispensed_drug_name3, old_enc_id;
+               ELSE
+            #create dispensing encounter
+            SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
+                                                 WHERE name = "DISPENSING"  LIMIT 1);
+                                                 
+            SET @old_dispensing_encounter_id = COALESCE((SELECT encounter_id FROM encounter
+                                                         WHERE encounter_id = old_enc_id
+                                                         AND encounter_type = 25),0);
+           
+            IF (@old_dispensing_encounter_id = 0) THEN #--onee
+              INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (old_enc_id, @dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+
+              SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+
+              IF NOT ISNULL(prescription_duration) THEN #--11
+                SET @auto_expire_date = NULL;
+                SET @auto_expire_date = (SELECT
+                      CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                        ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                      ELSE
+                        ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                      END AS prescription_duration_in_days);
+              ELSE
+                SET @auto_expire_date = NULL;
+              END IF; #--11
+              
+              INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @dispensed_drug_name3_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, (SELECT UUID()));
+
+              SET @dispensed_without_pres_drug_order_id = (SELECT LAST_INSERT_ID());
+
+              #create drug_order without quantity
+              INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+              VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name3_concept_id, dispensed_dosage3, pres_dosage3, pres_frequency3, dispensed_quantity3);
+
+              #create amount dispensed obs
+              INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+              VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name3_concept_id, dispensed_quantity3,@creator, date_created, (SELECT UUID()));
+            
+              SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                                   WHERE concept_set = @arv_regimen_concept_id
+                                                   AND concept_id = @drug_concept_id), 0);
+
+              IF (@arv_drug_concept_id != 0) THEN  #--7
+                #create arv_regimen_received_abstracted_construct obs
+                INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+             END IF; #--7
+            
+            ELSE #--onee
+              SET @old_temp_encounter_id = COALESCE((SELECT encounter_id FROM temp_encounter tnc
+                                                     WHERE tnc.patient_id = patient_id
+                                                     AND tnc.encounter_type = 54
+                                                     AND tnc.encounter_datetime = encounter_datetime
+                                                     LIMIT 1), 0 );
+              
+              IF (@old_temp_encounter_id = 0) THEN
+                INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+                VALUES (@dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, (SELECT UUID()));
+                SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+              ELSE
+                SET @dispensing_without_pres_encounter_id = (@old_temp_encounter_id);
+              END IF;
+
+              IF NOT ISNULL(prescription_duration) THEN #--11
+                SET @auto_expire_date = NULL;
+                SET @auto_expire_date = (SELECT
+                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                          ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                        ELSE
+                          ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                        END AS prescription_duration_in_days);
+              ELSE
+                SET @auto_expire_date = NULL;
+              END IF; #--11
+              
+              INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @dispensed_drug_name3_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, (SELECT UUID()));
+              
+              SET @dispensed_without_pres_drug_order_id = (SELECT LAST_INSERT_ID());
+              
+              #create drug_order without quantity
+              INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+              VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name3_concept_id, dispensed_dosage3, dispensed_dosage3, pres_frequency3, dispensed_quantity3);
+
+              #create amount dispensed obs
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+              VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name3_concept_id, dispensed_quantity3,@creator, date_created, (SELECT UUID()));
+
+              SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name3_concept_id);
+
+              SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                                   WHERE concept_set = @arv_regimen_concept_id
+                                                   AND concept_id = @drug_concept_id), 0);
+
+              IF (@arv_drug_concept_id != 0) THEN  #--7
+                #create arv_regimen_received_abstracted_construct obs
+                INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+
+             END IF; #--7 
+            END IF; #--onee
+           END IF;
+          END IF;
+
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
@@ -1694,6 +2057,126 @@ BEGIN
         
          INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency)
           VALUES (@pres_drug4_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, pres_dosage4, pres_frequency4);
+        
+        
+            #--implement dispensation without prescription
+            IF NOT ISNULL(dispensed_drug_name4) THEN
+               IF ( dispensed_drug_name4 = pres_drug_name5 ) THEN
+                  select dispensed_drug_name4, old_enc_id;
+               ELSEIF ( dispensed_drug_name4 = pres_drug_name4 ) THEN
+                    select dispensed_drug_name4, old_enc_id;
+               ELSEIF ( dispensed_drug_name4 = pres_drug_name4 ) THEN
+                      select dispensed_drug_name4, old_enc_id;
+               ELSEIF ( dispensed_drug_name4 =  pres_drug_name4) THEN
+                      select dispensed_drug_name3, old_enc_id;
+               ELSEIF ( dispensed_drug_name4 =  pres_drug_name1) THEN
+                    select dispensed_drug_name3, old_enc_id;
+               ELSE
+            #create dispensing encounter
+            SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
+                                                 WHERE name = "DISPENSING"  LIMIT 1);
+                                                 
+            SET @old_dispensing_encounter_id = COALESCE((SELECT encounter_id FROM encounter
+                                                         WHERE encounter_id = old_enc_id
+                                                         AND encounter_type = 25),0);
+           
+            IF (@old_dispensing_encounter_id = 0) THEN #--onee
+              INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (old_enc_id, @dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+
+              SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+
+              IF NOT ISNULL(prescription_duration) THEN #--11
+                SET @auto_expire_date = NULL;
+                SET @auto_expire_date = (SELECT
+                      CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                        ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                      ELSE
+                        ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                      END AS prescription_duration_in_days);
+              ELSE
+                SET @auto_expire_date = NULL;
+              END IF; #--11
+              
+              INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @dispensed_drug_name4_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, (SELECT UUID()));
+
+              SET @dispensed_without_pres_drug_order_id = (SELECT LAST_INSERT_ID());
+
+              #create drug_order without quantity
+              INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+              VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, pres_dosage4, pres_frequency4, dispensed_quantity4);
+
+              #create amount dispensed obs
+              INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+              VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4,@creator, date_created, (SELECT UUID()));
+            
+              SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                                   WHERE concept_set = @arv_regimen_concept_id
+                                                   AND concept_id = @drug_concept_id), 0);
+
+              IF (@arv_drug_concept_id != 0) THEN  #--7
+                #create arv_regimen_received_abstracted_construct obs
+                INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+             END IF; #--7
+            
+            ELSE #--onee
+              SET @old_temp_encounter_id = COALESCE((SELECT encounter_id FROM temp_encounter tnc
+                                                     WHERE tnc.patient_id = patient_id
+                                                     AND tnc.encounter_type = 54
+                                                     AND tnc.encounter_datetime = encounter_datetime
+                                                     LIMIT 1), 0 );
+              
+              IF (@old_temp_encounter_id = 0) THEN
+                INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+                VALUES (@dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, (SELECT UUID()));
+                SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+              ELSE
+                SET @dispensing_without_pres_encounter_id = (@old_temp_encounter_id);
+              END IF;
+
+              IF NOT ISNULL(prescription_duration) THEN #--11
+                SET @auto_expire_date = NULL;
+                SET @auto_expire_date = (SELECT
+                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                          ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                        ELSE
+                          ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                        END AS prescription_duration_in_days);
+              ELSE
+                SET @auto_expire_date = NULL;
+              END IF; #--11
+              
+              INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @dispensed_drug_name4_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, (SELECT UUID()));
+              
+              SET @dispensed_without_pres_drug_order_id = (SELECT LAST_INSERT_ID());
+              
+              #create drug_order without quantity
+              INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+              VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name4_concept_id, dispensed_dosage4, dispensed_dosage4, pres_frequency4, dispensed_quantity4);
+
+              #create amount dispensed obs
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+              VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name4_concept_id, dispensed_quantity4,@creator, date_created, (SELECT UUID()));
+
+              SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name4_concept_id);
+
+              SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                                   WHERE concept_set = @arv_regimen_concept_id
+                                                   AND concept_id = @drug_concept_id), 0);
+
+              IF (@arv_drug_concept_id != 0) THEN  #--7
+                #create arv_regimen_received_abstracted_construct obs
+                INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+
+             END IF; #--7 
+            END IF; #--onee
+           END IF;
+          END IF;        
+       
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
@@ -2081,6 +2564,125 @@ BEGIN
           
           INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose,  frequency)
           VALUES (@pres_drug5_order_id, @pres_drug_name5_concept_id, pres_dosage5, pres_dosage5, pres_frequency5);
+        
+            #--implement dispensation without prescription
+            IF NOT ISNULL(dispensed_drug_name5) THEN
+               IF ( dispensed_drug_name5 = pres_drug_name5 ) THEN
+                  select dispensed_drug_name5, old_enc_idbbc news;
+               ELSEIF ( dispensed_drug_name5 = pres_drug_name4 ) THEN
+                    select dispensed_drug_name5, old_enc_id;
+               ELSEIF ( dispensed_drug_name5 = pres_drug_name5 ) THEN
+                      select dispensed_drug_name5, old_enc_id;
+               ELSEIF ( dispensed_drug_name5 =  pres_drug_name5) THEN
+                      select dispensed_drug_name5, old_enc_id;
+               ELSEIF ( dispensed_drug_name5 =  pres_drug_name1) THEN
+                  select dispensed_drug_name3, old_enc_id;
+               ELSE
+            #create dispensing encounter
+            SET @dispensing_encounter_type_id = (SELECT encounter_type_id FROM encounter_type 
+                                                 WHERE name = "DISPENSING"  LIMIT 1);
+                                                 
+            SET @old_dispensing_encounter_id = COALESCE((SELECT encounter_id FROM encounter
+                                                         WHERE encounter_id = old_enc_id
+                                                         AND encounter_type = 25),0);
+           
+            IF (@old_dispensing_encounter_id = 0) THEN #--onee
+              INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+              VALUES (old_enc_id, @dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
+
+              SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+
+              IF NOT ISNULL(prescription_duration) THEN #--11
+                SET @auto_expire_date = NULL;
+                SET @auto_expire_date = (SELECT
+                      CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                        ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                      ELSE
+                        ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                      END AS prescription_duration_in_days);
+              ELSE
+                SET @auto_expire_date = NULL;
+              END IF; #--11
+              
+              INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @dispensed_drug_name5_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, (SELECT UUID()));
+
+              SET @dispensed_without_pres_drug_order_id = (SELECT LAST_INSERT_ID());
+
+              #create drug_order without quantity
+              INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+              VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, pres_dosage5, pres_frequency5, dispensed_quantity5);
+
+              #create amount dispensed obs
+              INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+              VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5,@creator, date_created, (SELECT UUID()));
+            
+              SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                                   WHERE concept_set = @arv_regimen_concept_id
+                                                   AND concept_id = @drug_concept_id), 0);
+
+              IF (@arv_drug_concept_id != 0) THEN  #--7
+                #create arv_regimen_received_abstracted_construct obs
+                INSERT INTO obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+             END IF; #--7
+            
+            ELSE #--onee
+              SET @old_temp_encounter_id = COALESCE((SELECT encounter_id FROM temp_encounter tnc
+                                                     WHERE tnc.patient_id = patient_id
+                                                     AND tnc.encounter_type = 54
+                                                     AND tnc.encounter_datetime = encounter_datetime
+                                                     LIMIT 1), 0 );
+              
+              IF (@old_temp_encounter_id = 0) THEN
+                INSERT INTO temp_encounter (encounter_type, patient_id, provider_id, encounter_datetime, creator, date_created, uuid)
+                VALUES (@dispensing_encounter_type_id, patient_id, @provider, encounter_datetime, @creator, date_created, (SELECT UUID()));
+                SET @dispensing_without_pres_encounter_id = (SELECT LAST_INSERT_ID());
+              ELSE
+                SET @dispensing_without_pres_encounter_id = (@old_temp_encounter_id);
+              END IF;
+
+              IF NOT ISNULL(prescription_duration) THEN #--11
+                SET @auto_expire_date = NULL;
+                SET @auto_expire_date = (SELECT
+                        CASE WHEN TRIM(REPLACE(SUBSTRING(prescription_duration,INSTR(prescription_duration, ' ')),'s','')) = 'Month' THEN
+                          ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 30) - 2))
+                        ELSE
+                          ADDDATE(encounter_datetime,((LEFT(prescription_duration,INSTR(prescription_duration, ' ')) * 7) - 2))
+                        END AS prescription_duration_in_days);
+              ELSE
+                SET @auto_expire_date = NULL;
+              END IF; #--11
+              
+              INSERT INTO orders (order_type_id, concept_id, orderer, encounter_id, patient_id, start_date, auto_expire_date, creator, date_created, uuid)
+              VALUES (1, @dispensed_drug_name5_new_concept_id, 1, @dispensing_without_pres_encounter_id, patient_id, encounter_datetime, @auto_expire_date, @creator,  date_created, (SELECT UUID()));
+              
+              SET @dispensed_without_pres_drug_order_id = (SELECT LAST_INSERT_ID());
+              
+              #create drug_order without quantity
+              INSERT INTO drug_order (order_id, drug_inventory_id, equivalent_daily_dose, dose, frequency, quantity)
+              VALUES (@dispensed_without_pres_drug_order_id, @dispensed_drug_name5_concept_id, dispensed_dosage5, dispensed_dosage5, pres_frequency5, dispensed_quantity5);
+
+              #create amount dispensed obs
+              INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_drug, value_numeric, creator, date_created, uuid)
+              VALUES (patient_id, @amount_dispensed_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @dispensed_drug_name5_concept_id, dispensed_quantity5,@creator, date_created, (SELECT UUID()));
+
+              SET @drug_concept_id = (SELECT concept_id FROM drug WHERE drug_id = @dispensed_drug_name5_concept_id);
+
+              SET @arv_drug_concept_id = COALESCE((SELECT concept_id FROM concept_set
+                                                   WHERE concept_set = @arv_regimen_concept_id
+                                                   AND concept_id = @drug_concept_id), 0);
+
+              IF (@arv_drug_concept_id != 0) THEN  #--7
+                #create arv_regimen_received_abstracted_construct obs
+                INSERT INTO temp_obs (person_id, concept_id, encounter_id, order_id, obs_datetime, value_coded, creator, date_created, uuid)
+                VALUES (patient_id, @arv_regimens_received_abstracted_construct_concept_id, @dispensing_without_pres_encounter_id, @dispensed_without_pres_drug_order_id, encounter_datetime, @drug_concept_id, @creator, date_created, (SELECT UUID()));
+
+             END IF; #--7 
+            END IF; #--onee
+           END IF;
+          END IF;        
+        
         END IF;    #--5  
       ELSE #--1
         #--implement dispensation without prescription
