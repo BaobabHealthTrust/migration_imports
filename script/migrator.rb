@@ -128,12 +128,14 @@ def start
 
     encounters = Encounter.find_by_sql("
                               SELECT e.* FROM encounter e
-	                              INNER JOIN obs o on e.encounter_id = o.encounter_id
+	                              INNER JOIN obs o on e.encounter_id = o.encounter_id and o.voided = 0
                               WHERE e.patient_id = #{patient.id}
                               AND o.voided = 0
                               AND o.concept_id != 0 
                               AND e.date_created = (	SELECT MAX(enc.date_created)
 						                                          FROM encounter enc
+						                                          INNER JOIN obs ob ON ob.encounter_id = enc.encounter_id 
+						                                            AND ob.voided = 0 
 						                                          WHERE enc.patient_id = e.patient_id
 						                                          AND enc.encounter_type = e.encounter_type
 						                                          AND DATE(enc.encounter_datetime) = DATE(e.encounter_datetime))
