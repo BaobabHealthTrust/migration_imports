@@ -92,10 +92,10 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	  # Not done, process the parameters
 
 	  # Map destination user to source user
-	  SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+	  SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator LIMIT 1), 1);
 
 	  # Map destination user to source user
-	  SET @provider = COALESCE((SELECT person_id FROM users WHERE user_id = @creator), 1);
+	  SET @provider = COALESCE((SELECT person_id FROM users WHERE user_id = @creator LIMIT 1), 1);
 
 	  # Get location id
 	  SET @location_id = (SELECT location_id FROM location WHERE name = location LIMIT 1);

@@ -91,9 +91,9 @@ BEGIN
         # Not done, process the parameters
         
         # Map destination user to source user
-        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator LIMIT 1), 1);
 
-        SET @site_code = COALESCE((select property_value from global_property where property = 'site_prefix'), 'MPC');
+        SET @site_code = COALESCE((select property_value from global_property where property = 'site_prefix' LIMIT 1), 'MPC');
 
         IF ISNULL(dob_estimated) THEN
           SET @date_of_birth_estimated = (false);
@@ -135,13 +135,13 @@ BEGIN
         VALUES (@person_name_id, soundex(given_name), soundex(middle_name), soundex(family_name));
 
         # Check variables for several person attribute type ids
-        SET @cellphone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Cell Phone Number");
-        SET @home_phone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Home Phone Number");
-        SET @office_phone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Office Phone Number");
-        SET @occupation_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Occupation");
-        SET @traditional_authority_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Ancestral Traditional Authority");
-        SET @current_address_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Current Place Of Residence");
-        SET @landmark_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Landmark Or Plot Number");
+        SET @cellphone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Cell Phone Number" LIMIT 1);
+        SET @home_phone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Home Phone Number" LIMIT 1);
+        SET @office_phone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Office Phone Number" LIMIT 1);
+        SET @occupation_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Occupation" LIMIT 1);
+        SET @traditional_authority_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Ancestral Traditional Authority" LIMIT 1);
+        SET @current_address_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Current Place Of Residence" LIMIT 1);
+        SET @landmark_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Landmark Or Plot Number" LIMIT 1);
     
         # Create associated person attributes
         IF COALESCE(traditional_authority, "") != "" THEN

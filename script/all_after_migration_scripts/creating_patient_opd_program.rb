@@ -48,8 +48,13 @@ def start
     if opd_patient_prog.blank?
       puts "creating opd_program for #{patient.patient_id}..........#{count_opd_obs -= 1} patients to go"
           
-      create_opd_program = "INSERT INTO #{Source_db}.patient_program (patient_id, program_id, date_enrolled, creator, date_created, location_id,uuid)
+      if patient.location_id.nil?
+	create_opd_program = "INSERT INTO #{Source_db}.patient_program (patient_id, program_id, date_enrolled, creator, date_created, location_id,uuid)
+  VALUES(#{patient.patient_id}, #{@opd_program_id}, '#{@date_enrolled}', 1, '#{@date_created}' , NULL,(SELECT UUID()))"
+      else
+	create_opd_program = "INSERT INTO #{Source_db}.patient_program (patient_id, program_id, date_enrolled, creator, date_created, location_id,uuid)
   VALUES(#{patient.patient_id}, #{@opd_program_id}, '#{@date_enrolled}', 1, '#{@date_created}' ,#{patient.location_id},(SELECT UUID()))"
+      end
 
       CONN.execute create_opd_program
       

@@ -91,7 +91,7 @@ BEGIN
         # Not done, process the parameters
         
         # Map destination user to source user
-        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+        SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator LIMIT 1), 1);
 
         # Get last person id for association later to other records
         SET @person_id = (patient_id);

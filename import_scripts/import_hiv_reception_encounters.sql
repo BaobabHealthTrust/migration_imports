@@ -79,16 +79,16 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 	# Not done, process the parameters
 
 	# Map destination user to source user
-	SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+	SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator LIMIT 1), 1);
 
 	# Map destination user to source user
-	SET @provider = COALESCE((SELECT person_id FROM users WHERE user_id = @creator), 1);
+	SET @provider = COALESCE((SELECT person_id FROM users WHERE user_id = @creator LIMIT 1), 1);
 
 	# Get location id
-	SET @location_id = (SELECT location_id FROM location WHERE name = location);
+	SET @location_id = (SELECT location_id FROM location WHERE name = location LIMIT 1);
 
 	# Get id of encounter type
-	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'HIV RECEPTION');
+	SET @encounter_type = (SELECT encounter_type_id FROM encounter_type WHERE name = 'HIV RECEPTION' LIMIT 1);
 
 	# Create encounter
 	INSERT INTO encounter (encounter_id, encounter_type, patient_id, provider_id, location_id, encounter_datetime, creator, date_created, uuid) VALUES (old_enc_id, @encounter_type, patient_id, @provider, @location_id, encounter_datetime, @creator, date_created, (SELECT UUID())) ON DUPLICATE KEY UPDATE encounter_id = old_enc_id;
