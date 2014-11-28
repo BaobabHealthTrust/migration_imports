@@ -1350,6 +1350,90 @@ def self.repeated_obs(enc, ob)
       enc.recto_vaginal_fitsula = self.get_concept(ob.value_coded)
     when 'HIV WASTING SYNDROME (SEVERE WEIGHT LOSS + PERSISTENT FEVER OR SEVERE LOSS + CHRONIC DIARRHOEA)'
       enc.hiv_wasting_syndrome = self.get_concept(ob.value_coded)
+    when 'CRYPTOCOCCAL MENINGITIS OR OTHER EXTRAPULMONARY CRYPTOCOCCOSIS'
+      enc.cryptococcal_meningitis_or_other_eptb_cryptococcosis = self.get_concept(ob.value_coded)
+    when 'CANDIDIASIS OF OESOPHAGUS, TRACHEA, BRONCHI OR LUNGS'
+      enc.candidiasis_of_oesophagus_trachea_bronchi_or_lungs = self.get_concept(ob.value_coded)
+    when 'SEVERE UNEXPLAINED WASTING / MALNUTRITION NOT RESPONDING TO TREATMENT(WEIGHT-FOR-HEIGHT/ -AGE LESS THAN 70% OR MUAC LESS THAN 11CM OR OEDEMA)'
+      enc.severe_unexplained_wasting_malnutrition = self.get_concept(ob.value_coded)
+    when 'DIARRHOEA, CHRONIC (>1 MONTH) UNEXPLAINED'
+      enc.diarrhoea_chronic_less_1_month_unexplained = self.get_concept(ob.value_coded)
+    when 'MODERATE WEIGHT LOSS <10%, UNEXPLAINED' 
+      enc.moderate_weight_loss_10_unexplained = self.get_concept(ob.value_coded)
+    when 'CD4 PERCENTAGE AVAILABLE' 
+      enc.cd4_percentage_available = self.get_concept(ob.value_coded)
+    when 'ACUTE NECROTIZING ULCERATIVE STOMATITIS GINGIVITIS OR PERIODONTITIS' 
+      enc.acute_necrotizing_ulcerative_stomatitis_gingivitis_or_period = self.get_concept(ob.value_coded)
+    when 'MODERATE UNEXPLAINED WASTING / MALNUTRITION NOT RESPONDING TO TREATMENT (WEIGHT-FOR-HEIGHT/ -AGE 70-79% OR MUAC 11-12CM)' 
+      enc.moderate_unexplained_wasting_malnutrition = self.get_concept(ob.value_coded)
+    when 'DIARRHOEA, PERSISTENT UNEXPLAINED (14 DAYS OR MORE)' 
+      enc.diarrhoea_persistent_unexplained_14_days_or_more = self.get_concept(ob.value_coded)    
+    when 'ACUTE ULCERATIVE MOUTH INFECTIONS'
+      enc.acute_ulcerative_mouth_infections = self.get_concept(ob.value_coded)
+    when 'ANAEMIA, UNEXPLAINED < 8 G/DL'
+      enc.anaemia_unexplained_8_g_dl = self.get_concept(ob.value_coded)
+    when 'ATYPICAL MYCOBACTERIOSIS, DISSEMINATED OR LUNG'
+      enc.atypical_mycobacteriosis_disseminated_or_lung = self.get_concept(ob.value_coded)
+    when 'BACTERIAL INFECTIONS, SEVERE RECURRENT (EMPYEMA, PYOMYOSITIS, BONE/JOINT, MENINGITIS, BUT EXCLUDING PNEUMONIA)'
+      enc.bacterial_infections_sev_recurrent_excluding_pneumonia = self.get_concept(ob.value_coded)
+    when 'CANCER CERVIX'
+      enc.cancer_cervix = self.get_concept(ob.value_coded)
+    when 'CHRONIC HERPES SIMPLEX INFECTION(OROLABIAL, GENITAL / ANORECTAL >1 MONTH OR VISCERAL AT ANY SITE)'
+      enc.chronic_herpes_simplex_infection_genital = self.get_concept(ob.value_coded)
+    when 'CRYPTOSPORIDIOSIS, CHRONIC WITH DIARRHOEA'
+      enc.cryptosporidiosis_chronic_with_diarrhoea = self.get_concept(ob.value_coded)
+    when 'CYTOMEGALOVIRUS INFECTION - RETINITIS OR OTHER ORGAN (FROM AGE 1 MONTH)'
+      enc.cytomegalovirus_infection_retinitis_or_other_organ = self.get_concept(ob.value_coded)
+    when 'CYTOMEGALOVIRUS OF AN ORGAN OTHER THAN LIVER, SPLEEN OR LYMPH NODE'
+      enc.cytomegalovirus_of_an_organ_other_than_liver = self.get_concept(ob.value_coded)
+    when 'FUNGAL NAIL INFECTIONS'
+      enc.fungal_nail_infections = self.get_concept(ob.value_coded)
+    when 'HERPES SIMPLEX INFECTION, MUCOCUTANEOUS FOR LONGER THAN  1 MONTH OR VISCERAL'
+      enc.herpes_simplex_infection_mucocutaneous_visceral = self.get_concept(ob.value_coded)
+    when 'HIV-ASSOCIATED CARDIOMYOPATHY'
+      enc.hiv_associated_cardiomyopathy = self.get_concept(ob.value_coded)
+    when 'HIV-ASSOCIATED NEPHROPATHY'
+      enc.hiv_associated_nephropathy = self.get_concept(ob.value_coded)
+    when 'INVASIVE CANCER CERVIX'
+      enc.invasive_cancer_cervix = self.get_concept(ob.value_coded)
+    when 'ISOSPORIASIS >1 MONTH'
+      enc.isosporiasis_1_month = self.get_concept(ob.value_coded)
+    when 'LEISHMANIASIS, ATYPICAL DISSEMINATED'
+      enc.leishmaniasis_atypical_disseminated = self.get_concept(ob.value_coded)
+    when 'MINOR MUCOCUTANEOUS MANIFESTATIONS (SEBORRHEIC DERMATITIS, PRURIGO, FUNGAL NAIL INFECTIONS, RECURRENT ORAL ULCERATIONS, ANGULAR CHEILITIS)'
+      enc.minor_mucocutaneous_manifestations_seborrheic_dermatitis = self.get_concept(ob.value_coded)
+    when 'MODERATE UNEXPLAINED MALNUTRITION'
+      enc.moderate_unexplained_malnutrition = self.get_concept(ob.value_coded)
+    when 'MOLLUSCUM CONTAGIOSUM, EXTENSIVE'
+      enc.molluscum_contagiosum_extensive = self.get_concept(ob.value_coded)
+    when 'NON-TYPHOIDAL SALMONELLA BACTERAEMIA, RECURRENT'
+      enc.non_typhoidal_salmonella_bacteraemia_recurrent = self.get_concept(ob.value_coded)
+    when 'ORAL CANDIDIASIS (FROM AGE 2 MONTHS)'
+      enc.oral_candidiasis_from_age_2_months = self.get_concept(ob.value_coded)
+    when 'ORAL THRUSH'
+      enc.oral_thrush = self.get_concept(ob.value_coded)
+    when 'PERFORM EXTENDED STAGING'
+      enc.perform_extended_staging = self.get_concept(ob.value_coded)
+    when 'PNEUMOCYSTIS CARINII PNEUMONIA'
+      enc.pneumocystis_carinii_pneumonia = self.get_concept(ob.value_coded)
+    when 'PNEUMONIA, SEVERE'
+      enc.pneumonia_severe = self.get_concept(ob.value_coded)
+    when 'RECURRENT BACTERAEMIA OR SEPSIS WITH NTS'
+      enc.recurrent_bacteraemia_or_sepsis_with_nts = self.get_concept(ob.value_coded)
+    when 'RECURRENT SEVERE PRESUMED PNEUMONIA'
+      enc.recurrent_severe_presumed_pneumonia = self.get_concept(ob.value_coded)
+    when 'RECURRENT UPPER RESPIRATORY TRACT INFECTIONS (IE, BACTERIAL SINUSITIS)'
+      enc.recurrent_upper_respiratory_tract_bac_sinusitis = self.get_concept(ob.value_coded)
+    when 'SEBORRHOEIC DERMATITIS'
+      enc.seborrhoeic_dermatitis = self.get_concept(ob.value_coded)
+    when 'SEPSIS, SEVERE'
+      enc.sepsis_severe = self.get_concept(ob.value_coded)
+    when 'TB LYMPHADENOPATHY'
+      enc.tb_lymphadenopathy = self.get_concept(ob.value_coded)
+    when 'UNEXPLAINED ANAEMIA, NEUTROPENIA OR THROMBOCYTOPENIA'
+      enc.unexplained_anaemia_neutropenia_or_thrombocytopenia = self.get_concept(ob.value_coded)
+    when 'VISCERAL LEISHMANIASIS'
+      enc.visceral_leishmaniasis = self.get_concept(ob.value_coded)
     when 'REASON ANTIRETROVIRALS STARTED'
       enc.reason_for_starting_art = self.get_concept(ob.value_coded)
     when 'WHO STAGE'
@@ -1486,7 +1570,7 @@ def flush_art_visit()
 end
 
 def flush_hiv_staging()
-  flush_queue(Hiv_staging_queue, "hiv_staging_encounters", ['visit_encounter_id','old_enc_id', 'patient_id', 'patient_pregnant', 'patient_breast_feeding', 'cd4_count_available', 'cd4_count', 'cd4_count_modifier', 'cd4_count_percentage', 'date_of_cd4_count', 'asymptomatic', 'persistent_generalized_lymphadenopathy', 'unspecified_stage_1_cond', 'molluscumm_contagiosum', 'wart_virus_infection_extensive', 'oral_ulcerations_recurrent', 'parotid_enlargement_persistent_unexplained', 'lineal_gingival_erythema', 'herpes_zoster', 'respiratory_tract_infections_recurrent', 'unspecified_stage2_condition', 'angular_chelitis', 'papular_prurtic_eruptions', 'hepatosplenomegaly_unexplained', 'oral_hairy_leukoplakia', 'severe_weight_loss', 'fever_persistent_unexplained', 'pulmonary_tuberculosis', 'pulmonary_tuberculosis_last_2_years', 'severe_bacterial_infection', 'bacterial_pnuemonia', 'symptomatic_lymphoid_interstitial_pnuemonitis', 'chronic_hiv_assoc_lung_disease', 'unspecified_stage3_condition', 'aneamia', 'neutropaenia', 'thrombocytopaenia_chronic', 'diarhoea', 'oral_candidiasis', 'acute_necrotizing_ulcerative_gingivitis', 'lymph_node_tuberculosis', 'toxoplasmosis_of_brain', 'cryptococcal_meningitis', 'progressive_multifocal_leukoencephalopathy', 'disseminated_mycosis', 'candidiasis_of_oesophagus', 'extrapulmonary_tuberculosis', 'cerebral_non_hodgkin_lymphoma', 'kaposis', 'hiv_encephalopathy', 'bacterial_infections_severe_recurrent', 'unspecified_stage_4_condition', 'pnuemocystis_pnuemonia', 'disseminated_non_tuberculosis_mycobactierial_infection', 'cryptosporidiosis', 'isosporiasis', 'symptomatic_hiv_asscoiated_nephropathy', 'chronic_herpes_simplex_infection', 'cytomegalovirus_infection', 'toxoplasomis_of_the_brain_1month', 'recto_vaginal_fitsula', 'hiv_wasting_syndrome', 'reason_for_starting_art', 'who_stage','location', 'voided', 'void_reason', 'encounter_datetime', 'date_voided', 'voided_by', 'date_created', 'creator'])
+  flush_queue(Hiv_staging_queue, "hiv_staging_encounters", ['visit_encounter_id','old_enc_id', 'patient_id', 'patient_pregnant', 'patient_breast_feeding', 'cd4_count_available', 'cd4_count', 'cd4_count_modifier', 'cd4_count_percentage', 'date_of_cd4_count', 'asymptomatic', 'persistent_generalized_lymphadenopathy', 'unspecified_stage_1_cond', 'molluscumm_contagiosum', 'wart_virus_infection_extensive', 'oral_ulcerations_recurrent', 'parotid_enlargement_persistent_unexplained', 'lineal_gingival_erythema', 'herpes_zoster', 'respiratory_tract_infections_recurrent', 'unspecified_stage2_condition', 'angular_chelitis', 'papular_prurtic_eruptions', 'hepatosplenomegaly_unexplained', 'oral_hairy_leukoplakia', 'severe_weight_loss', 'fever_persistent_unexplained', 'pulmonary_tuberculosis', 'pulmonary_tuberculosis_last_2_years', 'severe_bacterial_infection', 'bacterial_pnuemonia', 'symptomatic_lymphoid_interstitial_pnuemonitis', 'chronic_hiv_assoc_lung_disease', 'unspecified_stage3_condition', 'aneamia', 'neutropaenia', 'thrombocytopaenia_chronic', 'diarhoea', 'oral_candidiasis', 'acute_necrotizing_ulcerative_gingivitis', 'lymph_node_tuberculosis', 'toxoplasmosis_of_brain', 'cryptococcal_meningitis', 'progressive_multifocal_leukoencephalopathy', 'disseminated_mycosis', 'candidiasis_of_oesophagus', 'extrapulmonary_tuberculosis', 'cerebral_non_hodgkin_lymphoma', 'kaposis', 'hiv_encephalopathy', 'bacterial_infections_severe_recurrent', 'unspecified_stage_4_condition', 'pnuemocystis_pnuemonia', 'disseminated_non_tuberculosis_mycobactierial_infection', 'cryptosporidiosis', 'isosporiasis', 'symptomatic_hiv_asscoiated_nephropathy', 'chronic_herpes_simplex_infection', 'cytomegalovirus_infection', 'toxoplasomis_of_the_brain_1month', 'recto_vaginal_fitsula', 'hiv_wasting_syndrome', 'cryptococcal_meningitis_or_other_eptb_cryptococcosis', 'candidiasis_of_oesophagus_trachea_bronchi_or_lungs', 'severe_unexplained_wasting_malnutrition', 'diarrhoea_chronic_less_1_month_unexplained', 'moderate_weight_loss_10_unexplained', 'cd4_percentage_available', 'acute_necrotizing_ulcerative_stomatitis_gingivitis_or_period', 'moderate_unexplained_wasting_malnutrition', 'diarrhoea_persistent_unexplained_14_days_or_more',  'acute_ulcerative_mouth_infections', 'anaemia_unexplained_8_g_dl', 'atypical_mycobacteriosis_disseminated_or_lung', 'bacterial_infections_sev_recurrent_excluding_pneumonia', 'cancer_cervix', 'chronic_herpes_simplex_infection_genital', 'cryptosporidiosis_chronic_with_diarrhoea', 'cytomegalovirus_infection_retinitis_or_other_organ', 'cytomegalovirus_of_an_organ_other_than_liver', 'fungal_nail_infections', 'herpes_simplex_infection_mucocutaneous_visceral', 'hiv_associated_cardiomyopathy', 'hiv_associated_nephropathy', 'invasive_cancer_cervix', 'isosporiasis_1_month', 'leishmaniasis_atypical_disseminated', 'minor_mucocutaneous_manifestations_seborrheic_dermatitis', 'moderate_unexplained_malnutrition', 'molluscum_contagiosum_extensive', 'non_typhoidal_salmonella_bacteraemia_recurrent', 'oral_candidiasis_from_age_2_months', 'oral_thrush', 'perform_extended_staging', 'pneumocystis_carinii_pneumonia', 'pneumonia_severe', 'recurrent_bacteraemia_or_sepsis_with_nts', 'recurrent_severe_presumed_pneumonia', 'recurrent_upper_respiratory_tract_bac_sinusitis', 'seborrhoeic_dermatitis', 'sepsis_severe', 'tb_lymphadenopathy', 'unexplained_anaemia_neutropenia_or_thrombocytopenia', 'visceral_leishmaniasis','reason_for_starting_art', 'who_stage','location', 'voided', 'void_reason', 'encounter_datetime', 'date_voided', 'voided_by', 'date_created', 'creator'])
 end
 
 def flush_update_outcome()
