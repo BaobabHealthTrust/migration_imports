@@ -340,7 +340,14 @@ def self.create_patient(pat)
   patient.dob = pat.birthdate
   patient.dob_estimated = pat.birthdate_estimated
   patient.traditional_authority = ids["ta"]
-	patient.current_address =  PatientAddress.find_by_sql("select city_village from #{Source_db}.patient_address where patient_id = #{pat.id} and voided = 0 limit 1").map{|p| p.city_village}
+	patient.current_address =  PatientAddress.find_by_sql("select pa.city_village
+                                                        from #{Source_db}.patient_address pa
+                                                        where pa.patient_id = #{pat.id}
+                                                        and pa.date_created = (select max(date_created)
+                                                                               from #{Source_db}.patient_address p 
+                                                                               where p.patient_id = pa.patient_id
+					                                                                     and p.voided = 0)
+                                                        and pa.voided = 0 limit 1").map{|p| p.city_village}
 	patient.landmark = ids["phy_add"]
   patient.cellphone_number= ids["cell"]
   patient.home_phone_number= ids["home_phone"]
@@ -405,7 +412,16 @@ def self.get_patient_identifiers(pat_id)
 
 	pat_identifiers = Hash.new()	
 	
-	identifiers = PatientIdentifier.find(:all, :conditions => ["patient_id = ? and voided = 0", pat_id])
+	#identifiers = PatientIdentifier.find(:all, :conditions => ["patient_id = ? and voided = 0", pat_id])
+	identifier = PtientIdentifier.find_by_sql("select pi.* from #{Source_db}.patient_identifier pi
+                                            where pi.date_created = (select max(pid.date_created) 
+                                                                     from #{Source_db}.patient_identifier pid 
+                                                                     where pid.patient_id = pi.patient_id 
+                                                                     and pid.voided = 0
+                                                                     and pid.identifier_type = pi.identifier_type)
+                                            and pi.patient_id = #{pat_id}
+                                            and pi.voided = 0")
+
 	identifiers.each do |id|
 		id_type=PatientIdentifierType.find(id.identifier_type).name
 		case id_type.upcase
