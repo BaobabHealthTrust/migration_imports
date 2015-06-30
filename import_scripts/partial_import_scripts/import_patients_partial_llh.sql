@@ -371,7 +371,7 @@ BEGIN
           select "general_reception_encounter";        
           CALL proc_import_general_reception_encounters_llh(@person_id);    # good
           
-          select "outpatient_diagnosis_encounter";        
+          select "outpatient_diagnosis_encounter";       
           CALL proc_import_outpatient_diagnosis_encounters_llh(@person_id); # good
 
           select patient_id;
