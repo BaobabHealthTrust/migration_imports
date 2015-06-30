@@ -342,37 +342,37 @@ BEGIN
 #--if patient already exist then create encounters
           select patient_id;
           select "first_visit_encounter";
-          CALL proc_import_first_visit_encounters(@person_id);          # good
+          CALL proc_import_first_visit_encounters_llh(@person_id);          # good
           
           select "hiv_reception_encounter";
-          CALL proc_import_hiv_reception_encounters(@person_id);        # good
+          CALL proc_import_hiv_reception_encounters_llh(@person_id);        # good
           
           select "vitals_encounter";
-          CALL proc_import_vitals_encounters(@person_id);               # good
+          CALL proc_import_vitals_encounters_llh(@person_id);               # good
           
           select "art_visit_encounter";
-          CALL proc_import_art_visit_encounters(@person_id);            # good
+          CALL proc_import_art_visit_encounters_llh(@person_id);            # good
           
           select "pre_art_visit_encounter";
-          CALL proc_import_pre_art_visit_encounters(@person_id);        # good
+          CALL proc_import_pre_art_visit_encounters_llh(@person_id);        # good
           
           select "hiv_staging_encounter";        
-          CALL proc_import_hiv_staging_encounters(@person_id);          # good
+          CALL proc_import_hiv_staging_encounters_llh(@person_id);          # good
 
           select "give_drugs_encounter";        
-          CALL proc_import_give_drugs(@person_id);                      # good
+          CALL proc_import_give_drugs_llh(@person_id);                      # good
           
           select "patient_outcome_encounter";        
-          CALL proc_import_patient_outcome(@person_id);                 # good
+          CALL proc_import_patient_outcome_llh(@person_id);                 # good
           
           select "guardians_encounter";        
-          CALL proc_import_guardians(@person_id);                       # good
+          CALL proc_import_guardians_llh(@person_id);                       # good
           
           select "general_reception_encounter";        
-          CALL proc_import_general_reception_encounters(@person_id);    # good
+          CALL proc_import_general_reception_encounters_llh(@person_id);    # good
           
           select "outpatient_diagnosis_encounter";        
-          CALL proc_import_outpatient_diagnosis_encounters(@person_id); # good
+          CALL proc_import_outpatient_diagnosis_encounters_llh(@person_id); # good
 
           select patient_id;
         END IF;
