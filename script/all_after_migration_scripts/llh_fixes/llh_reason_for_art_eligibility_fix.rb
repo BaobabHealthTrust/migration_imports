@@ -11,7 +11,7 @@ def start
   
   #get all patients in earliest_start_date
    eligible_patients = Patient.find_by_sql("SELECT * FROM #{Source_db}.earliest_start_date").map(&:patient_id)
-#raise eligible_patients.count.to_yaml
+  #raise eligible_patients.count.to_yaml
   #get all patients with reason for eligibility observation
   patients_with_reason_for_eligibility = Observation.find_by_sql("SELECT person_id FROM #{Source_db}.obs
                                                                   WHERE person_id IN (#{eligible_patients.join(',')})
@@ -73,8 +73,8 @@ def start
 
   count = 0
   total_obs = reason_for_starting_details.length
- #loop through reason_for_starting_details
- (reason_for_starting_details || []).each do |patient|
+  #loop through reason_for_starting_details
+  (reason_for_starting_details || []).each do |patient|
    #check if patient exist in $eligible_patients_with_hiv_staging_encounter
    
    this_patient = $eligible_patients_with_hiv_staging_encounter.select{|pat| pat.patient_id == patient.patient_id}
@@ -86,11 +86,11 @@ def start
       puts "working on patient_id: #{patient.patient_id}"
       @reason_for_elibility_concept_id = Encounter.find_by_sql("SELECT * FROM #{Source_db}.concept_name
                                                                 WHERE concept_name_id = #{patient.reason_for_eligibility_concept_name_id}
-                                                                LIMIT 1").map(&:concept_id)
+                                                                AND voided = 0").map(&:concept_id)
       #insert who_stage
       @who_stage_concept_id = Encounter.find_by_sql("SELECT * FROM #{Source_db}.concept_name
                                                      WHERE concept_name_id = #{patient.who_stage_concept_name_id}
-                                                     LIMIT 1").map(&:concept_id)
+                                                     AND voided = 0").map(&:concept_id)
                                                                 
 	ActiveRecord::Base.connection.insert "           
 INSERT INTO #{Source_db}.obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
@@ -109,4 +109,4 @@ EOF
   end
  end
 end                                                                                                                            
-start                                                                  
+start
