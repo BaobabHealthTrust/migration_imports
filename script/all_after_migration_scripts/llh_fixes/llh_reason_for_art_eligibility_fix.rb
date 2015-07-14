@@ -108,5 +108,12 @@ EOF
    end
   end
  end
+
+  time_ended = Time.now
+  ended_at =  Time.now.strftime("%Y-%m-%d-%H%M%S")
+
+  puts "Started at: #{time_started}"
+  puts "Ended at: #{ended_at}"
+
 end                                                                                                                            
 start
