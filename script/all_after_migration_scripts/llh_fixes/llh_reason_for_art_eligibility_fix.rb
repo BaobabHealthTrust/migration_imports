@@ -13,15 +13,23 @@ def start
    eligible_patients = Patient.find_by_sql("SELECT * FROM #{Source_db}.earliest_start_date").map(&:patient_id)
   #raise eligible_patients.count.to_yaml
   #get all patients with reason for eligibility observation
-  patients_with_reason_for_eligibility = Observation.find_by_sql("SELECT person_id FROM #{Source_db}.obs
-                                                                  WHERE person_id IN (#{eligible_patients.join(',')})
-                                                                  AND concept_id IN (7562, 7563)
-                                                                  AND voided = 0
-                                                                  GROUP BY person_id").map(&:person_id)
+  #patients_with_reason_for_eligibility = Observation.find_by_sql("SELECT person_id FROM #{Source_db}.obs
+  #                                                                WHERE person_id IN (#{eligible_patients.join(',')})
+  #                                                                AND concept_id IN (7562, 7563)
+   #                                                               AND voided = 0
+   #                                                               GROUP BY person_id").map(&:person_id)
+
+
+  patients_with_reason_for_eligibility = Encounter.find_by_sql("select esd.patient_id from #{Source_db}.earliest_start_date esd
+ inner join #{Source_db}.encounter e on e.patient_id = esd.patient_id and e.encounter_type = 52 and e.voided = 0
+ inner join #{Source_db}.obs o on o.person_id = esd.patient_id and o.voided = 0
+where o.concept_id = 7563
+and o.value_coded IS NOT NULL
+group by esd.patient_id").map(&:patient_id)
 
   #get all patients without reason for eligilibility obs
-  patients_without_reason_for_eligibility = []
-  patients_without_reason_for_eligibility = (eligible_patients - patients_with_reason_for_eligibility)
+   patients_without_reason_for_eligibility = []
+   patients_without_reason_for_eligibility = (eligible_patients - patients_with_reason_for_eligibility)
   
   #get all eligible patients with hiv_staging_encounter
   $eligible_patients_with_hiv_staging_encounter = Encounter.find_by_sql("SELECT patient_id, encounter_id, encounter_datetime, date_created, location_id, creator
@@ -104,7 +112,7 @@ EOF
       puts "Finished working on patient_id: #{patient.patient_id}"
    else
      puts  "Patient>>>>#{patient.patient_id} failed"
-		 $failed_orders << "#{patient.patient_id} \n"
+     $failed_orders << "#{patient.patient_id} \n"
    end
   end
  end
