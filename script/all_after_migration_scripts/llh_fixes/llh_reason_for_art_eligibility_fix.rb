@@ -10,22 +10,31 @@ def start
   $failed_orders = File.open("./migration_output/#{started_at}-Failed_hiv_staging_fix.txt", "w")
   
   #get all patients in earliest_start_date
-   eligible_patients = Patient.find_by_sql("SELECT * FROM #{Source_db}.earliest_start_date").map(&:patient_id)
+  eligible_patients = Patient.find_by_sql("SELECT * FROM #{Source_db}.earliest_start_date").map(&:patient_id)
   #raise eligible_patients.count.to_yaml
   #get all patients with reason for eligibility observation
   #patients_with_reason_for_eligibility = Observation.find_by_sql("SELECT person_id FROM #{Source_db}.obs
   #                                                                WHERE person_id IN (#{eligible_patients.join(',')})
   #                                                                AND concept_id IN (7562, 7563)
-   #                                                               AND voided = 0
-   #                                                               GROUP BY person_id").map(&:person_id)
+  #                                                               AND voided = 0
+  #                                                               GROUP BY person_id").map(&:person_id)
 
 
-  patients_with_reason_for_eligibility = Encounter.find_by_sql("select esd.patient_id from #{Source_db}.earliest_start_date esd
- inner join #{Source_db}.encounter e on e.patient_id = esd.patient_id and e.encounter_type = 52 and e.voided = 0
- inner join #{Source_db}.obs o on o.person_id = esd.patient_id and o.voided = 0
-where o.concept_id = 7563
-and o.value_coded IS NOT NULL
-group by esd.patient_id").map(&:patient_id)
+  patients_with_reason_for_eligibility = Encounter.find_by_sql("SELECT 
+                                                                    esd.patient_id
+                                                                FROM
+                                                                    earliest_start_date esd
+                                                                        INNER JOIN
+                                                                    encounter e ON e.patient_id = esd.patient_id
+                                                                        AND e.encounter_type = 52
+                                                                        AND e.voided = 0
+                                                                        INNER JOIN
+                                                                    obs o ON o.person_id = esd.patient_id
+                                                                        AND o.voided = 0
+                                                                WHERE
+                                                                    o.concept_id = 7563
+                                                                        AND o.value_coded IS NOT NULL
+                                                                GROUP BY esd.patient_id").map(&:patient_id)
 
   #get all patients without reason for eligilibility obs
    patients_without_reason_for_eligibility = []
