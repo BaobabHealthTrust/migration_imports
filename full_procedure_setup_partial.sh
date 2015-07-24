@@ -50,15 +50,15 @@ echo "loading recalculating adherence scripts"
 mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/adherence_calculation.sql
 mysql --host=$HOST --user=$USERNAME --password=$PASSWORD $DATABASE < db/recalculate_adherence.sql
 
-echo "importing data......................................."
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
-CALL proc_import_patients_partial_llh;
-EOFMYSQL
+#echo "importing data......................................."
+#mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
+#CALL proc_import_patients_partial_llh;
+#EOFMYSQL
 
-echo "creating dispensation, appointment and exit from HIV care encounters....."
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
-CALL proc_import_from_temp;
-EOFMYSQL
+#echo "creating dispensation, appointment and exit from HIV care encounters....."
+#mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
+#CALL proc_import_from_temp;
+#EOFMYSQL
 
 echo "calculating adherence................................"
 
@@ -75,8 +75,8 @@ script/runner script/all_after_migration_scripts/fix_for_equivalent_daily_dose_l
 echo "adding the hanging pills"
 script/runner script/all_after_migration_scripts/include_hanging_pills_to_drug_orders_llh.rb
 
-echo "recalculating adherence"
-script/runner script/all_after_migration_scripts/recalculate_adherence.rb
+#echo "recalculating adherence"
+#script/runner script/all_after_migration_scripts/recalculate_adherence.rb
 
 echo "creating OPD program"
 script/runner script/all_after_migration_scripts/creating_patient_opd_program.rb
