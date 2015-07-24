@@ -66,6 +66,9 @@ mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE<<EOFMYSQL
 CALL proc_update_obs_order_id;
 EOFMYSQL
 
+echo "fixing regimen_type"
+script/runner script/all_after_migration_scripts/llh_fixes/llh_regimen_type_fix.rb
+
 echo "fixing retired drugs"
 script/runner script/all_after_migration_scripts/fix_program_locations.rb
 
