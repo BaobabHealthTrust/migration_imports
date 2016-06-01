@@ -17,6 +17,9 @@ ActiveRecord::Base.connection.execute <<EOF
 	`dead` int,
 	`traditional_authority` varchar(255),
 	`current_address` varchar(255),
+	`home_village` varchar(255),
+	`current_ta` varchar(255),
+	`group_ta` varchar(255),
 	`landmark` varchar(255),
 	`cellphone_number` varchar(255),
 	`home_phone_number` varchar(255),
@@ -34,12 +37,15 @@ ActiveRecord::Base.connection.execute <<EOF
 	`prev_art_number` varchar(255),
 	`filing_number` varchar(255),
 	`archived_filing_number` varchar(255),
+	`anc_connect_id`  varchar(255),
+	`ivr_code_id`  varchar(255),
+	`nearest_health_facility` varchar(255),
 	`voided` tinyint(1) not null default 0,
 	`void_reason` varchar(255),
 	`date_voided` date ,
 	`voided_by` int,
 	`date_created` date not null,
-	`creator` varchar(255) not null 
+	`creator` varchar(255) not null
 
 	);
 

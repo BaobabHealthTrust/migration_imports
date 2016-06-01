@@ -77,7 +77,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 limit 10")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
 
@@ -188,9 +188,9 @@ def start
   flush_birth_plan()
   flush_anc_visit()
   flush_users()
-  flush_patient_outcome()
-  flush_users()
-  flush_guardians()
+  #flush_patient_outcome()
+  #flush_users()
+  #flush_guardians()
 
   if Output_sql == 1
     $visits_outfile.close()
@@ -297,17 +297,23 @@ end
 
 def self.create_patient(pat)
   #temp = PersonName.find(:last, :conditions => ["person_id = ? and voided = 0", pat.id])
-temp = []
-Patient.find_by_sql("select pn.person_id, pn.given_name, pn.family_name, pn.middle_name,
-       								 pn.middle_name, p.gender, p.birthdate, p.birthdate_estimated
-								from #{Source_db}.person_name pn
-								 inner join #{Source_db}.person p on p.person_id = pn.person_id
-								where pn.voided = 0
-								and p.person_id = #{pat.id}
-								order by p.date_created DESC
-								limit 1").collect{|d| temp << d}
+  temp = []
+  Patient.find_by_sql("select pn.person_id, pn.given_name, pn.family_name, pn.middle_name,
+                             pn.middle_name, p.gender, p.birthdate, p.birthdate_estimated,
+                             pa.address2, pa.city_village, pa.county_district, pa.subregion,
+                             p.dead
+                      from #{Source_db}.person_name pn
+                        left join #{Source_db}.person p on p.person_id = pn.person_id
+                        left join #{Source_db}.person_address pa on pa.person_id = pn.person_id
+                      where pn.voided = 0
+                      and p.person_id = #{pat.id}
+                      order by p.date_created DESC
+                      limit 1").collect{|d| temp << d}
 
-  ids = self.get_patient_identifiers(pat.id)
+  identifiers = self.get_patient_identifiers(pat.id)
+
+  attributes = self.get_patient_attribute(pat.id)
+
   #guardian = Relationship.find(:all, :conditions => ["person_id = ?", pat.id]).last
   patient = PatientRecord.new()
   patient.patient_id = pat.id
@@ -318,32 +324,22 @@ Patient.find_by_sql("select pn.person_id, pn.given_name, pn.family_name, pn.midd
 	  patient.gender = p.gender
 	  patient.dob = p.birthdate
 	  patient.dob_estimated = p.birthdate_estimated
+    patient.dead = p.dead
+    patient.current_address = p.city_village
+    patient.home_village = p.address2
+    patient.current_ta = p.county_district
+    patient.group_ta = p.subregion
+
   end
-=begin
-  patient.traditional_authority = ids["ta"]
-  patient.current_address =  Patient.find_by_sql("select pa.city_village
-                                                        from #{Source_db}.person_address pa
-                                                        where pa.person_id = #{pat.id}
-                                                        and pa.date_created = (select max(date_created)
-                                                                               from #{Source_db}.person_address p
-                                                                               where p.person_id = pa.person_id
-					                                                                     and p.voided = 0)
-                                                        and pa.voided = 0 limit 1").map{|p| p.city_village}
-  patient.landmark = ids["phy_add"]
-  patient.cellphone_number= ids["cell"]
-  patient.home_phone_number= ids["home_phone"]
-  patient.office_phone_number= ids["office_phone"]
-  patient.occupation= ids["occ"]
-  patient.dead = pat.dead
-  patient.nat_id = ids["nat_id"]
-  patient.art_number= ids["art_number"]
-  patient.pre_art_number= ids["pre_arv_number"]
-  patient.tb_number= ids["tb_id"]
-  patient.new_nat_id= ids["new_nat_id"]
-  patient.prev_art_number= ids["pre_arv_number"]
-  patient.filing_number= ids["filing_number"]
-  patient.archived_filing_number= ids["archived_filing_number"]
-=end
+
+  patient.nat_id = identifiers["nat_id"]
+  patient.ivr_code_id = identifiers["ivr_code"]
+  patient.anc_connect_id = identifiers["anc_conn"]
+  patient.cellphone_number = attributes["cell_phone"]
+  patient.office_phone_number = attributes["office_phone"]
+  patient.occupation = attributes["occ"]
+  patient.nearest_health_facility = attributes["nearest_fac"]
+
   patient.void_reason = pat.void_reason
   patient.date_voided = pat.date_voided
   patient.voided_by = pat.voided_by
@@ -406,42 +402,46 @@ def self.get_patient_identifiers(pat_id)
                                             and pi.voided = 0")
 
 	identifiers.each do |id|
-		id_type=PatientIdentifierType.find(id.identifier_type).name
-		case id_type.upcase
-			when 'NATIONAL ID'
+		#id_type=PatientIdentifierType.find(id.identifier_type).name
+		#case id_type.upcase
+    if id.identifier_type ==  3 #'National id'
 				pat_identifiers["nat_id"] = id.identifier
-			when 'OCCUPATION'
-				pat_identifiers["occ"] = id.identifier
-			when 'CELL PHONE NUMBER'
-				pat_identifiers["cell"] = id.identifier
-			when 'TRADITIONAL AUTHORITY '
-				pat_identifiers["ta"] = id.identifier
-		  when 'PHYSICAL ADDRESS'
-		    pat_identifiers['phy_add'] = id.identifier
-			when 'FILING NUMBER'
-				pat_identifiers["filing_number"] = id.identifier
-			when 'HOME PHONE NUMBER'
-				pat_identifiers["home_phone"] = id.identifier
-			when 'OFFICE PHONE NUMBER'
-				pat_identifiers["office_phone"] = id.identifier
-			when 'ART NUMBER'
-				pat_identifiers["art_number"] = id.identifier
-			when 'ARV NATIONAL ID'
-				pat_identifiers["art_number"] = id.identifier
-			when 'PREVIOUS ART NUMBER'
-				pat_identifiers["prev_art_number"] = id.identifier
-			when 'NEW NATIONAL ID'
-				pat_identifiers["new_nat_id"] = id.identifier
-			when 'PRE ARV NUMBER ID'
-				pat_identifiers["pre_arv_number"] = id.identifier
-			when 'TB TREATMENT ID'
-				pat_identifiers["tb_id"] = id.identifier
-			when 'ARCHIVED FILING NUMBER'
-				pat_identifiers["archived_filing_number"] = id.identifier
+		elsif id.identifier_type ==  21 #'IVR Access Code'
+				pat_identifiers["ivr_code"] = id.identifier
+		elsif id.identifier_type ==  25 #''ANC Connect ID'
+				pat_identifiers["anc_conn"] = id.identifier
+    else
 		end
 	end
 	return pat_identifiers
 end
+
+def self.get_patient_attribute(pat_id)
+
+	pat_attributes = PatientIdentifier.find_by_sql("select pa.* from #{Source_db}.person_attribute pa
+                                            where pa.date_created = (select max(pad.date_created)
+                                                                     from #{Source_db}.person_attribute pad
+                                                                     where pad.person_id = pa.person_id
+                                                                     and pad.voided = 0)
+                                            and pa.person_id = #{pat_id}
+                                            and pa.voided = 0")
+  attributes = Hash.new()
+
+	pat_attributes.each do |id|
+      if id.person_attribute_type_id == "12" #'Cell Phone Number'
+				attributes["cell_phone"] = id.value
+		  elsif id.person_attribute_type_id == '13' #'Occupation'
+				attributes["occ"] = id.value
+	    elsif id.person_attribute_type_id == "15" #'Office Phone Number'
+				attributes["office_phone"] = id.value
+      elsif id.person_attribute_type_id == "30" #'Nearest health facilityr'
+        attributes["nearest_fac"] = id.value
+      else
+      end
+	end
+	return attributes
+end
+
 
 def self.create_record(visit_encounter_id, encounter)
   case encounter.name.upcase
@@ -1075,7 +1075,7 @@ def preprocess_insert_val(val)
 end
 
 def flush_patient()
-  flush_queue(Patient_queue, "patients", ['patient_id','given_name', 'middle_name', 'family_name', 'gender', 'dob', 'dob_estimated', 'dead', 'traditional_authority','guardian_id', 'current_address', 'landmark', 'cellphone_number', 'home_phone_number', 'office_phone_number', 'occupation', 'nat_id', 'art_number', 'pre_art_number', 'tb_number', 'legacy_id', 'legacy_id2', 'legacy_id3', 'new_nat_id', 'prev_art_number', 'filing_number', 'archived_filing_number', 'voided', 'void_reason', 'date_voided', 'voided_by', 'date_created', 'creator'])
+  flush_queue(Patient_queue, "patients", ['patient_id','given_name', 'middle_name', 'family_name', 'gender', 'dob', 'dob_estimated', 'dead', 'traditional_authority','guardian_id', 'current_address', 'landmark', 'cellphone_number', 'home_phone_number', 'office_phone_number', 'occupation', 'nat_id', 'art_number', 'pre_art_number', 'tb_number', 'legacy_id', 'legacy_id2', 'legacy_id3', 'new_nat_id', 'prev_art_number', 'filing_number', 'archived_filing_number', 'ivr_code_id', 'anc_connect_id', 'nearest_health_facility', 'home_village', 'current_ta', 'group_ta', 'voided', 'void_reason', 'date_voided', 'voided_by', 'date_created', 'creator'])
 end
 
 def flush_registration()
@@ -1162,21 +1162,20 @@ end
 
 
 def self.create_users()
-  users = User.find_by_sql("Select * from  #{Source_db}.users")
+  users = User.find_by_sql("select u.*, pn.given_name, pn.family_name, pn.middle_name
+                            from #{Source_db}.users u
+                              left join #{Source_db}.person_name pn on pn.person_id = u.user_id")
 
   users.each do |user|
     new_user = MigratedUsers.new()
-
     user_roles = User.find_by_sql("SELECT r.role FROM #{Source_db}.user_role ur
-                                       INNER JOIN #{Source_db}.role r ON r.role_id = ur.role_id
+                                       INNER JOIN #{Source_db}.role r ON r.role = ur.role
                                        WHERE user_id = #{user.user_id}").map{|role| role.role}
-
     new_user.username = user.username
-=begin
-    new_user.first_name = user.first_name
-    new_user.middle_name = user.middle_name
-    new_user.last_name = user.last_name
-=end
+    new_user.first_name = user.given_name #rescue nil
+    new_user.middle_name = user.middle_name #rescue nil
+    new_user.last_name = user.family_name #rescue nil
+
     new_user.password = user.password
     new_user.salt = user.salt
     new_user.user_role1 = user_roles[0]
