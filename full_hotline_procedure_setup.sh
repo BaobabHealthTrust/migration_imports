@@ -40,7 +40,7 @@ done
 echo "loading hotline_1_7 database.............."
 mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE< db/new_dump.sql
 
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST --skip-column-names $DATABASE -e 'SHOW TRIGGERS;' | cut -f1 | sed -r 's/(.*)/DROP TRIGGER IF EXISTS \1;/' | mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE
+#mysql --user=$USERNAME --password=$PASSWORD --host=$HOST --skip-column-names $DATABASE -e 'SHOW TRIGGERS;' | cut -f1 | sed -r 's/(.*)/DROP TRIGGER IF EXISTS \1;/' | mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE
 
 #echo "importing users......................................"
 #mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
