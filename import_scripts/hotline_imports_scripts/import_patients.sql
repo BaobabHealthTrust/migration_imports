@@ -239,8 +239,8 @@ BEGIN
 				select "birth_plan_encounters";
 				CALL proc_import_birth_plan_encounters(@person_id);         # good
 
-				#select "child_health_symptoms_encounters";
-        #CALL proc_import_child_health_symptoms_encounters(@person_id); # good
+				select "child_health_symptoms_encounters";
+        CALL proc_import_child_health_symptoms_encounters(@person_id); # good
 
 				#select "maternal_health_symptoms_encounters";
         #CALL proc_import_maternal_health_symptoms_encounters(@person_id); # good
