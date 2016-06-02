@@ -37,12 +37,9 @@ Patient_outcome_queue = Array.new
 Patient_outcome_size = 1
 ANC_visit_queue = Array.new
 ANC_visit_size = 1
-
-
-=begin
 Guardian_queue = Array.new
-Guardian_queue_size = 1000
-=end
+Guardian_queue_size = 1
+
 Users_queue = Array.new
 
 Source_db= YAML.load(File.open(File.join(RAILS_ROOT, "config/database.yml"), "r"))['bart']["database"]
@@ -163,7 +160,7 @@ def start
     end
 
     self.create_patient(patient)
-    #self.create_guardian(patient)
+    self.create_guardian(patient)
 
     pt2 = Time.now
     elapsed = time_diff_milli pt1, pt2
@@ -189,8 +186,7 @@ def start
   flush_anc_visit()
   flush_users()
   #flush_patient_outcome()
-  #flush_users()
-  #flush_guardians()
+  flush_guardians()
 
   if Output_sql == 1
     $visits_outfile.close()
@@ -314,7 +310,7 @@ def self.create_patient(pat)
 
   attributes = self.get_patient_attribute(pat.id)
 
-  #guardian = Relationship.find(:all, :conditions => ["person_id = ?", pat.id]).last
+  guardian = Relationship.find(:all, :conditions => ["person_a = ?", pat.id]).last
   patient = PatientRecord.new()
   patient.patient_id = pat.id
   temp.each do |p|
@@ -329,7 +325,6 @@ def self.create_patient(pat)
     patient.home_village = p.address2
     patient.current_ta = p.county_district
     patient.group_ta = p.subregion
-
   end
 
   patient.nat_id = identifiers["nat_id"]
@@ -349,9 +344,10 @@ def self.create_patient(pat)
 	if pat.voided
 	  patient.voided = 1
   end
-  #if !guardian.nil?
-  #	patient.guardian_id = guardian.relative_id
-  #end
+
+  if !guardian.nil?
+    patient.guardian_id = guardian.person_b
+  end
 
   if Use_queue > 0
     if Patient_queue[Patient_queue_size-1] == nil
@@ -366,32 +362,45 @@ def self.create_patient(pat)
 
 end
 
-=begin
 def self.create_guardian(pat)
-  person_id = Person.find(:last, :conditions => ["patient_id = ? ", pat.id]).person_id rescue nil
-  relatives = Relationship.find(:all, :conditions => ["person_id = ?", person_id])
+  person_id = Person.find(:last, :conditions => ["person_id = ? ", pat.id]).person_id #rescue nil
+  relatives = Relationship.find(:all, :conditions => ["person_a = ?", person_id])
   (relatives || []).each do |relative|
     guardian = Guardian.new()
-    guardian_patient_id = Person.find(:last, :conditions => ["person_id = ? ", relative.relative_id]).patient_id rescue nil
-    temp_relative = Patient.find(:last, :conditions => ["patient_id = ? ", guardian_patient_id]) rescue nil
-    temp = PatientName.find(:last, :conditions => ["patient_id = ? and voided = 0", guardian_patient_id]) rescue nil
+    guardian_patient_id = Person.find(:last, :conditions => ["person_id = ? ", relative.person_b]).person_id #rescue nil
+    temp_relative = Patient.find(:last, :conditions => ["patient_id = ? ", guardian_patient_id]) #rescue nil
     guardian.patient_id = pat.id
     guardian.relative_id = guardian_patient_id
-    guardian.family_name = temp.family_name rescue nil
-    guardian.name = temp.given_name rescue nil
-    guardian.gender = temp_relative.gender rescue nil
-    guardian.relationship = RelationshipType.find(relative.relationship).name
+
+    temp = []
+    Patient.find_by_sql("select pn.person_id, pn.given_name, pn.family_name, pn.middle_name,
+                               pn.middle_name, p.birthdate, p.birthdate_estimated,
+                               pa.address2, pa.city_village, pa.county_district, pa.subregion,
+                               p.dead, p.gender
+                        from #{Source_db}.person_name pn
+                          left join #{Source_db}.person p on p.person_id = pn.person_id
+                          left join #{Source_db}.person_address pa on pa.person_id = pn.person_id
+                        where pn.voided = 0
+                        and p.person_id = #{pat.id}
+                        order by p.date_created DESC
+                        limit 1").collect{|d| temp << d}
+
+    temp.each do |gurd|
+      guardian.family_name = gurd.family_name #rescue nil
+      guardian.name = gurd.given_name #rescue nil
+      guardian.gender = gurd.gender #rescue nil
+    end
+    #raise relative.relationship.to_yaml
+    guardian.relationship = RelationshipType.find(relative.relationship).b_is_to_a
+
     guardian.creator = User.find_by_user_id(temp_relative.creator).username rescue User.first.username
     guardian.date_created = relative.date_created
     Guardian_queue << guardian
   end
 end
-=end
+
 def self.get_patient_identifiers(pat_id)
-
 	pat_identifiers = Hash.new()
-
-	#identifiers = PatientIdentifier.find(:all, :conditions => ["patient_id = ? and voided = 0", pat_id])
 	identifiers = PatientIdentifier.find_by_sql("select pi.* from #{Source_db}.patient_identifier pi
                                             where pi.date_created = (select max(pid.date_created)
                                                                      from #{Source_db}.patient_identifier pid
@@ -441,7 +450,6 @@ def self.get_patient_attribute(pat_id)
 	end
 	return attributes
 end
-
 
 def self.create_record(visit_encounter_id, encounter)
   case encounter.name.upcase
@@ -1122,9 +1130,9 @@ def flush_users()
   flush_queue(Users_queue, 'users', ['username', 'first_name', 'middle_name', 'last_name', 'password', 'salt', 'user_role1', 'user_role2', 'user_role3', 'user_role4', 'user_role5', 'user_role6', 'user_role7', 'user_role8', 'user_role9', 'user_role10', 'date_created', 'voided', 'void_reason', 'date_voided', 'voided_by', 'creator'])
 end
 
-#def flush_guardians()
-#  flush_queue(Guardian_queue, "guardians", ['patient_id', 'relative_id', 'family_name', 'name', 'gender', 'relationship', 'creator', 'date_created'])
-#end
+def flush_guardians()
+  flush_queue(Guardian_queue, "guardians", ['patient_id', 'relative_id', 'family_name', 'name', 'gender', 'relationship', 'creator', 'date_created'])
+end
 
 def flush_queue(queue, table, columns)
   if queue.length == 0

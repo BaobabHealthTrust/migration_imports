@@ -3,7 +3,7 @@
 # ==========
 # The assumption here is your source database name is `bart1_intermediate_bare_bones`
 # and the destination any name you prefer.
-# This has been necessary because there seems to be no way to use dynamic database 
+# This has been necessary because there seems to be no way to use dynamic database
 # names in procedures yet
 
 # The default DELIMITER is disabled to avoid conflicting with our scripts
@@ -18,9 +18,8 @@ CREATE PROCEDURE `proc_import_users`(
 
 )
 
+BEGIN
 
-BEGIN 
-    
     # Declare condition for exiting loop
     DECLARE done INT DEFAULT FALSE;
 
@@ -48,7 +47,7 @@ BEGIN
     DECLARE voided_by int(11);
     DECLARE creator varchar(255);
 
-    
+
     # Declare and initialise cursor for looping through the table
     DECLARE cur CURSOR FOR SELECT DISTINCT `bart1_intermediate_bare_bones`.`users`.id,
 `bart1_intermediate_bare_bones`.`users`.username,
@@ -71,13 +70,13 @@ BEGIN
 `bart1_intermediate_bare_bones`.`users`.voided,
 `bart1_intermediate_bare_bones`.`users`.void_reason,
 `bart1_intermediate_bare_bones`.`users`.date_voided,
-`bart1_intermediate_bare_bones`.`users`.creator FROM 
+`bart1_intermediate_bare_bones`.`users`.creator FROM
 `bart1_intermediate_bare_bones`.`users`
 WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-    
+
     # Disable system checks and indexing to speed up processing
     # SET FOREIGN_KEY_CHECKS = 0;
     # SET UNIQUE_CHECKS = 0;
@@ -86,12 +85,12 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
 
     # Open cursor
     OPEN cur;
-    
+
     # Declare loop for traversing through the records
     read_loop: LOOP
-    
+
         # Get the fields into the variables declared earlier
-        FETCH cur INTO  
+        FETCH cur INTO
           id,
           username,
           first_name,
@@ -114,12 +113,12 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           void_reason,
           date_voided,
           creator;
-        
+
         # Check if we are done and exit loop if done
         IF done THEN
-        
+
             LEAVE read_loop;
-        
+
         END IF;
 
 	      # Map destination user to source user
@@ -139,10 +138,10 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
 
         INSERT INTO person_name(person_id, given_name, middle_name, family_name, date_created, creator, uuid)
         VALUES (@person_id, last_name, middle_name, first_name, date_created, @creator, (SELECT UUID()));
-        
+
         #create user
         SET @user_uuid = (SELECT UUID());
-        
+
         INSERT INTO users(username, password, salt, person_id, date_created, creator, uuid)
         VALUES (username, password, salt, @person_id, date_created, @creator, @user_uuid);
 
@@ -159,11 +158,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role1 = user_role1;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role1);
         END IF;
-        
+
         IF NOT ISNULL(user_role2) THEN
           IF (user_role2 = 'Data Entry Clerk') THEN
            SET @user_role2 = 'Data Assistant';
@@ -174,11 +173,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role2 = user_role2;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role2);
         END IF;
-        
+
         IF NOT ISNULL(user_role3) THEN
           IF (user_role3 = 'Data Entry Clerk') THEN
            SET @user_role3 = 'Data Assistant';
@@ -189,11 +188,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role3 = user_role3;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role3);
         END IF;
-        
+
         IF NOT ISNULL(user_role4) THEN
           IF (user_role4 = 'Data Entry Clerk') THEN
            SET @user_role4 = 'Data Assistant';
@@ -204,11 +203,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role4 = user_role4;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role4);
         END IF;
-        
+
         IF NOT ISNULL(user_role5) THEN
           IF (user_role5 = 'Data Entry Clerk') THEN
            SET @user_role5 = 'Data Assistant';
@@ -219,11 +218,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role5 = user_role5;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role5);
         END IF;
-        
+
         IF NOT ISNULL(user_role6) THEN
           IF (user_role6 = 'Data Entry Clerk') THEN
            SET @user_role6 = 'Data Assistant';
@@ -234,11 +233,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role6 = user_role6;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role6);
         END IF;
-        
+
         IF NOT ISNULL(user_role7) THEN
           IF (user_role7 = 'Data Entry Clerk') THEN
            SET @user_role7 = 'Data Assistant';
@@ -249,11 +248,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role7 = user_role7;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role7);
         END IF;
-        
+
         IF NOT ISNULL(user_role8) THEN
           IF (user_role8 = 'Data Entry Clerk') THEN
            SET @user_role8 = 'Data Assistant';
@@ -264,11 +263,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role8 = user_role8;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role8);
         END IF;
-        
+
         IF NOT ISNULL(user_role9) THEN
           IF (user_role9 = 'Data Entry Clerk') THEN
            SET @user_role9 = 'Data Assistant';
@@ -279,11 +278,11 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role9 = user_role9;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role9);
         END IF;
-        
+
         IF NOT ISNULL(user_role10) THEN
           IF (user_role10 = 'Data Entry Clerk') THEN
            SET @user_role10 = 'Data Assistant';
@@ -294,7 +293,7 @@ WHERE `bart1_intermediate_bare_bones`.`users`.id > 1;
           ELSE
            SET @user_role10 = user_role10;
           END IF;
-          
+
           INSERT INTO user_role(user_id, role)
           VALUES(@user_id, @user_role10);
         END IF;

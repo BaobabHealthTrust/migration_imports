@@ -2,7 +2,6 @@ tools/data
 tools/output
 *~
 *.txt
-*.sql
 *.log
 *.yml
 *.csv
