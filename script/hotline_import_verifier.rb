@@ -59,75 +59,61 @@ def start
   print females_intermed.to_s.ljust(20)
   print (females_intermed.to_i - females_destination.to_i ).to_s
   puts ""
-  print "HIV Clinic Registration".ljust(30)
-  print hiv_clinic_enc_destination.to_s.ljust(20)
-  print hiv_clinic_enc_intermed.to_s.ljust(20)
-  print ( hiv_clinic_enc_intermed.to_i - hiv_clinic_enc_destination.to_i ).to_s
   puts ""
-  print "HIV Clinic Reception".ljust(30)
-  print hiv_recp_enc_destination.to_s.ljust(20)
-  print hiv_recp_enc_intermed.to_s.ljust(20)
-  print (hiv_recp_enc_intermed.to_i - hiv_recp_enc_destination.to_i ).to_s
+  print "Registration".ljust(30)
+  print registration_enc_destination.to_s.ljust(20)
+  print registration_enc_intermed.to_s.ljust(20)
+  print (registration_enc_destination.to_i - registration_enc_intermed.to_i ).to_s
   puts ""
-  print "HIV Clinic Consultation".ljust(30)
-  print hiv_consult_enc_destination.to_s.ljust(20)
-  print hiv_consult_enc_intermed.to_s.ljust(20)
-  print ( hiv_consult_enc_intermed.to_i - hiv_consult_enc_destination.to_i ).to_s
+  print "Baby Delivery ".ljust(30)
+  print baby_delivery_enc_destination.to_s.ljust(20)
+  print baby_delivery_enc_intermed.to_s.ljust(20)
+  print (baby_delivery_enc_destination.to_i - baby_delivery_enc_intermed.to_i ).to_s
   puts ""
-  print "HIV Clinic Staging".ljust(30)
-  print hiv_stage_enc_destination.to_s.ljust(20)
-  print hiv_stage_enc_intermed.to_s.ljust(20)
-  print ( hiv_stage_enc_intermed.to_i - hiv_stage_enc_destination.to_i ).to_s
+  print "Birth Plan".ljust(30)
+  print birth_plan_enc_destination.to_s.ljust(20)
+  print birth_plan_enc_intermed.to_s.ljust(20)
+  print (birth_plan_enc_destination.to_i - birth_plan_enc_intermed.to_i ).to_s
   puts ""
-  print "Treatment Encounters".ljust(30)
-  print treatment_enc_destination.to_s.ljust(20)
-  print treatment_enc_intermed.to_s.ljust(20)
-  print ( treatment_enc_intermed.to_i - treatment_enc_destination.to_i ).to_s
+  print "ANC Visit".ljust(30)
+  print anc_visit_enc_destination.to_s.ljust(20)
+  print anc_visit_enc_intermed.to_s.ljust(20)
+  print (anc_visit_enc_destination.to_i - anc_visit_enc_intermed.to_i ).to_s
   puts ""
-  print "General Reception".ljust(30)
-  print opd_recp_enc_destination.to_s.ljust(20)
-  print opd_recp_enc_intermed.to_s.ljust(20)
-  print ( opd_recp_enc_intermed.to_i - opd_recp_enc_destination.to_i ).to_s
+  print "Tips and Reminders".ljust(30)
+  print tips_and_reminders_enc_destination.to_s.ljust(20)
+  print tips_and_reminders_enc_intermed.to_s.ljust(20)
+  print (tips_and_reminders_enc_destination.to_i - tips_and_reminders_enc_intermed.to_i ).to_s
   puts ""
-  print "OPD Diagnosis".ljust(30)
-  print opd_diag_enc_destination.to_s.ljust(20)
-  print opd_diag_enc_intermed.to_s.ljust(20)
-  print (opd_diag_enc_intermed.to_i - opd_diag_enc_destination.to_i ).to_s
+  print "Child Health Symptoms".ljust(30)
+  print child_health_symptoms_enc_destination.to_s.ljust(20)
+  print child_health_symptoms_enc_intermed.to_s.ljust(20)
+  print (child_health_symptoms_enc_destination.to_i - child_health_symptoms_enc_intermed.to_i ).to_s
   puts ""
-  print "Vitals".ljust(30)
-  print vitals_enc_destination.to_s.ljust(20)
-  print vitals_enc_intermed.to_s.ljust(20)
-  print (vitals_enc_intermed.to_i - vitals_enc_destination.to_i ).to_s
+  print "Maternal Health Symptoms".ljust(30)
+  print maternal_health_symptoms_enc_destination.to_s.ljust(20)
+  print maternal_health_symptoms_enc_intermed.to_s.ljust(20)
+  print (maternal_health_symptoms_enc_destination.to_i - maternal_health_symptoms_enc_intermed.to_i ).to_s
   puts ""
-  print "Appointment".ljust(30)
-  print appointment_destination.to_s.ljust(20)
-  print appointment_intermed.to_s.ljust(20)
-  print (appointment_intermed.to_i - appointment_destination.to_i ).to_s
+  print "Pregnancy Status".ljust(30)
+  print pregnancy_status_enc_destination.to_s.ljust(20)
+  print pregnancy_status_enc_intermed.to_s.ljust(20)
+  print (pregnancy_status_enc_destination.to_i - pregnancy_status_enc_intermed.to_i ).to_s
   puts ""
-  print "ART adherence".ljust(30)
-  print art_adh_destination.to_s.ljust(20)
-  print art_adh_intermed.to_s.ljust(20)
-  print (art_adh_intermed.to_i - art_adh_destination.to_i).to_s
-  puts ""
-  print "Dispensing".ljust(30)
-  print dispensing_enc_destination.to_s.ljust(20)
-  print dispensing_enc_intermed.to_s.ljust(20)
-  print (dispensing_enc_intermed.to_i - dispensing_enc_destination.to_i ).to_s
-  puts ""
-  print "Exit from care".ljust(30)
-  print exit_from_care_destination.to_s.ljust(20)
-  print exit_from_care_intermed.to_s.ljust(20)
-  print (exit_from_care_intermed.to_i - exit_from_care_destination.to_i).to_s
+  print "Update Ouctome".ljust(30)
+  print update_outcome_enc_destination.to_s.ljust(20)
+  print update_outcome_enc_intermed.to_s.ljust(20)
+  print (update_outcome_enc_destination.to_i - update_outcome_enc_intermed.to_i ).to_s
   puts ""
   print "Users".ljust(30)
   print users_destination.to_s.ljust(20)
   print user_intermed.to_s.ljust(20)
-  print (user_intermed.to_i - users_destination.to_i).to_s
+  print (users_destination.to_i - user_intermed.to_i ).to_s
   puts ""
   print "Guardians".ljust(30)
   print guardian_destination.to_s.ljust(20)
   print guardian_intermed.to_s.ljust(20)
-  print (guardian_intermed.to_i - guardian_destination.to_i ).to_s
+  print (guardian_destination.to_i - guardian_intermed.to_i ).to_s
   puts ""
 end
 

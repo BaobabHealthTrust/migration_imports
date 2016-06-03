@@ -15,7 +15,7 @@ These are:
    Refer to Phase two of the migration process.***
 
 ***The Intermediary storage in this case will have several tables but the ones that are
-   vital to Hotline are listed below
+   vital to Hotline are listed below***
    1. anc_visit_encounters
    2. baby_delivery_encounters
    3. birth_plan_encounters

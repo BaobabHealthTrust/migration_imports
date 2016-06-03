@@ -150,7 +150,7 @@ BEGIN
         SET @cellphone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Cell Phone Number" LIMIT 1);
         SET @office_phone_number_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Office Phone Number" LIMIT 1);
         SET @occupation_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Occupation" LIMIT 1);
-				SET @nearest_health_facility_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Current Place Of Residence" LIMIT 1);
+				SET @nearest_health_facility_type_id = (SELECT person_attribute_type_id FROM person_attribute_type WHERE name = "Nearest Health Facility" LIMIT 1);
 
         # Create associated person attributes
         IF COALESCE(nearest_fac, "") != "" THEN
@@ -254,6 +254,9 @@ BEGIN
 
 				select "pregnancy_status_encounters";
 				CALL proc_import_pregnancy_status_encounters(@person_id);       # good
+
+				select "guardian";
+				CALL proc_import_guardians(@person_id);
 
         select patient_id;
 
