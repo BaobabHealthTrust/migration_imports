@@ -16,29 +16,29 @@ Output_sql = 1
 Execute_sql = 1
 
 Patient_queue = Array.new
-Patient_queue_size = 1
+Patient_queue_size = 1000
 Registration_queue = Array.new
-Registration_size = 1
+Registration_size = 1000
 Update_outcome_queue = Array.new
-Update_outcome_size = 1
+Update_outcome_size = 1000
 Tips_and_reminders_queue = Array.new
-Tips_and_reminders_size = 1
+Tips_and_reminders_size = 1000
 Maternal_health_symptoms_queue = Array.new
-Maternal_health_symptoms_size = 1
+Maternal_health_symptoms_size = 1000
 Child_health_symptoms_queue = Array.new
-Child_health_symptoms_size = 1
+Child_health_symptoms_size = 1000
 Baby_delivery_queue = Array.new
-Baby_delivery_size = 1
+Baby_delivery_size = 1000
 Pregnancy_status_queue = Array.new
-Pregnancy_status_size = 1
+Pregnancy_status_size = 1000
 Birth_plan_queue = Array.new
-Birth_plan_size = 1
+Birth_plan_size = 1000
 Patient_outcome_queue = Array.new
-Patient_outcome_size = 1
+Patient_outcome_size = 1000
 ANC_visit_queue = Array.new
-ANC_visit_size = 1
+ANC_visit_size = 1000
 Guardian_queue = Array.new
-Guardian_queue_size = 1
+Guardian_queue_size = 1000
 
 Users_queue = Array.new
 
@@ -364,12 +364,12 @@ def self.create_patient(pat)
 end
 
 def self.create_guardian(pat)
-  person_id = Person.find(:last, :conditions => ["person_id = ? ", pat.id]).person_id #rescue nil
+  person_id = Person.find(:last, :conditions => ["person_id = ? ", pat.id]).person_id rescue nil
   relatives = Relationship.find(:all, :conditions => ["person_a = ?", person_id])
   (relatives || []).each do |relative|
     guardian = Guardian.new()
-    guardian_patient_id = Person.find(:last, :conditions => ["person_id = ? ", relative.person_b]).person_id #rescue nil
-    temp_relative = Patient.find(:last, :conditions => ["patient_id = ? ", guardian_patient_id]) #rescue nil
+    guardian_patient_id = Person.find(:last, :conditions => ["person_id = ? ", relative.person_b]).person_id rescue nil
+    temp_relative = Patient.find(:last, :conditions => ["patient_id = ? ", guardian_patient_id]) rescue nil
     guardian.patient_id = pat.id
     guardian.relative_id = guardian_patient_id
 
