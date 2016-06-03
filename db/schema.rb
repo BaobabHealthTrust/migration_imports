@@ -563,6 +563,7 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
     t.string  "given_name"
     t.string  "middle_name"
     t.string  "family_name"
+    t.string  "mothers_surname"
     t.string  "gender",                  :limit => 25
     t.date    "dob"
     t.text    "dob_estimated"

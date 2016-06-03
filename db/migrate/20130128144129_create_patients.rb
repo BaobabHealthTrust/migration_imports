@@ -11,6 +11,7 @@ ActiveRecord::Base.connection.execute <<EOF
 	`given_name` varchar(255) ,
 	`middle_name` varchar(255),
 	`family_name` varchar(255),
+	`mothers_surname` varchar(255),
 	`gender` varchar(25) ,
 	`dob` date,
 	`dob_estimated` text,

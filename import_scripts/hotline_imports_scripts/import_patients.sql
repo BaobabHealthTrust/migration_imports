@@ -28,6 +28,7 @@ BEGIN
     DECLARE given_name VARCHAR(255);
     DECLARE middle_name VARCHAR(255);
     DECLARE family_name VARCHAR(255);
+		DECLARE mothers_surname VARCHAR(255);
     DECLARE gender VARCHAR(25);
     DECLARE dob DATE;
     DECLARE dob_estimated BIT(1);
@@ -84,7 +85,7 @@ BEGIN
     read_loop: LOOP
 
         # Get the fields into the variables declared earlier
-        FETCH cur INTO patient_id, given_name, middle_name, family_name, gender, dob, dob_estimated, dead, traditional_authority, current_address, home_village, current_ta, group_ta, landmark, cellphone_number, home_phone_number, office_phone_number, occupation, guardian_id, nat_id, art_number, pre_art_number, tb_number, legacy_id, legacy_id2, legacy_id3, new_nat_id, prev_art_number, filing_number, archived_filing_number, anc_connect_id, ivr_code_id, nearest_fac, voided, void_reason, date_voided, voided_by, date_created, creator;
+        FETCH cur INTO patient_id, given_name, middle_name, family_name, mothers_surname, gender, dob, dob_estimated, dead, traditional_authority, current_address, home_village, current_ta, group_ta, landmark, cellphone_number, home_phone_number, office_phone_number, occupation, guardian_id, nat_id, art_number, pre_art_number, tb_number, legacy_id, legacy_id2, legacy_id3, new_nat_id, prev_art_number, filing_number, archived_filing_number, anc_connect_id, ivr_code_id, nearest_fac, voided, void_reason, date_voided, voided_by, date_created, creator;
 
         # Check if we are done and exit loop if done
         IF done THEN
@@ -136,8 +137,8 @@ BEGIN
 				SET @person_address_id = (SELECT LAST_INSERT_ID());
 
 				# Create person name details
-        INSERT INTO person_name (person_id, given_name, middle_name, family_name, creator, date_created, uuid)
-        VALUES (patient_id, given_name, middle_name, family_name, @creator, date_created, (SELECT UUID()));
+        INSERT INTO person_name (person_id, given_name, middle_name, family_name, family_name2, creator, date_created, uuid)
+        VALUES (patient_id, given_name, middle_name, family_name, mothers_surname, @creator, date_created, (SELECT UUID()));
 
         SET @person_name_id = (SELECT LAST_INSERT_ID());
 
@@ -189,8 +190,8 @@ BEGIN
 
         SET @new_nat_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "National id");
         SET @nat_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "National id");
-				SET @anc_connect_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "ANC connect ID");
-        SET @ivr_code_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "IVR Code ID");
+				SET @anc_connect_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "ANC Connect ID");
+        SET @ivr_code_id = (SELECT patient_identifier_type_id FROM patient_identifier_type WHERE name = "IVR Access Code");
 
         # Location id defaulted to "Unknown" since the source database version
         # did not capture this field

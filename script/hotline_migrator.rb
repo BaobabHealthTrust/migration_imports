@@ -74,7 +74,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 and patient_id > 18000")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
 
@@ -294,7 +294,7 @@ end
 def self.create_patient(pat)
   #temp = PersonName.find(:last, :conditions => ["person_id = ? and voided = 0", pat.id])
   temp = []
-  Patient.find_by_sql("select pn.person_id, pn.given_name, pn.family_name, pn.middle_name,
+  Patient.find_by_sql("select pn.person_id, pn.given_name, pn.family_name, pn.family_name2,pn.middle_name,
                              pn.middle_name, p.gender, p.birthdate, p.birthdate_estimated,
                              pa.address2, pa.city_village, pa.county_district, pa.subregion,
                              p.dead
@@ -317,6 +317,7 @@ def self.create_patient(pat)
 	  patient.given_name = p.given_name rescue nil
 	  patient.middle_name = p.middle_name rescue nil
 	  patient.family_name = p.family_name rescue nil
+    patient.mothers_surname = p.family_name2 rescue nil
 	  patient.gender = p.gender
 	  patient.dob = p.birthdate
 	  patient.dob_estimated = p.birthdate_estimated
@@ -1083,7 +1084,7 @@ def preprocess_insert_val(val)
 end
 
 def flush_patient()
-  flush_queue(Patient_queue, "patients", ['patient_id','given_name', 'middle_name', 'family_name', 'gender', 'dob', 'dob_estimated', 'dead', 'traditional_authority','guardian_id', 'current_address', 'landmark', 'cellphone_number', 'home_phone_number', 'office_phone_number', 'occupation', 'nat_id', 'art_number', 'pre_art_number', 'tb_number', 'legacy_id', 'legacy_id2', 'legacy_id3', 'new_nat_id', 'prev_art_number', 'filing_number', 'archived_filing_number', 'ivr_code_id', 'anc_connect_id', 'nearest_health_facility', 'home_village', 'current_ta', 'group_ta', 'voided', 'void_reason', 'date_voided', 'voided_by', 'date_created', 'creator'])
+  flush_queue(Patient_queue, "patients", ['patient_id','given_name', 'middle_name', 'family_name', 'mothers_surname', 'gender', 'dob', 'dob_estimated', 'dead', 'traditional_authority','guardian_id', 'current_address', 'landmark', 'cellphone_number', 'home_phone_number', 'office_phone_number', 'occupation', 'nat_id', 'art_number', 'pre_art_number', 'tb_number', 'legacy_id', 'legacy_id2', 'legacy_id3', 'new_nat_id', 'prev_art_number', 'filing_number', 'archived_filing_number', 'ivr_code_id', 'anc_connect_id', 'nearest_health_facility', 'home_village', 'current_ta', 'group_ta', 'voided', 'void_reason', 'date_voided', 'voided_by', 'date_created', 'creator'])
 end
 
 def flush_registration()
