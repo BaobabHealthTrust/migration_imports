@@ -74,7 +74,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 and patient_id > 18000")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
 
@@ -1127,7 +1127,7 @@ end
 #end
 
 def flush_users()
-  flush_queue(Users_queue, 'users', ['username', 'first_name', 'middle_name', 'last_name', 'password', 'salt', 'user_role1', 'user_role2', 'user_role3', 'user_role4', 'user_role5', 'user_role6', 'user_role7', 'user_role8', 'user_role9', 'user_role10', 'date_created', 'voided', 'void_reason', 'date_voided', 'voided_by', 'creator'])
+  flush_queue(Users_queue, 'users', ['username', 'first_name', 'middle_name', 'last_name', 'person_id', 'user_id', 'password', 'salt', 'user_role1', 'user_role2', 'user_role3', 'user_role4', 'user_role5', 'user_role6', 'user_role7', 'user_role8', 'user_role9', 'user_role10', 'date_created', 'voided', 'void_reason', 'date_voided', 'voided_by', 'creator'])
 end
 
 def flush_guardians()
@@ -1170,20 +1170,22 @@ end
 
 
 def self.create_users()
-  users = User.find_by_sql("select u.*, pn.given_name, pn.family_name, pn.middle_name
+  users = User.find_by_sql("select u.*, pn.person_id, pn.given_name, pn.family_name, pn.middle_name
                             from #{Source_db}.users u
                               left join #{Source_db}.person_name pn on pn.person_id = u.user_id")
-
+#raise users.to_yaml
   users.each do |user|
     new_user = MigratedUsers.new()
     user_roles = User.find_by_sql("SELECT r.role FROM #{Source_db}.user_role ur
                                        INNER JOIN #{Source_db}.role r ON r.role = ur.role
                                        WHERE user_id = #{user.user_id}").map{|role| role.role}
+    #puts "#{user.person_id}......#{user.user_id}.....#{user.username}"
     new_user.username = user.username
     new_user.first_name = user.given_name #rescue nil
     new_user.middle_name = user.middle_name #rescue nil
     new_user.last_name = user.family_name #rescue nil
-
+    new_user.person_id = user.person_id,
+    new_user.user_id = user.user_id,
     new_user.password = user.password
     new_user.salt = user.salt
     new_user.user_role1 = user_roles[0]

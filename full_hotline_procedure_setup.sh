@@ -38,17 +38,17 @@ do
 done
 
 echo "loading hotline_1_7 database.............."
-mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE< db/new_dump.sql
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE< db/newdump.sql
 
 #mysql --user=$USERNAME --password=$PASSWORD --host=$HOST --skip-column-names $DATABASE -e 'SHOW TRIGGERS;' | cut -f1 | sed -r 's/(.*)/DROP TRIGGER IF EXISTS \1;/' | mysql --user=$USERNAME --password=$PASSWORD --host=$HOST $DATABASE
 
-#echo "importing users......................................"
-#mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
-#CALL proc_import_users;
-#EOFMYSQL
+echo "importing users......................................"
+mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL
+CALL proc_import_users;
+EOFMYSQL
 
-#echo "fixing user with person_id 1........................."
-#script/runner script/fix_user_with_person_id1.rb
+echo "fixing user with person_id 1........................."
+script/runner script/fix_user_with_person_id1.rb
 
 echo "importing data......................................."
 mysql --user=$USERNAME --password=$PASSWORD --host=$HOST  $DATABASE<<EOFMYSQL

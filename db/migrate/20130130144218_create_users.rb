@@ -8,6 +8,8 @@ EOF
 ActiveRecord::Base.connection.execute <<EOF
 create table `users`(
 `id` int not null auto_increment primary key,
+`person_id` int,
+`user_id` int,
 `username` varchar(255),
 `first_name` varchar(255),
 `middle_name` varchar(255),

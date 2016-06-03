@@ -707,6 +707,8 @@ ActiveRecord::Schema.define(:version => 20130512004616) do
   end
 
   create_table "users", :force => true do |t|
+    t.integer "person_id"
+    t.integer "user_id"
     t.string  "username"
     t.string  "first_name"
     t.string  "middle_name"

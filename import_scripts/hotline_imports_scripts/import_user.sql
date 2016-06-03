@@ -25,6 +25,8 @@ BEGIN
     DECLARE done INT DEFAULT FALSE;
 
     DECLARE id int(11);
+    DECLARE person_id int(11);
+    DECLARE user_id INT(11);
     DECLARE username varchar(255);
     DECLARE first_name varchar(255);
     DECLARE middle_name varchar(255);
@@ -51,6 +53,8 @@ BEGIN
 
     # Declare and initialise cursor for looping through the table
     DECLARE cur CURSOR FOR SELECT DISTINCT `hotline_intermediate_bare_bones`.`users`.id,
+`hotline_intermediate_bare_bones`.`users`.person_id,
+`hotline_intermediate_bare_bones`.`users`.user_id,
 `hotline_intermediate_bare_bones`.`users`.username,
 `hotline_intermediate_bare_bones`.`users`.first_name,
 `hotline_intermediate_bare_bones`.`users`.middle_name,
@@ -73,7 +77,8 @@ BEGIN
 `hotline_intermediate_bare_bones`.`users`.date_voided,
 `hotline_intermediate_bare_bones`.`users`.creator FROM
 `hotline_intermediate_bare_bones`.`users`
-WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
+WHERE `hotline_intermediate_bare_bones`.`users`.id > 2
+GROUP BY `hotline_intermediate_bare_bones`.`users`.user_id;
 
     # Declare loop position check
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
@@ -82,7 +87,6 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
     # SET FOREIGN_KEY_CHECKS = 0;
     # SET UNIQUE_CHECKS = 0;
     # SET AUTOCOMMIT = 0;
-      SET @max_patient_id = 1000 ;#(SELECT MAX(patient_id) + 1 FROM `openmrs_mnch`.`patient`);
     # Open cursor
     OPEN cur;
 
@@ -92,6 +96,8 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
         # Get the fields into the variables declared earlier
         FETCH cur INTO
           id,
+          person_id,
+          user_id,
           username,
           first_name,
           middle_name,
@@ -121,31 +127,24 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
 
         END IF;
 
-	      # Map destination user to source user
-	      SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator), 1);
+        #SET @max_patient_id = (SELECT MAX(patient_id) + 1 FROM `hotline_intermediate_bare_bones`.`patients`);
 
-    IF NOT ISNULL(id) THEN
+	      # Map destination user to source user
+	      SET @creator = COALESCE((SELECT user_id FROM users WHERE username = creator limit 1), 1);
+
+        IF NOT ISNULL(user_id) THEN
 
         #create person
         SET @person_uuid = (SELECT UUID());
-
         INSERT INTO person (person_id,date_created, date_changed, creator, uuid)
-        VALUES (@max_patient_id,date_created, date_created, @creator, @person_uuid);
-
-        #create person_names
-        SET @person_id = (SELECT person_id FROM person WHERE uuid = @person_uuid);
-        SET @max_patient_id = @max_patient_id + 1;
+        VALUES (user_id,date_created, date_created, @creator, @person_uuid) ON DUPLICATE KEY UPDATE person_id = user_id;
 
         INSERT INTO person_name(person_id, given_name, middle_name, family_name, date_created, creator, uuid)
-        VALUES (@person_id, last_name, middle_name, first_name, date_created, @creator, (SELECT UUID()));
+        VALUES (user_id, last_name, middle_name, first_name, date_created, @creator, (SELECT UUID())) ON DUPLICATE KEY UPDATE person_id = user_id;
 
         #create user
-        SET @user_uuid = (SELECT UUID());
-
-        INSERT INTO users(username, password, salt, person_id, date_created, creator, uuid)
-        VALUES (username, password, salt, @person_id, date_created, @creator, @user_uuid);
-
-        SET @user_id = (SELECT user_id FROM users WHERE uuid = @user_uuid);
+        INSERT INTO users(user_id, username, password, salt, person_id, date_created, creator, uuid)
+        VALUES (user_id, username, password, salt, @person_id, date_created, @creator, (SELECT UUID())) ON DUPLICATE KEY UPDATE user_id = user_id;
 
         #create user_roles
         IF NOT ISNULL(user_role1) THEN
@@ -160,7 +159,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role1);
+          VALUES(user_id, @user_role1);
         END IF;
 
         IF NOT ISNULL(user_role2) THEN
@@ -175,7 +174,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role2);
+          VALUES(user_id, @user_role2);
         END IF;
 
         IF NOT ISNULL(user_role3) THEN
@@ -190,7 +189,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role3);
+          VALUES(user_id, @user_role3);
         END IF;
 
         IF NOT ISNULL(user_role4) THEN
@@ -205,7 +204,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role4);
+          VALUES(user_id, @user_role4);
         END IF;
 
         IF NOT ISNULL(user_role5) THEN
@@ -220,7 +219,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role5);
+          VALUES(user_id, @user_role5);
         END IF;
 
         IF NOT ISNULL(user_role6) THEN
@@ -235,7 +234,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role6);
+          VALUES(user_id, @user_role6);
         END IF;
 
         IF NOT ISNULL(user_role7) THEN
@@ -250,7 +249,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role7);
+          VALUES(user_id, @user_role7);
         END IF;
 
         IF NOT ISNULL(user_role8) THEN
@@ -265,7 +264,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role8);
+          VALUES(user_id, @user_role8);
         END IF;
 
         IF NOT ISNULL(user_role9) THEN
@@ -280,7 +279,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role9);
+          VALUES(user_id, @user_role9);
         END IF;
 
         IF NOT ISNULL(user_role10) THEN
@@ -295,7 +294,7 @@ WHERE `hotline_intermediate_bare_bones`.`users`.id > 1;
           END IF;
 
           INSERT INTO user_role(user_id, role)
-          VALUES(@user_id, @user_role10);
+          VALUES(user_id, @user_role10);
         END IF;
 
       #--END IF;
