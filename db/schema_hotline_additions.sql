@@ -25,6 +25,7 @@ CREATE TABLE `call_log` (
   `end_time` datetime DEFAULT NULL,
   `call_type` int(1),
   `person_id` int(11),
+  `district` int(11),
   `creator` int(11),
   PRIMARY KEY (`call_log_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

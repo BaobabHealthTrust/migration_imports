@@ -1,4 +1,5 @@
 Source_db = YAML.load(File.open(File.join(RAILS_ROOT, "config/database.yml"), "r"))['bart2']["database"]
+
 CONN = ActiveRecord::Base.connection
 
 def start
@@ -11,6 +12,7 @@ def start
                                                   cl.start_time,
                                                   cl.end_time,
                                                   cl.call_type,
+                                                  cl.district,
                                                   cl.creator,
                                                   DATE(o.obs_datetime)
                                               FROM
@@ -26,8 +28,8 @@ def start
     #insert the call_log details
      puts "............................working on #{patient.person_id}"
     ActiveRecord::Base.connection.execute <<EOF
-INSERT INTO #{Source_db}.call_log (call_log_id, start_time, end_time, call_type, person_id, creator)
-VALUES (#{patient.call_log_id}, '#{patient.start_time}', '#{patient.end_time}', #{patient.call_type}, #{patient.person_id}, #{patient.creator})
+INSERT INTO #{Source_db}.call_log (call_log_id, start_time, end_time, call_type, district, person_id, creator)
+VALUES (#{patient.call_log_id}, '#{patient.start_time}', '#{patient.end_time}', #{patient.call_type}, #{patient.district}, #{patient.person_id}, #{patient.creator})
 EOF
 
   end
