@@ -241,7 +241,7 @@ BEGIN
 				CALL proc_import_birth_plan_encounters(@person_id);         # good
 
 				select "child_health_symptoms_encounters";
-        CALL proc_import_child_health_symptoms_encounters(@person_id); # good
+        CALL proc_import_child_health_symptoms_encounters(@person_id);   # good
 
 				select "maternal_health_symptoms_encounters";
         CALL proc_import_maternal_health_symptoms_encounters(@person_id); # good
@@ -250,10 +250,10 @@ BEGIN
         CALL proc_import_tips_and_reminders_encounters(@person_id);      # good
 
 				select "update_outcomes_encounters";
-        CALL proc_import_update_outcome_encounters(@person_id);        # good
+        CALL proc_import_update_outcome_encounters(@person_id);          # good
 
 				select "pregnancy_status_encounters";
-				CALL proc_import_pregnancy_status_encounters(@person_id);       # good
+				CALL proc_import_pregnancy_status_encounters(@person_id);        # good
 
 				select "guardian";
 				CALL proc_import_guardians(@person_id);
