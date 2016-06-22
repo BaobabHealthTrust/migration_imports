@@ -18,14 +18,23 @@ def start
     #get all patient_encs as in bart1
     pat_encs = []
     pat_encs = Encounter.find_by_sql("select e.* from #{Source_db}.encounter e
-                                      	inner join #{Source_db}.obs o on o.encounter_id = e.encounter_id and o.voided = 0
-                                      where o.patient_id = #{patient.patient_id} GROUP BY e.encounter_id").map(&:encounter_id)
+                                        inner join #{Source_db}.obs o on o.encounter_id = e.encounter_id and o.voided = 0
+                                      where o.patient_id = #{patient.patient_id} GROUP BY e.encounter_id
+                                      union all
+                                      select e.* from #{Source_db}.encounter e
+                                        inner join #{Source_db}.orders o on o.encounter_id = e.encounter_id and o.voided = 0
+                                      where e.patient_id = #{patient.patient_id} GROUP BY e.encounter_id").map(&:encounter_id)
+
     if !pat_encs.blank?
       #check if the encs are all voided in bart2_dataset
-      pat_bart2_migrated_encs  = Encounter.find_by_sql("SELECT * FROM openmrs_zomba_latest.encounter
-                                                WHERE patient_id = #{patient.patient_id}
-                                                AND encounter_id IN (#{pat_encs.join(', ')})
-                                                AND voided = 0 GROUP BY encounter_type").map(&:encounter_type)
+      pat_bart2_migrated_encs  = Encounter.find_by_sql("SELECT e.* FROM openmrs_zomba_latest.encounter e
+                                                         INNER JOIN openmrs_zomba_latest.obs o ON o.encounter_id = e.encounter_id AND o.voided = 0
+                                                         INNER JOIN openmrs_zomba_latest.orders ords ON ords.encounter_id = e.encounter_id and ords.voided = 0
+                                                        WHERE e.patient_id = #{patient.patient_id}
+                                                        AND e.encounter_id IN (#{pat_encs.join(', ')})
+                                                        AND e.voided = 0
+                                                        GROUP BY encounter_type").map(&:encounter_type)
+
       #get encs after migration for the patient
       pat_bart2_after_migration_encs  = Encounter.find_by_sql("SELECT * FROM openmrs_zomba_latest.encounter
                                                 WHERE patient_id = #{patient.patient_id}
@@ -42,8 +51,6 @@ def start
            art_encs = pat_bart2_after_migration_encs.select{|enc| bart2_art_enc_types.include?(enc)}
            if !art_encs.blank?
              #flag the patient
-             #raise $failed_encs.write.to_yaml
-             #self.flag_patient(patient.patient_id)
              $flagged_pats << patient.patient_id
              puts "#{patient.patient_id} : With ART encs"
            else
@@ -59,9 +66,7 @@ def start
         pat_art_encs = pat_bart2_migrated_encs.select{|enc| bart2_art_enc_types.include?(enc)}
         if !pat_art_encs.blank?
           #flag the patient
-          #raise patient.patient_id.to_yaml
           $flagged_pats << patient.patient_id
-          #self.flag_patient(patient.patient_id)
           puts "#{patient.patient_id} : With ART encs"
         else
           #check if the patient does not have encs in bart2
@@ -70,9 +75,7 @@ def start
              art_encs = pat_bart2_after_migration_encs.select{|enc| bart2_art_enc_types.include?(enc)}
              if !art_encs.blank?
                #flag the patient
-               #raise patient.patient_id.to_yaml
                $flagged_pats << patient.patient_id
-               #self.flag_patient(patient.patient_id)
                puts "#{patient.patient_id} : With ART encs"
              else
                #void ARV number
@@ -147,6 +150,12 @@ ActiveRecord::Base.connection.execute <<EOF
 UPDATE openmrs_zomba_latest.patient_program
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE patient_id = #{patient}
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+UPDATE openmrs_zomba_latest.patient_state
+SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
+WHERE patient_program_id IN (SELECT patient_program_id FROM openmrs_zomba_latest.patient_program WHERE patient_id = #{patient})
 EOF
 end
 
