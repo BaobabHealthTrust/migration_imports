@@ -6,7 +6,7 @@ def start
   #get all the patients with non-zch ARV_IDs
   non_zch_arv_ids_patients = Encounter.find_by_sql("SELECT * FROM #{Source_db}.patient_identifier
                                                     WHERE identifier_type = 18
-                                                    AND identifier  LIKE '%MAT%'
+                                                    AND identifier NOT LIKE '%ZCH%'
                                                     AND voided = 0
                                                     GROUP BY patient_id")
 
@@ -55,7 +55,7 @@ def start
              puts "#{patient.patient_id} : With ART encs"
            else
              #void ARV number
-             self.void_arv_number(patient.patient_id)
+             self.void_arv_number(patient)
            end
         else
           #void patient with associated things
@@ -79,7 +79,7 @@ def start
                puts "#{patient.patient_id} : With ART encs"
              else
                #void ARV number
-               self.void_arv_number(patient.patient_id)
+               self.void_arv_number(patient)
              end
           else
             #void patient with associated things
@@ -90,16 +90,17 @@ def start
     end
   end
   self.flag_patient($flagged_pats)
-
+  unvoid_all_opd_patient
 end
 
-def self.void_arv_number(patient_id)
+def self.void_arv_number(patient)
   #update patient_identifier table and void ARV_number
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE openmrs_zomba_latest.patient_identifier
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
-WHERE patient_id = patient_id
+WHERE patient_id = #{patient.patient_id}
 AND identifier_type = 4
+AND identifier LIKE '%#{patient.identifier}%'
 EOF
 end
 
@@ -155,7 +156,7 @@ EOF
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE openmrs_zomba_latest.patient_state
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
-WHERE patient_program_id IN (SELECT patient_program_id FROM openmrs_zomba_latest.patient_program WHERE patient_id = #{patient})
+WHERE patient_program_id IN (SELECT patient_program_id FROM openmrs_zomba_latest.patient_program WHERE  patient_id = #{patient})
 EOF
 end
 
@@ -167,4 +168,105 @@ def self.flag_patient(patients)
     end
   end
 end
+
+def unvoid_all_opd_patient
+  #check if patient have OPD encs
+  patient_opd_encs = Encounter.find_by_sql("SELECT * FROM  openmrs_zomba_latest.encounter
+                                            WHERE encounter_type NOT IN (6, 7, 9, 25, 51, 52, 53, 54, 68, 119)
+                                            AND void_reason = 'Not ZCH data' GROUP BY patient_id")
+
+  (patient_opd_encs || []).each do |patient|
+    #unvoid everything
+     self.completely_unvoid_opd_patient(patient.patient_id)
+  end
+end
+
+def self.completely_unvoid_opd_patient(patient_id)
+  #update patient_identifier table and void ARV_number
+  opd_encs = Encounter.find_by_sql("SELECT * FROM openmrs_zomba_latest.encounter WHERE  encounter_type NOT IN (6, 7, 9, 25, 51, 52, 53, 54, 68, 119)
+                                    AND patient_id = #{patient_id}
+                                    AND void_reason = 'Not ZCH data'
+                                    AND voided = 1").map(&:encounter_id)
+
+  puts "working on OPD patient #{patient_id}........."
+
+  if !opd_encs.blank?
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.patient_identifier
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL
+  WHERE identifier_type IN (2, 3)
+  AND void_reason = 'Not ZCH data'
+  AND patient_id  = #{patient_id}
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.patient
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL, date_changed = NOW(), changed_by = 1
+  WHERE patient_id = patient_id
+  AND void_reason = 'Not ZCH data'
+  AND patient_id  = #{patient_id}
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.person
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL, date_changed = NOW(), changed_by = 1
+  WHERE void_reason = 'Not ZCH data'
+  AND person_id  = #{patient_id}
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.person_address
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL
+  WHERE void_reason = 'Not ZCH data'
+  AND person_id  = #{patient_id}
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.person_attribute
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL, date_changed = NOW(), changed_by = 1
+  WHERE void_reason = 'Not ZCH data'
+  AND person_id  = #{patient_id}
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.obs
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL
+  WHERE void_reason = 'Not ZCH data'
+  AND person_id  = #{patient_id}
+  AND encounter_id IN (#{opd_encs.join(',')})
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.orders
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL
+  WHERE void_reason = 'Not ZCH data'
+  AND patient_id  = #{patient_id}
+  AND encounter_id IN (#{opd_encs.join(',')})
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.encounter
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL, date_changed = NOW(), changed_by = 1
+  WHERE void_reason = 'Not ZCH data'
+  AND patient_id  = #{patient_id}
+  AND encounter_id IN (#{opd_encs.join(',')})
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.patient_program
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL, date_changed = NOW(), changed_by = 1
+  WHERE void_reason = 'Not ZCH data'
+  AND patient_id  = #{patient_id}
+  AND patient_program_id = 14
+EOF
+
+ActiveRecord::Base.connection.execute <<EOF
+  UPDATE openmrs_zomba_latest.patient_state
+  SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL, date_changed = NOW(), changed_by = 1
+  WHERE void_reason = 'Not ZCH data'
+  AND patient_program_id IN (SELECT patient_program_id FROM openmrs_zomba_latest.patient_program WHERE  patient_program_id = 14 AND patient_id = #{patient_id})
+EOF
+  end
+end
+
 start
