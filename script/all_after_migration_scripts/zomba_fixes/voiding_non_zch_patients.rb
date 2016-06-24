@@ -11,12 +11,14 @@ def start
                                                     WHERE identifier_type = 18
                                                     AND identifier NOT LIKE '%ZCH%'
                                                     AND voided = 0
-                                                    GROUP BY patient_id 
-                                                    LIMIT 1")
+                                                    GROUP BY patient_id ")
+
+  count = patients.length
 
   $flagged_pats = []
   #loop through to get the encounter_ids as they are in BART1
   (non_zch_arv_ids_patients || []).each do |patient|
+
     puts "working on patient #{patient.patient_id}........."
 
     #get all patient_encs as in bart1
@@ -92,6 +94,7 @@ def start
         end
       end
     end
+    puts "#{count-=1}................ patient(s) to go"
   end
   self.flag_patient($flagged_pats)
   unvoid_all_opd_patient
@@ -103,7 +106,7 @@ ActiveRecord::Base.establish_connection(
   :host     => "192.168.0.15",
   :username => "root",
   :password => "only4u",
-  :database => "openmrs_zch"   
+  :database => "openmrs_zch"
 )
 
 def self.void_arv_number(patient)
@@ -122,54 +125,63 @@ ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.patient
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE patient_id = #{patient}
+AND voided = 0
 EOF
 
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.person
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE person_id = #{patient}
+AND voided = 0
 EOF
 
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.person_address
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE person_id = #{patient}
+AND voided = 0
 EOF
 
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.patient_identifier
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE patient_id = #{patient}
+AND voided = 0
 EOF
 
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.person_attribute
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE person_id = #{patient}
+AND voided = 0
 EOF
 
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.obs
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE person_id = #{patient}
+AND voided = 0
 EOF
 
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.orders
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE patient_id = #{patient}
+AND voided = 0
 EOF
 
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.patient_program
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE patient_id = #{patient}
+AND voided = 0
 EOF
 
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.patient_state
 SET voided = 1, voided_by = 1, void_reason = 'Not ZCH data', date_voided = NOW()
 WHERE patient_program_id IN (SELECT patient_program_id FROM #{Source_db}.patient_program WHERE  patient_id = #{patient})
+AND voided = 0
 EOF
 end
 
