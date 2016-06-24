@@ -110,6 +110,7 @@ ActiveRecord::Base.establish_connection(
 )
 
 def self.void_arv_number(patient)
+  ActiveRecord::Base.connection.execute("SET FOREIGN_KEY_CHECKS = 0")
   #update patient_identifier table and void ARV_number
 ActiveRecord::Base.connection.execute <<EOF
 UPDATE #{Source_db}.patient_identifier
@@ -216,6 +217,7 @@ def self.completely_unvoid_opd_patient(patient_id)
   puts "working on OPD patient #{patient_id}........."
 
   if !opd_encs.blank?
+    ActiveRecord::Base.connection.execute("SET FOREIGN_KEY_CHECKS = 0")
 ActiveRecord::Base.connection.execute <<EOF
   UPDATE #{Source_db}.patient_identifier
   SET voided = 0, voided_by = NULL, void_reason = NULL, date_voided = NULL
