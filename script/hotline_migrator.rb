@@ -74,7 +74,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 ORDER BY patient_id desc")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
 
@@ -540,9 +540,9 @@ def self.create_tips_and_reminders_encounter(visit_encounter_id, encounter)
 		  enc.call_id = value
 	  elsif ob.concept_id == 8315 #'ON TIPS AND REMINDERS PROGRAM'
 		  enc.on_tips_and_reminders = value
-	  elsif ob.concept_id ==  8316 #'TYPE OF MESSAGE'
+	  elsif ob.concept_id ==  8317 #'TYPE OF MESSAGE'
 		  enc.type_of_message = value
-	  elsif ob.concept_id ==  8317 #'LANGUAGE PREFERENCE'
+	  elsif ob.concept_id ==  8316 #'LANGUAGE PREFERENCE'
 		  enc.language_preference = value
 	  elsif ob.concept_id ==  8318 #'TYPE OF MESSAGE CONTENT'
       enc.type_of_message_content = value
