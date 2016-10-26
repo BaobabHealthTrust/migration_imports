@@ -80,7 +80,6 @@ def start
    end
    CONN.execute update_row
 
-
    puts "Finished Working on message type patient_id: #{arow.person_id}"
  end
  $failed_message_types.close()

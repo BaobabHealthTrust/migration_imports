@@ -3,7 +3,7 @@ usage(){
   echo "Usage: $0 ENVIRONMENT"
   echo
   echo "ENVIRONMENT should be: development|production"
-} 
+}
 
 ENV=$1
 

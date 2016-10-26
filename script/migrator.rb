@@ -80,7 +80,7 @@ def start
   puts "Loaded concepts in #{elapsed}"
 
   #you can specify the number of patients to export by adding limit then number of patiets e.g limit 100 to the query below
-  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0")
+  patients = Patient.find_by_sql("Select * from #{Source_db}.patient where voided = 0 LIMIT 100")
   patient_ids = patients.map{|p| p.patient_id}
   pat_ids =  [0] if patient_ids.blank?
   
@@ -413,7 +413,7 @@ def self.get_patient_identifiers(pat_id)
 	pat_identifiers = Hash.new()	
 	
 	#identifiers = PatientIdentifier.find(:all, :conditions => ["patient_id = ? and voided = 0", pat_id])
-	identifier = PtientIdentifier.find_by_sql("select pi.* from #{Source_db}.patient_identifier pi
+	identifiers = PatientIdentifier.find_by_sql("select pi.* from #{Source_db}.patient_identifier pi
                                             where pi.date_created = (select max(pid.date_created) 
                                                                      from #{Source_db}.patient_identifier pid 
                                                                      where pid.patient_id = pi.patient_id 

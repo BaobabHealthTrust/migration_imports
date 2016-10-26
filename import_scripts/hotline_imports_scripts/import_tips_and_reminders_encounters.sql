@@ -250,7 +250,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                               LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                               WHERE name = 'Language preference' AND voided = 0 AND retired = 0 LIMIT 1);
 
-        # Get value_coded idWHO stage
+        # Get value_coded id
         SET @language_preference_value_coded = (SELECT concept_name.concept_id FROM concept_name concept_name
                         LEFT OUTER JOIN concept ON concept.concept_id = concept_name.concept_id
                         WHERE name = language_preference AND voided = 0 AND retired = 0 LIMIT 1);
@@ -262,8 +262,7 @@ DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
         # Create observation
         INSERT INTO obs (person_id, concept_id, encounter_id, obs_datetime, location_id , value_coded, value_coded_name_id, creator, date_created, uuid)
-        VALUES (patient_id, @language_preference_concept_id, old_enc_id, encounter_datetime, @location_id , @language_preference_value_coded, @language_preference_value_coded_name_id
-, @creator, date_created, (SELECT UUID()));
+        VALUES (patient_id, @language_preference_concept_id, old_enc_id, encounter_datetime, @location_id , @language_preference_value_coded, @language_preference_value_coded_name_id, @creator, date_created, (SELECT UUID()));
 
         # Get last obs id for association later to other records
         SET @language_preference_id = (SELECT LAST_INSERT_ID());
